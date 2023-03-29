@@ -1,14 +1,124 @@
+% Text:              X
+% Citation:          X
+% Revision:          X
+% Final Revision:    X
 \chapter{Preliminaries}
 This chapter will provide a context for the thesis.
 The reader will be able to gain the necessary background knowledge in order
-to understand the purpose of the thesis and why it can be useful for developing Jolie applications. This essentially builds on the motivation
+to understand the purpose of the thesis and why it can be useful for developing Jolie applications. This 
+essentially builds on the motivation
 described in the previous chapter.
 
-This chapter will describe some of the relevant definitions of the microservice architecture paradigm, as well as provide
-the reader with a quick overview of the Jolie programming language, and what other similar tools exist both for Jolie and other programming languages.
+This chapter will highlight some of the relevant definitions of the microservice architecture paradigm, as
+ well as provide
+the reader with a quick overview of the Jolie programming language, and what other similar tools exist 
+both for Jolie and other programming languages.
 
 \section{Microservice Architecture}
+Building software today requires a lot of careful considerations when it comes
+to choosing a software architecture. Many developers will choose a more monolithic architecture where all
+ functionality of the application
+is in one codebase. This is the simpler approach because everything is deployed as one solution, however,
+ there are many drawbacks
+with this approach when the software starts getting bigger, and a larger number of users starts 
+interacting with the platform.
+
+In this section and the following subsections, I will adopt the definitions from "Microservices patterns"
+ by Chris Richardson. \cite{microservicepatterns}
+
+\subsection{Some of the Problems with Monoliths}
+Drawbacks exist in all parts of using monolith software architecture, everything from development to 
+deploying and maintaining the production application.
+From a development standpoint, it can be slow to introduce new features into a monolithic application's
+ codebase. As the project grows, so will the complexity, and trying to somehow weave in a new feature in a large, cluttered project can seem almost impossible.
+
+After developing a new feature, or fixing a bug, the developer would ideally like to see their change 
+in production as fast as possible. This can, however, be quite a long and tedious process when developing in one large codebase.
+First, all tests must run, which can take a long time. The codebase is complex so the likelihood of a 
+test failing is big, meaning that the tests must be run multiple times.
+
+When the project runs in production, a whole new set of issues can quickly arise. It can be difficult
+to scale an application when the whole application is one big instance.
+The only thing to do is give the machine running the application more processing power and memory 
+storage capacity, in other words, vertically scale the application. Another significant problem with having the application be one instance of everything, is that a single point of failure exists. If one functionality of the program is faulty, it can affect other parts of the application
+even if the other parts seemingly have nothing to do with the faulty code.
+
+\subsection{Utilizing the Microservice Architecture}
+To avoid all the problems with the monolith architecture, developers can try to go for a more
+ distributed approach, where the microservice architecture is one of those approaches.
+% TODO more on what microservices are
+The microservice architecture addresses the more \textit{non-functional} aspects of the application.
+This includes maintainability, extensibility and testability, as well as the important aspect of 
+\textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
+faster response times and eliminating the single point of failure mentioned before.
+% TODO write something more here
+% maybe add some drawbacks of microservices here
+
+\section{Microservice Architectural Patterns}
+% here should be something about MAP 
 
 \section{Jolie}
+Jolie is a service-oriented programming language, which aims to abstract away the communication between services to a certain degree.
+The programmer will only need to design the API of the service in order to have other services communicate with it.
+A Jolie program can be seen as a composition of services
+Jolie code is always contained in services, where some building blocks are used to design properties of the specific service.
+
+\subsection{Basic Building Blocks of a Jolie Program}
+This subsection will quickly describe some of the relevant building blocks which are needed for a Jolie service.
+
+\textbf{Service}: the service block is sort of the key element of Jolie programs. Everything inside this block is what that specific service will handle. It is also 
+in this block where a developer will create business logic and provide information about the API.
+
+\textbf{Ports}: ports are the means of communication between services. Not just between Jolie services but also external communication.
+Jolie-services differentiate between in-going and out-going communication. So building blocks for both exists, namely \texttt{inputPort} and \texttt{outputPort}.
+Ports have their properties which a developer needs to specify. The three main properties of any port are: \textit{location}, \textit{protocol}, and \textit{interfaces}.
+Where location specifies where the port will be listening for messages and where the port will send messages.
+Protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
+operations the service is capable of performing, and for output ports, the interfaces specify which
+operations the service is capable of invoking internally. Listing \ref*{lst:simple-inputport} shows a basic input port in Jolie, where all the key properties are set.
+
+\begin{jolisting}[][caption={Simple input port in Jolie},label=lst:simple-inputport]
+inputPort IP {
+    Location: "socket://localhost:9999"
+    Protocol: sodep
+    Interfaces: SomeInterface
+}
+\end{jolisting}
+
+%TODO find someplace to talk about communication, namely local (in-memory) and socket://localhost
+
+\textbf{Interfaces}: interfaces define a list of operations. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
+and \texttt{OneWay} where the operation takes in a request type but returns nothing.
+
+\textbf{Type}: interfaces use types to define what is expected to be given to an operation, and in some cases what the operation will return. In Jolie, there are basic
+data types which include: \texttt{void}, \texttt{int}, \texttt{string}, \texttt{bool}, etc. However, it is also to define custom types which can contain subtypes. 
+This could be used when an operation needs more data types.
+Listing \ref*{lst:type-with-interf} is an example of a custom type used in an interface in Jolie:
+\begin{jolisting}[][caption={Custom type used in an interface in Jolie},label=lst:type-with-interf]
+type SomeType: void {
+    content: string
+    id: int
+}
+
+interface SomeInterface {
+    RequestResponse:
+        handleSomething(SomeType)(int)
+}
+\end{jolisting}
+
+Besides the four things mentioned, there are some other things which are needed for a Jolie program, however, for this thesis, there is no reason to dive further into the specifics. 
+If one wishes to get more familiar with the language, the programming language does have a documentation page which goes more into the specifics of each component.
+
+\subsection{Architectural Programming in Jolie}
+Jolie facilitates the possibility of programming the execution contexts.
+This means that, in code, the developer can handle the execution of other services. This is called \textit{Embedding}.
+
+A service can embed another service, which means that the embedder can launch the embedded service. This is useful when a service depends on another service to be running.
+The service can simply embed another service to ensure that when the embedder is running, so is the embedded services.
+Another benefit of embedding is that the language will take care of the connection, meaning that the developer does not necessarily need to worry about how a service is connected to the embedded services.
+This also potentially hides the connection from the outside world. 
+
+\section{Docker-Compose}
 
 \section{Current Tools}
+% establish the context of the visualization tools
