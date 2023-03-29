@@ -1,0 +1,437 @@
+\documentclass[oneside]{book}
+
+% UTILS ------------------------------------------------------------------------
+\usepackage{xparse}
+\usepackage{etoolbox}
+\usepackage{environ}
+\usepackage{lipsum}
+
+% PROJECT ----------------------------------------------------------------------
+\usepackage{import}
+
+% PAGE&FONT --------------------------------------------------------------------
+\usepackage[a4paper]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[utf8]{inputenc}
+\usepackage[final]{microtype}
+%\usepackage{bera}
+
+\usepackage{titlepic}
+\linespread{1.15}
+\newcommand{\subsubsubsection}[1]{\paragraph{#1}\mbox{}\\}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+% GRAPHICS ---------------------------------------------------------------------
+\usepackage[x11names,rgb,html]{xcolor}
+
+\usepackage{graphicx}
+\graphicspath{./figures/}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{tikzmark}
+%\usepackage{pgfplots}
+
+% BABEL ------------------------------------------------------------------------
+\usepackage[british]{babel}
+\usepackage{csquotes}
+\hyphenation{}
+
+% MATH -------------------------------------------------------------------------
+\usepackage{amsmath}
+
+% TABULARS ---------------------------------------------------------------------
+\usepackage{array}
+\usepackage{xtab}
+\usepackage{booktabs}
+\usepackage{multicol}
+
+% FLOATS -----------------------------------------------------------------------
+\usepackage{float}
+%\usepackage{placeins}
+%\usepackage{wrapfig}
+
+% ENUMS ------------------------------------------------------------------------
+\usepackage[inline]{enumitem}
+
+% CROSS REFS -------------------------------------------------------------------
+\usepackage{hyperref}
+\usepackage{nameref}
+\usepackage[capitalise,nameinlink,noabbrev]{cleveref} % capitalise, (removed)
+
+% register lstlisting with cleveref
+\Crefname{lstlisting}{Listing}{Listings}
+\makeatletter
+\if@cref@capitalise
+\else
+\crefname{lstlisting}{listing}{listings}
+\fi
+\makeatother
+
+\AtEndPreamble{\hypersetup{
+  hidelinks,
+  %     colorlinks=true,
+  %     linkcolor=black,
+  %     urlcolor=blue,
+  %     citecolor=black
+  final,
+}}
+
+% BIBLIO -----------------------------------------------------------------------
+\usepackage{biblatex} %Imports biblatex package
+\addbibresource{bibliography.bib} %Import the bibliography file
+
+% REVISION ---------------------------------------------------------------------
+\usepackage[
+%   disable,     % hide all todos
+% obeyDraft,   % show todos only in draft mode
+  obeyFinal,   % hide todos if in final mode
+  textwidth=\marginparwidth,
+  textsize=footnotesize,
+  colorinlistoftodos,
+  prependcaption
+]{todonotes}
+\newcommand{\unsure}[2][]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red,#1]{#2}}
+\newcommand{\change}[2][]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
+\newcommand{\info}[2][]{\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan,#1]{#2}}
+\newcommand{\improvement}[2][]{\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}}
+
+% LISTINGS ---------------------------------------------------------------------
+
+% Typesetting folder and file trees
+\usepackage{dirtree}
+\usepackage{listings}
+
+% patch lstinline to work in mathmode
+\expandafter\patchcmd\csname \string\lstinline\endcsname{%
+  \leavevmode
+  \bgroup
+}{%
+  \leavevmode
+  \ifmmode\mbox\fi
+  \bgroup
+}{}{%
+  \typeout{Patching of \string\lstinline\space failed!}%
+}
+
+% As a reference, this is the language def for Java from package listings. 
+% \lstdefinelanguage{Java}%
+%  {morekeywords={abstract,boolean,break,byte,case,catch,char,class,%
+%      const,continue,default,do,double,else,extends,false,final,%
+%      finally,float,for,goto,if,implements,import,instanceof,int,%
+%      interface,label,long,native,new,null,package,private,protected,%
+%      public,return,short,static,super,switch,synchronized,this,throw,%
+%      throws,transient,true,try,void,volatile,while,final},%
+%   sensitive,%
+%   morecomment=[l]//,%
+%   morecomment=[s]{/*}{*/},%
+%   morestring=[b]",%
+%   morestring=[b]',%
+%  }[keywords,comments,strings]%
+
+\lstdefinelanguage{jolie}{
+  morekeywords={as,csets,type,configType,raw,any,undefined,void,default,
+  if,for,while,spawn,foreach,else,define,main,include,from,
+  constants,inputPort,outputPort,interface,execution,cset,
+  nullProcess,RequestResponse,OneWay,throw,throws,install,
+  scope,embedded,init,synchronized,global,is_defined,
+  is_int,is_bool,is_long,is_string,bool,long,int,string,
+  double,undef,with,location,protocol,interfaces,aggregates,courier,
+  redirects,import,embed,service,binding,foreign,InputPort,OutputPort,implementation},
+  morekeywords=[2]{>>,select,match},
+  sensitive,%
+	morecomment=[l]//,%
+	morecomment=[s]{/*}{*/},%
+	morestring=[b]",%
+  morestring=[b]',%
+  classoffset=1, % starting new class
+  otherkeywords={;,|,@},
+  classoffset=0,% returning to previous class
+  }[keywords,comments,strings]%
+
+\lstdefinelanguage{javascript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstdefinelanguage{markdown}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break},
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+% style --------------------------------
+\usepackage[scaled=.85]{FiraMono}
+\usepackage{fancyhdr}
+\usepackage{fancyvrb}
+
+% Solirized palette, see https://ethanschoonover.com/solarized/
+\definecolor{sbase03}{HTML}{002B36}
+\definecolor{sbase02}{HTML}{073642}
+\definecolor{sbase01}{HTML}{586E75}
+\definecolor{sbase00}{HTML}{657B83}
+\definecolor{sbase0}{HTML}{839496}
+\definecolor{sbase1}{HTML}{93A1A1}
+\definecolor{sbase2}{HTML}{EEE8D5}
+\definecolor{sbase3}{HTML}{FDF6E3}
+\definecolor{syellow}{HTML}{B58900}
+\definecolor{sorange}{HTML}{CB4B16}
+\definecolor{sred}{HTML}{DC322F}
+\definecolor{smagenta}{HTML}{D33682}
+\definecolor{sviolet}{HTML}{6C71C4}
+\definecolor{sblue}{HTML}{268BD2}
+\definecolor{scyan}{HTML}{2AA198}
+\definecolor{sgreen}{HTML}{859900}
+
+\lstdefinestyle{solarized-light}{
+  frame=none,
+  breaklines=true,
+  showstringspaces=false,
+  tabsize=1,
+  columns=fixed,
+  %mathescape=true,
+  extendedchars=true,
+  backgroundcolor=\color{sbase3},
+  keywordstyle=\bfseries\color{sbase01},
+  keywordstyle=[2]\bfseries\color{sbase01},
+  stringstyle=\color{sviolet},
+  numberstyle=\color{sviolet},
+  identifierstyle=\color{sbase03},
+  commentstyle=\color{sgreen},
+  basicstyle=\color{sbase03}\ttfamily\lst@ifdisplaystyle\footnotesize\fi,
+}
+
+\colorlet{punct}{red!60!black}
+\definecolor{background}{HTML}{EEEEEE}
+\definecolor{delim}{RGB}{20,105,176}
+\colorlet{numb}{magenta!60!black}  
+
+% environments -------------------------
+
+\usepackage[most]{tcolorbox}
+\tcbuselibrary{listings}
+
+
+\NewDocumentCommand{\newlang}{o m m m}{%
+  \IfNoValueTF{#1}{\def\n{#2}}{\def\n{#1}}
+  \expandafter\NewDocumentCommand\csname \n listing\endcsname{s O{} O{}}{%
+	  \def\WithoutTitle{\tcblisting{
+	          enhanced, %draft,
+	          breakable = false,
+	          before skip=\abovedisplayskip,
+	          after  skip=\belowdisplayskip,
+	          sharp corners=all,
+	          boxrule=2pt,
+            left=5pt,right=5pt,top=-5pt,bottom=-5pt,
+            colframe=#4,
+            colback=sbase3,
+            overlay={\fill[sbase2] (interior.south west)
+                    rectangle ([xshift=3.5ex]interior.north west);},
+            title={},
+            listing remove caption=false,
+            listing only,
+            listing options={
+              language=#2,
+              numbers=left, 
+              numberstyle=\tiny,
+              xleftmargin=3.7ex,
+              style=solarized-light,##3
+            },
+	          ##2
+	  	}}%
+  	\def\withTitle{\tcblisting{
+         enhanced, %draft,
+         breakable = false,
+         before skip=\abovedisplayskip,
+         after  skip=\belowdisplayskip,
+         sharp corners=all,
+         boxrule=2pt,
+          left=5pt,right=5pt,top=-5pt,bottom=-5pt,
+         colframe=#4,
+         colback=sbase3,
+         finish={\node[anchor=south east, font=\footnotesize\itshape,
+         text=sbase3,fill=#4,outer sep=0pt] at (frame.south east) {#3};},
+          overlay={\fill[sbase2] (interior.south west)
+                  rectangle ([xshift=3.5ex]interior.north west);},
+         title={},
+          listing remove caption=false,
+         listing only,
+         listing options={
+            language=#2,
+            numbers=left, 
+            numberstyle=\tiny,
+            xleftmargin=3.7ex,
+            style=solarized-light,##3
+          },
+         ##2
+   }}%
+	  \IfBooleanTF{##1}{\WithoutTitle}{\withTitle}}
+  \expandafter\def\csname end\n listing\endcsname{\endtcblisting\noindent}
+  \expandafter\def\csname\n\endcsname{\lstinline[language=#2,style=solarized-light]}
+}
+
+%   Generate the environment for the abstract:
+\newcommand\summaryname{Abstract}
+\newenvironment{Abstract}%
+    {\small\begin{center}%
+    \bfseries{\summaryname} \end{center}}
+
+% listings and inlining of Jolie code
+\newlang[jo]{jolie}{Jolie}{sblue}
+
+% listings and inlining of JavaScript code
+\newlang[js]{javascript}{JavaScript}{scyan}
+
+\fancyhf{}
+\setlength{\headheight}{15pt}
+\lfoot{}
+\cfoot{}
+\usepackage{caption}
+\usepackage{setspace}
+\captionsetup[listing]{position=bottom,skip=-5pt}
+
+\pagestyle{fancy}
+
+%-------------------------------------------------------------------------------
+\begin{document}
+
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+% Defines a new command for
+% horizontal lines, change thickness here
+
+\center % Centre everything on the page
+
+	%------------------------------------------------
+	%	Headings
+	%------------------------------------------------
+
+	\textsc{\LARGE University of Southern Denmark}\\[1.5cm]
+	% Main heading such as the name of your university/college
+
+	\textsc{\Large Department of Mathematics and Computer Science}\\[0.5cm]
+	%Major heading such as course name
+
+	\textsc{\large SPDM801: Master's thesis in Computer Science}\\[0.5cm]
+	% COURSE ID AND NAME
+
+	%------------------------------------------------
+	%	Title
+	%------------------------------------------------
+
+	\HRule\\[0.5cm]
+
+	\begin{spacing}{1.9}
+		{\huge\bfseries A tool for eliciting patterns in microservice architectures written in Jolie}\\[0.0cm] % Title of your document
+	\end{spacing}
+
+	\HRule\\[1.0cm]
+
+	%------------------------------------------------
+	%	Author
+	%------------------------------------------------
+	\large
+	\textit{Author}\\ \bigskip
+	\begin{minipage}[t]{0.45\textwidth}
+	    \begin{center}
+		    \normalsize
+		    Emil Ovcina\\
+		    \href{mailto:emovc18@student.sdu.dk}{emovc18@student.sdu.dk}\\
+		    \href{mailto:emilovcina@gmail.com}{emilovcina@gmail.com}\\ \bigskip    
+	   \end{center}
+	\end{minipage}
+    \vfill\vfill\vfill
+    \large
+	\textit{Supervisor}\\ \bigskip
+	\begin{minipage}[t]{0.45\textwidth}
+	    \begin{center}
+		    \normalsize
+		    Marco Peressotti\\
+		    \href{mailto:peressotti@sdu.dk}{peressotti@sdu.dk}\\ \bigskip    
+	   \end{center}
+	\end{minipage}
+
+
+	%------------------------------------------------
+	%	Date
+	%------------------------------------------------
+
+	\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+
+	{\large \today}
+
+	%------------------------------------------------
+	%	Logo
+	%------------------------------------------------
+
+	\vfill\vfill
+	\begin{centering}
+	\includegraphics[width=0.3\textwidth]{figures/sdu_logo.png}\\[1cm]
+	% Include a
+% department/university logo - this will require the graphicx package
+	\end{centering}
+
+%-------------------------------------------------------------------------------
+
+	\vfill % Push the date up 1/4 of the remaining page
+\end{titlepage}
+
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\begin{Abstract}
+Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet amet proident proident. Sit ipsum laboris elit excepteur culpa elit sit cupidatat minim amet cupidatat. Officia nostrud cillum adipisicing amet pariatur do tempor in laboris eu. Occaecat excepteur ut aliquip incididunt officia enim sit tempor.
+\end{Abstract}
+\newpage
+
+
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+\setcounter{page}{1}
+
+\input{chapters/introduction.tex}
+\input{chapters/preliminaries.tex}
+\input{chapters/usingthetool.tex}
+\input{chapters/implementation.tex}
+
+\chapter{Chapter}
+\section{Section}
+\jo{service S}
+\begin{jolisting}
+service {}
+\end{jolisting}
+
+\js{[] == ""}
+
+\begin{jslisting}
+function f() { return 5; }
+\end{jslisting}
+
+% title
+\begin{jolisting}[title={Title goes here!}][]
+service {}
+\end{jolisting}
+
+% passing caption/label to lstlisting
+\begin{jolisting}[][caption={Caption goes here!},label=lst:a-listing]
+service {}
+\end{jolisting}
+
+\cref{lst:a-listing}
+
+\cite{jolie}
+
+\end{document}
