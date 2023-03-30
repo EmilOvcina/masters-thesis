@@ -406,6 +406,8 @@
 	\vfill % Push the date up 1/4 of the remaining page
 \end{titlepage}
 
+\pagenumbering{roman}
+\fancyfoot[C]{\thepage}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 \begin{Abstract}
 Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet amet proident proident. Sit ipsum laboris elit excepteur culpa elit sit cupidatat minim amet cupidatat. Officia nostrud cillum adipisicing amet pariatur do tempor in laboris eu. Occaecat excepteur ut aliquip incididunt officia enim sit tempor.
@@ -413,6 +415,7 @@ Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet am
 \newpage
 
 
+\pagenumbering{gobble}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 \tableofcontents
 \thispagestyle{empty}
@@ -429,12 +432,15 @@ Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet am
 % \newpage
 
 \setcounter{page}{1}
+\pagenumbering{arabic}
 \pagestyle{fancy}
-\fancyfoot{}
+\fancyfoot[C]{\vfill\thepage}
+
 \input{chapters/introduction.tex}
 \input{chapters/preliminaries.tex}
 \input{chapters/usingthetool.tex}
 \input{chapters/implementation.tex}
+\input{chapters/synthesis.tex}
 
 \chapter{Chapter}
 \section{Section}

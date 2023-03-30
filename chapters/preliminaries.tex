@@ -9,9 +9,10 @@ to understand the purpose of the thesis and why it can be useful for developing 
 essentially builds on the motivation
 described in the previous chapter.
 
+% todo "pros and cons of microservices"
 This chapter will highlight some of the relevant definitions of the microservice architecture paradigm, as
  well as provide
-the reader with a quick overview of the Jolie programming language, and what other similar tools exist 
+the reader with a quick overview of the Jolie programming language, what Docker Compose is, and what other similar tools exist 
 both for Jolie and other programming languages.
 
 \section{Microservice Architecture}
@@ -23,6 +24,7 @@ is in one codebase. This is the simpler approach because everything is deployed 
 with this approach when the software starts getting bigger, and a larger number of users starts 
 interacting with the platform.
 
+% ? what?
 In this section and the following subsections, I will adopt the definitions from "Microservices patterns"
  by Chris Richardson. \cite{microservicepatterns}
 
@@ -54,8 +56,10 @@ faster response times and eliminating the single point of failure mentioned befo
 % TODO write something more here
 % maybe add some drawbacks of microservices here
 
-\section{Microservice Architectural Patterns}
-% here should be something about MAP 
+% ? should this be here?
+\section{Microservice API Patterns}
+% here should be something about MAPs 
+In this section, I will go through some microservice API patterns which will become relevant in the context of Jolie programs.
 
 \section{Jolie}
 Jolie is a service-oriented programming language, which aims to abstract away the communication between services to a certain degree.
@@ -67,7 +71,7 @@ Jolie code is always contained in services, where some building blocks are used 
 This subsection will quickly describe some of the relevant building blocks which are needed for a Jolie service.
 
 \textbf{Service}: the service block is sort of the key element of Jolie programs. Everything inside this block is what that specific service will handle. It is also 
-in this block where a developer will create business logic and provide information about the API.
+in this block where a developer will create business logic and provide information about the API. Services usually consist of some main business logic block and any number of ports.
 
 \textbf{Ports}: ports are the means of communication between services. Not just between Jolie services but also external communication.
 Jolie-services differentiate between in-going and out-going communication. So building blocks for both exists, namely \texttt{inputPort} and \texttt{outputPort}.
@@ -85,9 +89,14 @@ inputPort IP {
 }
 \end{jolisting}
 
-%TODO find someplace to talk about communication, namely local (in-memory) and socket://localhost
+%maybe move this up a bit
+The location of the port can utilize different media for communication, but the two most common are TCP/IP sockets and Jolie in-memory communication.
+Specifying the location of ports with \texttt{socket://} followed by an IP address means that the ports are communicating via TCP/IP.
+Specifying the location with \texttt{local} means that the ports will use an in-memory channel to communicate, this also means that services on different networks cannot communicate.
+A port using the local communication medium will be referred to as a "local port".
 
-\textbf{Interfaces}: interfaces define a list of operations. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
+
+\textbf{Interfaces}: interfaces define a list of operations, which a service needs to implement in order to use. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
 and \texttt{OneWay} where the operation takes in a request type but returns nothing.
 
 \textbf{Type}: interfaces use types to define what is expected to be given to an operation, and in some cases what the operation will return. In Jolie, there are basic
@@ -106,19 +115,101 @@ interface SomeInterface {
 }
 \end{jolisting}
 
+% is this foreshadowing?
 Besides the four things mentioned, there are some other things which are needed for a Jolie program, however, for this thesis, there is no reason to dive further into the specifics. 
 If one wishes to get more familiar with the language, the programming language does have a documentation page which goes more into the specifics of each component.
 
-\subsection{Architectural Programming in Jolie}
+% Should this just be two subsections of embedding and communication topology
+% \subsection{Architectural Programming in Jolie}
+\subsection{Embedding Services in Jolie}
 Jolie facilitates the possibility of programming the execution contexts.
 This means that, in code, the developer can handle the execution of other services. This is called \textit{Embedding}.
 
 A service can embed another service, which means that the embedder can launch the embedded service. This is useful when a service depends on another service to be running.
 The service can simply embed another service to ensure that when the embedder is running, so is the embedded services.
 Another benefit of embedding is that the language will take care of the connection, meaning that the developer does not necessarily need to worry about how a service is connected to the embedded services.
-This also potentially hides the connection from the outside world. 
+This also potentially hides the connection from the outside world.
 
-\section{Docker-Compose}
+The in-memory communication channel can be utilized here. The developer can specify if the embedder should create a new local port and connect automatically via that. This requires that the embedded service contains an input port which shares protocol and location.
+Listing \ref*{lst:embed-as} showcases this functionality.
+
+\begin{jolisting}[][caption={Embedding of a service called "svc" via a local output port "OP"}, label=lst:embed-as]
+embed svc as OP
+\end{jolisting}
+
+It is not required that the embedder specifies some local output port for communication. In some cases, where the two services already have ports which use TCP/IP sockets, 
+it can be the intention to just keep using those ports for communication. If this
+is the intention, the developer can simply remove the \texttt{as OP} part of the embed line, and this will still ensure that the embedded service is running and available when the embedder is executing.
+
+% todo maybe add a figure of embedding (maybe taken from the visualizer)
+
+\subsection{Programming the Communication Topology}
+Jolie also facilitates the programming of the communication topology. This includes aggregation, redirection, couriers, and collections, which is useful when 
+implementing some of the microservice design patterns mentioned before.
+\newline\newline
+\textbf{Aggregation} is an architectural pattern where a service has an input port which exposes all operations of a specified set of output ports. This essentially works like a reverse proxy, where the aggregated service distributes requests to aggregated services without
+requiring the aggregated services to be publically exposed or known. Listing \ref{lst:aggregator-inputport} displays how an input port can expose the API of two other output ports.
+The API of the output ports being aggregated can be extended by the aggregator service. This is done by using \textit{interface extenders} which does as the name implies and allows any client to access more operations than the output port's interfaces specify.
+This is a simple architectural pattern but can be used to implement some widely used architectural strategies. This includes load balancing, caching, encryption and cyber attack prevention.
+
+\begin{jolisting}[][caption={Input port which aggregates requests to some output ports, OP1 and OP2.}, label=lst:aggregator-inputport]
+inputPort AggregatorPort {
+    Location: "socket://localhost:8888"
+    Protocol: sodep
+    Aggregates: OP1, OP2
+}
+\end{jolisting}
+
+% todo rewrite
+Here is a simple example of how the aggregator pattern works: 
+% todo example of aggregation, with a figure.
+\newline\newline
+\textbf{Redirection} is a pattern which works similarly to the aggregator, but architecturally is very different.
+A service with an input port can specify that a resource name gets redirected to a specific service via an output port.
+Listing \ref*{lst:redirector-inputport} displays how an input port can specify resources and map them to an output port.
+This means that a client sending a request to the redirector can specify a resource name in the communication media, and the redirector will forward the message to the correct service based on that resource name.
+To specify a resource name the client simply needs to specify it in the URL, e.g \texttt{socket://localhost:9000/!/rss} where the \texttt{/!/rss} part is what specifies the resource name.
+
+\begin{jolisting}[][caption={Input port which redirects requests using resource names}, label=lst:redirector-inputport]
+inputPort RedirectorPort {
+    Location: "socket://localhost:8888"
+    Protocol: sodep
+    Redirects:
+        rss1 => OP1
+        rss2 => OP2
+}
+\end{jolisting}
+
+% todo rewrite
+Here is a simple example of how the redirector pattern works.
+% todo example of redirector, with a figure?
+\newline\newline
+\textbf{Couriers} are can be used in extension with aggregators. Couriers allow the developer to append functionality to a set of operations.
+The developer defines a courier process by specifying an input port and a set of operations. When that input port receives a request using any of the operations, the courier process executes some code before forwarding
+the request along to the main operation implementation.
+\newline\newline
+\textbf{Collections} are another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
+They are specified by grouping output ports when defining aggregates.
+This together with courier processes can fully, and easily, implement a load balancer for services sharing interfaces because the courier can forward the requests to any of the aggregated services based on some condition.
+
+
+\section{Docker \& Docker Compose}
+Docker is a containerization tool used for deploying applications. It builds an \textit{image} which specifies how the container should build and start when it is created.
+Docker handles a single container, and \textit{Docker Compose} is used to handle multi-container applications. Docker Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
+
+Docker Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas 
+of containers if needed.
+
+\subsection{Jolie in Docker}
+% something about how to make a Jolie service in docker and how the connection works
+To utilize Docker and Docker Compose when developing a microservice architecture in Jolie, creating images can be done using the Jolie base image \texttt{jolielang/jolie}.
+Using this image when making a Dockerfile will set up Jolie when building the image, so only the exposed ports, source files and possible runtime arguments should be handled by the developer.
+
+When running a container, the developer needs to specify what container ports to expose, what parameters should be parsed into the Jolie program, and if it needs to connect to other services the developer needs to first create the network and then assign each container to that network.
+This is where Docker Compose, or \textit{Kubernetes} which is another container orchestration tool, can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
+
+Connecting ports over a Docker network needs some extra work from the developer. Ports which use TCP/IP sockets for communication cannot use "localhost" as seen in the previous examples, they need to use the container name as the IP address so Docker can figure out where to send messages inside the network.
+This can look something like: \texttt{socket://auth:9999}, where \texttt{auth} is the name of the container.
 
 \section{Current Tools}
-% establish the context of the visualization tools
+% establish the context of the current visualization tools
