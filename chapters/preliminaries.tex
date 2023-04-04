@@ -1,5 +1,5 @@
 % Text:              X
-% Citation:          X
+% Citations:         X
 % Revision:          X
 % Final Revision:    X
 \chapter{Preliminaries}
@@ -9,11 +9,11 @@ to understand the purpose of the thesis and why it can be useful for developing 
 essentially builds on the motivation
 described in the previous chapter.
 
-% todo "pros and cons of microservices"
-This chapter will highlight some of the relevant definitions of the microservice architecture paradigm, as
+This chapter will highlight some of the relevant definitions of the microservice architecture paradigm, some of the benefits and consequences, and alternatives, as
  well as provide
-the reader with a quick overview of the Jolie programming language, what Docker Compose is, and what other similar tools exist 
-both for Jolie and other programming languages.
+the reader with a quick overview of the Jolie programming language,
+what Docker Compose is, and what tools exist
+both for Jolie and other programming languages which can be used in some way to visualize.
 
 \section{Microservice Architecture}
 Building software today requires a lot of careful considerations when it comes
@@ -48,18 +48,33 @@ even if the other parts seemingly have nothing to do with the faulty code.
 \subsection{Utilizing the Microservice Architecture}
 To avoid all the problems with the monolith architecture, developers can try to go for a more
  distributed approach, where the microservice architecture is one of those approaches.
-% TODO more on what microservices are
+
+The microservice architecture tries to make the application modular. This means that all business logic is broken up into different services 
+where each service serves only one cohesive set of purposes, and the services can be replicated.
+The services will have some kind of API which other services can use for communication. This provides some kind of forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
+This helps in preserving modularity and keeps services decoupled.
+The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
+
 The microservice architecture addresses the more \textit{non-functional} aspects of the application.
-This includes maintainability, extensibility and testability, as well as the important aspect of 
+This includes maintainability, extensibility and testability, as well as the important aspect of
 \textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
 faster response times and eliminating the single point of failure mentioned before.
-% TODO write something more here
-% maybe add some drawbacks of microservices here
 
-% ? should this be here?
+There can be some difficulties in working with microservices, so it is not a one-solution-fits-all.
+The communication between microservices can be a whole new dimension of complexity. The developer has several ways of implementing communication
+and all have their benefits and consequences. The microservices can communicate through event channels, they can expose a REST API, and one could set up a service mesh to handle inter-service communication.
+Another set of problems is data consistency. Different patterns can be used to ensure that data between services stay consistent. This includes \textit{sagas}, \textit{event sourcing} and many more.
+% TODO write something more here
+
+% ? Should this be here?
 \section{Microservice API Patterns}
-% here should be something about MAPs 
+% Here should be something about MAPs 
 In this section, I will go through some microservice API patterns which will become relevant in the context of Jolie programs.
+% todo - explain the structure of MAPs and what is used in which scenario.
+% ? subsections could be of the types of pattern: foundation, quality, structure and so on...
+
+\subsection{The Embedded Entity Pattern}
+\subsection{The API Gateway Pattern}
 
 \section{Jolie}
 Jolie is a service-oriented programming language, which aims to abstract away the communication between services to a certain degree.
@@ -89,12 +104,10 @@ inputPort IP {
 }
 \end{jolisting}
 
-%maybe move this up a bit
 The location of the port can utilize different media for communication, but the two most common are TCP/IP sockets and Jolie in-memory communication.
 Specifying the location of ports with \texttt{socket://} followed by an IP address means that the ports are communicating via TCP/IP.
 Specifying the location with \texttt{local} means that the ports will use an in-memory channel to communicate, this also means that services on different networks cannot communicate.
 A port using the local communication medium will be referred to as a "local port".
-
 
 \textbf{Interfaces}: interfaces define a list of operations, which a service needs to implement in order to use. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
 and \texttt{OneWay} where the operation takes in a request type but returns nothing.
@@ -111,16 +124,13 @@ type SomeType: void {
 
 interface SomeInterface {
     RequestResponse:
-        handleSomething(SomeType)(int)
+        someOperation(SomeType)(int)
 }
 \end{jolisting}
 
-% is this foreshadowing?
-Besides the four things mentioned, there are some other things which are needed for a Jolie program, however, for this thesis, there is no reason to dive further into the specifics. 
+Besides the four things mentioned, there are some other things which are needed for a Jolie program, however, for this thesis, there is no reason to dive further into the specifics.
 If one wishes to get more familiar with the language, the programming language does have a documentation page which goes more into the specifics of each component.
 
-% Should this just be two subsections of embedding and communication topology
-% \subsection{Architectural Programming in Jolie}
 \subsection{Embedding Services in Jolie}
 Jolie facilitates the possibility of programming the execution contexts.
 This means that, in code, the developer can handle the execution of other services. This is called \textit{Embedding}.
@@ -137,17 +147,16 @@ Listing \ref*{lst:embed-as} showcases this functionality.
 embed svc as OP
 \end{jolisting}
 
-It is not required that the embedder specifies some local output port for communication. In some cases, where the two services already have ports which use TCP/IP sockets, 
+It is not required that the embedder specifies some local output port for communication. In some cases, where the two services already have ports which use TCP/IP sockets,
 it can be the intention to just keep using those ports for communication. If this
 is the intention, the developer can simply remove the \texttt{as OP} part of the embed line, and this will still ensure that the embedded service is running and available when the embedder is executing.
 
-% todo maybe add a figure of embedding (maybe taken from the visualizer)
+In the quality pattern category of the microservice API patterns mentioned before, embeddings are a way of implementing \textit{Embedded Entity} reference management.
 
 \subsection{Programming the Communication Topology}
 Jolie also facilitates the programming of the communication topology. This includes aggregation, redirection, couriers, and collections, which is useful when 
 implementing some of the microservice design patterns mentioned before.
-\newline\newline
-\textbf{Aggregation} is an architectural pattern where a service has an input port which exposes all operations of a specified set of output ports. This essentially works like a reverse proxy, where the aggregated service distributes requests to aggregated services without
+\newdif{Aggregation} is an architectural pattern where a service has an input port which exposes all operations of a specified set of output ports. This essentially works like a reverse proxy, where the aggregated service distributes requests to aggregated services without
 requiring the aggregated services to be publically exposed or known. Listing \ref{lst:aggregator-inputport} displays how an input port can expose the API of two other output ports.
 The API of the output ports being aggregated can be extended by the aggregator service. This is done by using \textit{interface extenders} which does as the name implies and allows any client to access more operations than the output port's interfaces specify.
 This is a simple architectural pattern but can be used to implement some widely used architectural strategies. This includes load balancing, caching, encryption and cyber attack prevention.
@@ -160,15 +169,25 @@ inputPort AggregatorPort {
 }
 \end{jolisting}
 
-% todo rewrite
-Here is a simple example of how the aggregator pattern works: 
-% todo example of aggregation, with a figure.
-\newline\newline
-\textbf{Redirection} is a pattern which works similarly to the aggregator, but architecturally is very different.
+To Showcase this feature in an example: imagine that an app wants to support different payment methods but doesn't want the client to know the location and protocol of each of them. An aggregator can be set up between the 
+client and the services, and depending on the payment method, the aggregator can send the payment request to the correct service.
+Figure \ref*{figure:aggregator_example} shows a system with a service which can aggregate requests by having an output port to each of the aggregated services and a single input port where the aggregation is specified. The aggregated services can either be embedded or not.
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.5\textwidth]{figures/aggregator_example.png}
+    \caption{A group of microservices handling different payment methods. The payment service acts as an aggregator obscuring the underlying services. The orange hexagons depict services, the yellow boxes depict input ports and the red boxes depict output ports.
+    Sending a request to the payment service will aggregate the message to the correct payment service depending on the user's chosen payment method. This is done without the client needing to know the correct service's location and protocol.}
+    \label{figure:aggregator_example}
+\end{figure}
+\newdif{Redirection} is a pattern which works similarly to the aggregator, but architecturally is very different.
 A service with an input port can specify that a resource name gets redirected to a specific service via an output port.
 Listing \ref*{lst:redirector-inputport} displays how an input port can specify resources and map them to an output port.
 This means that a client sending a request to the redirector can specify a resource name in the communication media, and the redirector will forward the message to the correct service based on that resource name.
 To specify a resource name the client simply needs to specify it in the URL, e.g \texttt{socket://localhost:9000/!/rss} where the \texttt{/!/rss} part is what specifies the resource name.
+
+Redirection can be used to implement several different microservice (API) patterns since it essentially is a proxy.
+Generally, a lot of API structures can be implemented using redirectors, because of how a client can specify a specific resource.
+\text{API Gateway} is one of the API patterns which can be implemented using redirectors, which are used a lot by heavily visited sites like Netflix.
 
 \begin{jolisting}[][caption={Input port which redirects requests using resource names}, label=lst:redirector-inputport]
 inputPort RedirectorPort {
@@ -180,36 +199,70 @@ inputPort RedirectorPort {
 }
 \end{jolisting}
 
-% todo rewrite
-Here is a simple example of how the redirector pattern works.
-% todo example of redirector, with a figure?
-\newline\newline
-\textbf{Couriers} are can be used in extension with aggregators. Couriers allow the developer to append functionality to a set of operations.
+Here is a simple example of what the redirector pattern could be used for: imagine that a client wants to load a webpage displaying all relevant information about a certain product.
+Instead of the client needing to call different services with different locations and protocols, a redirector could be used to
+act as a single point of entry. The client would then specify the resources needed for a product page. similarly, if another service in the system would like to get the current stock of some product it could call the product service with the correct resource name.
+The example is showcased in figure \ref*{figure:redirector_example}. The client makes requests to the redirector specifying the resource name to fetch the relevant data.
+% todo change figure image
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.5\textwidth]{figures/redirector_example.png}
+    \caption{A group of microservices handling different elements of product information. The \textit{Product} service is a redirector service which supports three resource names:
+    \texttt{getSimilar}, \texttt{getRecommendations}, and \texttt{getStock}. The client can choose what resource to get for the specific product. The \textit{Similar} service's job is to know what other products are similar to the searched product.
+    The \textit{Recommended} service finds what products are recommended together with this product and \textit{Warehouse} gets warehouse information about the product.}
+    \label{figure:redirector_example}
+\end{figure}
+\newdif{Couriers}  allow the developer to append functionality to a set of operations. They work well in extension with other communication topologies like aggregators.
 The developer defines a courier process by specifying an input port and a set of operations. When that input port receives a request using any of the operations, the courier process executes some code before forwarding
 the request along to the main operation implementation.
-\newline\newline
-\textbf{Collections} are another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
+
+Couriers can be used to implement any type of middleware functionality. From the book by Olaf Zimmermann et al., many of the quality patterns can be implemented using couriers. This includes
+\textit{conditional requests}, \textit{rate limit}, \textit{pricing plan} etc. Besides the quality microservice API patterns, other microservice patterns can be implemented using couriers, namely, \textit{API key} security and authorization.
+\newdif{Collections} is another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
 They are specified by grouping output ports when defining aggregates.
 This together with courier processes can fully, and easily, implement a load balancer for services sharing interfaces because the courier can forward the requests to any of the aggregated services based on some condition.
-
+% todo - in the context of MAPs, why are collections useful?
 
 \section{Docker \& Docker Compose}
 Docker is a containerization tool used for deploying applications. It builds an \textit{image} which specifies how the container should build and start when it is created.
 Docker handles a single container, and \textit{Docker Compose} is used to handle multi-container applications. Docker Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
 
-Docker Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas 
+Docker Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas
 of containers if needed.
 
 \subsection{Jolie in Docker}
-% something about how to make a Jolie service in docker and how the connection works
 To utilize Docker and Docker Compose when developing a microservice architecture in Jolie, creating images can be done using the Jolie base image \texttt{jolielang/jolie}.
 Using this image when making a Dockerfile will set up Jolie when building the image, so only the exposed ports, source files and possible runtime arguments should be handled by the developer.
 
 When running a container, the developer needs to specify what container ports to expose, what parameters should be parsed into the Jolie program, and if it needs to connect to other services the developer needs to first create the network and then assign each container to that network.
 This is where Docker Compose, or \textit{Kubernetes} which is another container orchestration tool, can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
 
-Connecting ports over a Docker network needs some extra work from the developer. Ports which use TCP/IP sockets for communication cannot use "localhost" as seen in the previous examples, they need to use the container name as the IP address so Docker can figure out where to send messages inside the network.
+Connecting ports over a Docker network needs some extra work from the developer. Ports which use TCP/IP sockets for communication cannot use "localhost" as seen in the previous examples, they need to use the container name as the host address so Docker can figure out where to send messages inside the network.
 This can look something like: \texttt{socket://auth:9999}, where \texttt{auth} is the name of the container.
 
 \section{Current Tools}
-% establish the context of the current visualization tools
+Jolie, and other programming languages, do have some tools in order to enhance the developer experience. This section will go through some of the tools
+which have been developed for Jolie and then look at some of the counterparts in other languages.
+%
+\newdif{Joliedoc} generates a documentation page for a single Jolie service. This gives an overview of the API a Jolie service exposes. It shows the input ports and output ports of the service as well as their location and protocol.
+This tool is useful when the developer wants a simple and easy-to-follow representation of a single service's API, which include operations, types, port information, and dependencies.
+For other programming languages, there are tools like \textit{JSDoc} which look at the comments in the code to generate the API documentation. This requires the developer to write more lines for the same result.
+Tools like \textit{Stoplight} and \textit{Swagger} can do the same for all languages, but this requires the developer to set up a markdown or YAML file and specify the whole API in that.
+Because of Jolie's way of writing the API as a part of the language, Joliedoc can infer the API from the code without the developer needing to write more lines or comments to achieve this goal.
+Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is more to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
+% ? Should this be here?
+\newdif{Slicer}
+\newdif{LEMMA2Jolie}
+
+\subsection{Visualization Tools}
+There are a lot of different visualization tools for software architecture which all fall into some categories and all have different use cases and intentions.
+The subset of tools which fall under the category of \textit{modelling tools} tries to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
+Tools like \textit{IcePanel} and \textit{Aplas} allow the developer of a system to use C4 modelling to create a model of their system, on any level of abstraction.
+
+Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \textit{mermaid}, \textit{ELK} and \textit{graphviz} belong.
+These tools allow the developer to write some kind of structured text or code and then they will render the diagram. Developers do not have to use any specific modelling technique, if they can write it in text or code it will be visualized.
+
+The last relevant category of tools is the diagramming tools. Tools like \textit{draw.io} and \textit{lucidchart} allows the user to diagram everything from E/R, UML and FlowCharts to complex systems.
+This is often done in a drag-and-drop fashion.
+
+One thing all these tools have in common is that they need developers to handle the modelling and diagramming. The developers need to have an overview of the system and then model it using any of these tools.

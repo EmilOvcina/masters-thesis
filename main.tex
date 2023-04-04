@@ -151,9 +151,9 @@
 	morecomment=[s]{/*}{*/},%
 	morestring=[b]",%
   morestring=[b]',%
-  classoffset=1, % starting new class
+  classoffset=1, % starting the new class
   otherkeywords={;,|,@},
-  classoffset=0,% returning to previous class
+  classoffset=0,% returning to the previous class
   }[keywords,comments,strings]%
 
 
@@ -303,6 +303,8 @@
     {\small\begin{center}%
     \bfseries{\summaryname} \end{center}}
 
+\newcommand{\newdif}[1]{\newline\newline\textbf{#1}}
+
 % listings and inlining of Jolie code
 \newlang[jo]{jolie}{Jolie}{syellow}
 
@@ -410,7 +412,7 @@
 \fancyfoot[C]{\thepage}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
 \begin{Abstract}
-Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet amet proident proident. Sit ipsum laboris elit excepteur culpa elit sit cupidatat minim amet cupidatat. Officia nostrud cillum adipisicing amet pariatur do tempor in laboris eu. Occaecat excepteur ut aliquip incididunt officia enim sit tempor.
+\input{chapters/abstract.tex}
 \end{Abstract}
 \newpage
 
@@ -442,29 +444,29 @@ Nostrud non elit velit dolor pariatur velit nostrud sint ad exercitation amet am
 \input{chapters/implementation.tex}
 \input{chapters/synthesis.tex}
 
-\chapter{Chapter}
-\section{Section}
-\jo{service S}
-\begin{jolisting}
-service {}
-\end{jolisting}
+% \chapter{Chapter}
+% \section{Section}
+% \jo{service S}
+% \begin{jolisting}
+% service {}
+% \end{jolisting}
 
 
-\begin{tslisting}
-function f(): void { return 5; }
-\end{tslisting}
+% \begin{tslisting}
+% function f(): void { return 5; }
+% \end{tslisting}
 
-% title
-\begin{jolisting}[title={Title goes here!}][]
-service {}
-\end{jolisting}
+% % title
+% \begin{jolisting}[title={Title goes here!}][]
+% service {}
+% \end{jolisting}
 
-% passing caption/label to lstlisting
-\begin{jolisting}[][caption={Caption goes here!},label=lst:a-listing]
-service {}
-\end{jolisting}
+% % passing caption/label to lstlisting
+% \begin{jolisting}[][caption={Caption goes here!},label=lst:a-listing]
+% service {}
+% \end{jolisting}
 
-\cref{lst:a-listing}
+% \cref{lst:a-listing}
 
 \printbibliography
 
