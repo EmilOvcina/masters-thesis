@@ -3,30 +3,29 @@
 % Revision:          X
 % Final Revision:    X
 \chapter{Preliminaries}
-This chapter will provide a context for the thesis.
+This chapter aims to provide a context for the thesis.
 The reader will be able to gain the necessary background knowledge in order
 to understand the purpose of the thesis and why it can be useful for developing Jolie applications. This 
 essentially builds on the motivation
 described in the previous chapter.
 
-This chapter will highlight some of the relevant definitions of the microservice architecture paradigm, some of the benefits and consequences, and alternatives, as
+This chapter will highlight some of the relevant definitions and concepts of the microservice architecture paradigm, some of the benefits and consequences, and alternatives, as
  well as provide
 the reader with a quick overview of the Jolie programming language,
-what Docker Compose is, and what tools exist
-both for Jolie and other programming languages which can be used in some way to visualize.
+what Docker Compose is, and what tools exist both for Jolie and 
+other programming languages which can be used in some way to visualize.
 
 \section{Microservice Architecture}
-Building software today requires a lot of careful considerations when it comes
+Building software requires a lot of careful considerations when it comes
 to choosing a software architecture. Many developers will choose a more monolithic architecture where all
- functionality of the application
-is in one codebase. This is the simpler approach because everything is deployed as one solution, however,
+ the functionality of the application
+is in one codebase. This seems like the simpler approach because everything is deployed as one solution, however,
  there are many drawbacks
 with this approach when the software starts getting bigger, and a larger number of users starts 
 interacting with the platform.
 
-% ? what?
-In this section and the following subsections, I will adopt the definitions from "Microservices patterns"
- by Chris Richardson. \cite{microservicepatterns}
+For this section and the following subsections, the book \textit{Microservices Patterns} by Chris Richardson \cite*{microservicepatterns} will serve as a good foundation. 
+The definitions and concepts described by him will be used throughout this thesis.
 
 \subsection{Some of the Problems with Monoliths}
 Drawbacks exist in all parts of using monolith software architecture, everything from development to 
@@ -35,7 +34,7 @@ From a development standpoint, it can be slow to introduce new features into a m
  codebase. As the project grows, so will the complexity, and trying to somehow weave in a new feature in a large, cluttered project can seem almost impossible.
 
 After developing a new feature, or fixing a bug, the developer would ideally like to see their change 
-in production as fast as possible. This can, however, be quite a long and tedious process when developing in one large codebase.
+in production as fast as possible. This can, however, be a long and tedious process when developing in one large codebase.
 First, all tests must run, which can take a long time. The codebase is complex so the likelihood of a 
 test failing is big, meaning that the tests must be run multiple times.
 
@@ -49,9 +48,9 @@ even if the other parts seemingly have nothing to do with the faulty code.
 To avoid all the problems with the monolith architecture, developers can try to go for a more
  distributed approach, where the microservice architecture is one of those approaches.
 
-The microservice architecture tries to make the application modular. This means that all business logic is broken up into different services 
+The microservice architecture aims to make the application modular. This means that all business logic is broken up into different services 
 where each service serves only one cohesive set of purposes, and the services can be replicated.
-The services will have some kind of API which other services can use for communication. This provides some kind of forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
+The services will have some API which other services can use for communication. This provides some forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
 This helps in preserving modularity and keeps services decoupled.
 The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
 
@@ -66,21 +65,38 @@ and all have their benefits and consequences. The microservices can communicate 
 Another set of problems is data consistency. Different patterns can be used to ensure that data between services stay consistent. This includes \textit{sagas}, \textit{event sourcing} and many more.
 % TODO write something more here
 
-% ? Should this be here?
 \section{Microservice API Patterns}
-% Here should be something about MAPs 
-In this section, I will go through some microservice API patterns which will become relevant in the context of Jolie programs.
-% todo - explain the structure of MAPs and what is used in which scenario.
-% ? subsections could be of the types of pattern: foundation, quality, structure and so on...
+% ? Is this relevant?
+This section aims to highlight some microservice API patterns which have been discussed in the book by Olaf Zimmermann et al.
 
-\subsection{The Embedded Entity Pattern}
-\subsection{The API Gateway Pattern}
+As mentioned before, microservices often communicate with each other through defined APIs and often the client of a microservice application will also communicate using an API.
+Thinking about and incorporating good design patterns when creating any service-oriented architecture can be a big benefit.
+The design patterns can be partitioned into five categories of design patterns each trying to solve different problems.
+
+The first category of patterns is the \textit{Foundation Patterns}. These patterns aim to deal with executive decisions of the APIs, including: Where the API should be
+accessible from, how a client interacts with the system through an API and how is the system landscape with multiple services handled. Some of the patterns in this category include frontend- and backend integration which aims
+to address the communication between the client and the system and the communication between systems or services, respectively. Another set of patterns in this category is concerning the visibility of an API.
+
+The second category is the \textit{Responsibility Patterns}, which aims to clarify the architectural roles and responsibilities of API endpoints.
+This can be further partitioned into operational responsibilities, which aim to handle state changes from the API client, and information holder types which aim to handle the exchange of data between APIs and clients.
+
+Diving deeper down the levels of abstraction, the third category, \textit{Structure Patterns}, addresses the structure of messages between APIs. This includes request parameters and responses.
+
+The last category, which will be quickly explained in this part of the section, is the \textit{Evolution Patterns} which will address how the APIs evolve and how the API provider will handle versioning, compatibility and deprecation.
+
+\subsection{Quality Patterns}
+This category of patterns is highlighted in a subsection because they are more relevant in the context of the thesis. 
+Quality patterns focus on cost-effectively providing high-quality services. These patterns can be partitioned into \textit{Refecence Management}, \textit{Data Transfer Parsimony}, and \textit{Quality Management and Governance}.
+
+Relevant patterns in this category include the \textit{Conditional Request} pattern which aims to eliminate unnecessary server-side processing,
+, the \textit{Rate Limit} pattern that prevents excessive usage of an endpoint, and the \textit{Pricing Plan} pattern that allows the provider to monetize the API,
+
+% todo write something here
 
 \section{Jolie}
 Jolie is a service-oriented programming language, which aims to abstract away the communication between services to a certain degree.
 The programmer will only need to design the API of the service in order to have other services communicate with it.
-A Jolie program can be seen as a composition of services
-Jolie code is always contained in services, where some building blocks are used to design properties of the specific service.
+A Jolie program can be seen as a composition of services.
 
 \subsection{Basic Building Blocks of a Jolie Program}
 This subsection will quickly describe some of the relevant building blocks which are needed for a Jolie service.
@@ -151,8 +167,6 @@ It is not required that the embedder specifies some local output port for commun
 it can be the intention to just keep using those ports for communication. If this
 is the intention, the developer can simply remove the \texttt{as OP} part of the embed line, and this will still ensure that the embedded service is running and available when the embedder is executing.
 
-In the quality pattern category of the microservice API patterns mentioned before, embeddings are a way of implementing \textit{Embedded Entity} reference management.
-
 \subsection{Programming the Communication Topology}
 Jolie also facilitates the programming of the communication topology. This includes aggregation, redirection, couriers, and collections, which is useful when 
 implementing some of the microservice design patterns mentioned before.
@@ -199,17 +213,16 @@ inputPort RedirectorPort {
 }
 \end{jolisting}
 
-Here is a simple example of what the redirector pattern could be used for: imagine that a client wants to load a webpage displaying all relevant information about a certain product.
-Instead of the client needing to call different services with different locations and protocols, a redirector could be used to
-act as a single point of entry. The client would then specify the resources needed for a product page. similarly, if another service in the system would like to get the current stock of some product it could call the product service with the correct resource name.
+A simple example of what the redirector could be used for is: imagine that an e-commerce application wants to have one point-of-entry for the system. The application could set up an \textit{API Gateway} which will act as that point of entry. 
+When a client wants to get information for a product page, it can specify what it needs in the resource names. This also handles protocol transformation so the client does not need to know the internal service's required protocols.
 The example is showcased in figure \ref*{figure:redirector_example}. The client makes requests to the redirector specifying the resource name to fetch the relevant data.
-% todo change figure image
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.5\textwidth]{figures/redirector_example.png}
-    \caption{A group of microservices handling different elements of product information. The \textit{Product} service is a redirector service which supports three resource names:
-    \texttt{getSimilar}, \texttt{getRecommendations}, and \texttt{getStock}. The client can choose what resource to get for the specific product. The \textit{Similar} service's job is to know what other products are similar to the searched product.
-    The \textit{Recommended} service finds what products are recommended together with this product and \textit{Warehouse} gets warehouse information about the product.}
+    \caption{A group of microservices which can be accessed through an API gateway. 
+    The client can specify a resource name to specify which service to send the request to.
+    The product service fetches information about a product. The recommended service fetches
+    the recommended products based on the user and the shipping service fetches shipping information given the user's location.}
     \label{figure:redirector_example}
 \end{figure}
 \newdif{Couriers}  allow the developer to append functionality to a set of operations. They work well in extension with other communication topologies like aggregators.
@@ -221,7 +234,7 @@ Couriers can be used to implement any type of middleware functionality. From the
 \newdif{Collections} is another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
 They are specified by grouping output ports when defining aggregates.
 This together with courier processes can fully, and easily, implement a load balancer for services sharing interfaces because the courier can forward the requests to any of the aggregated services based on some condition.
-% todo - in the context of MAPs, why are collections useful?
+Since collections are an extension of aggregates, they can have the same use cases, but the collections can group services that share the same interfaces but can have much different underlying business logic.
 
 \section{Docker \& Docker Compose}
 Docker is a containerization tool used for deploying applications. It builds an \textit{image} which specifies how the container should build and start when it is created.
@@ -250,19 +263,19 @@ For other programming languages, there are tools like \textit{JSDoc} which look 
 Tools like \textit{Stoplight} and \textit{Swagger} can do the same for all languages, but this requires the developer to set up a markdown or YAML file and specify the whole API in that.
 Because of Jolie's way of writing the API as a part of the language, Joliedoc can infer the API from the code without the developer needing to write more lines or comments to achieve this goal.
 Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is more to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
-% ? Should this be here?
-\newdif{Slicer}
-\newdif{LEMMA2Jolie}
 
 \subsection{Visualization Tools}
 There are a lot of different visualization tools for software architecture which all fall into some categories and all have different use cases and intentions.
-The subset of tools which fall under the category of \textit{modelling tools} tries to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
+The subset of tools which fall under the category of \textit{modelling tools} aims to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
 Tools like \textit{IcePanel} and \textit{Aplas} allow the developer of a system to use C4 modelling to create a model of their system, on any level of abstraction.
 
 Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \textit{mermaid}, \textit{ELK} and \textit{graphviz} belong.
-These tools allow the developer to write some kind of structured text or code and then they will render the diagram. Developers do not have to use any specific modelling technique, if they can write it in text or code it will be visualized.
+These tools allow the developer to write structured text or code and then they will render the diagram. Developers do not have to use any specific modelling technique, if they can write it in text or code it will be visualized.
 
 The last relevant category of tools is the diagramming tools. Tools like \textit{draw.io} and \textit{lucidchart} allows the user to diagram everything from E/R, UML and FlowCharts to complex systems.
 This is often done in a drag-and-drop fashion.
 
 One thing all these tools have in common is that they need developers to handle the modelling and diagramming. The developers need to have an overview of the system and then model it using any of these tools.
+
+% Should this be here??
+\section{Bigraphs}
