@@ -12,7 +12,7 @@ described in the previous chapter.
 This chapter will highlight some of the relevant definitions and concepts of the microservice architecture paradigm, some of the benefits and consequences, and alternatives, as
  well as provide
 the reader with a quick overview of the Jolie programming language,
-what Docker Compose is, and what tools exist both for Jolie and 
+what Docker Compose is, and what tools exist both for Jolie and
 other programming languages which can be used in some way to visualize.
 
 \section{Microservice Architecture}
@@ -54,7 +54,7 @@ The services will have some API which other services can use for communication. 
 This helps in preserving modularity and keeps services decoupled.
 The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
 
-The microservice architecture addresses the more \textit{non-functional} aspects of the application.
+The microservice architecture also addresses the more \textit{non-functional} aspects of the application.
 This includes maintainability, extensibility and testability, as well as the important aspect of
 \textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
 faster response times and eliminating the single point of failure mentioned before.
@@ -66,7 +66,6 @@ Another set of problems is data consistency. Different patterns can be used to e
 % TODO write something more here
 
 \section{Microservice API Patterns}
-% ? Is this relevant?
 This section aims to highlight some microservice API patterns which have been discussed in the book by Olaf Zimmermann et al.
 
 As mentioned before, microservices often communicate with each other through defined APIs and often the client of a microservice application will also communicate using an API.
@@ -88,10 +87,17 @@ The last category, which will be quickly explained in this part of the section, 
 This category of patterns is highlighted in a subsection because they are more relevant in the context of the thesis. 
 Quality patterns focus on cost-effectively providing high-quality services. These patterns can be partitioned into \textit{Refecence Management}, \textit{Data Transfer Parsimony}, and \textit{Quality Management and Governance}.
 
-Relevant patterns in this category include the \textit{Conditional Request} pattern which aims to eliminate unnecessary server-side processing,
-, the \textit{Rate Limit} pattern that prevents excessive usage of an endpoint, and the \textit{Pricing Plan} pattern that allows the provider to monetize the API,
+Relevant patterns in this category include the \textit{Conditional Request} pattern which aims to eliminate unnecessary server-side 
+processing, the \textit{Rate Limit} pattern that prevents excessive usage of an endpoint and the \textit{Pricing Plan} pattern that allows the provider to monetize the API,
 
-% todo write something here
+Many of the patterns can be used in conjunction to enhance the effect of the desired functionality. For example: \textit{Pricing Plan} can use \textit{Rate Limit} to allow the provider to have different levels of pricing plans.
+To further enhance the functionality of the pricing plan pattern, \textit{API Keys} (A structure API pattern which allows the API provider
+to assign a unique token/key to each client which can be used for authorization purposes) can be used together to allow the API provider to safely and reliably monetize the API using different billing plans. 
+Adding this to an API Gateway is good to ensure that all clients are monetized accordingly.
+
+Generally, most of the API patterns described in the book are best utilized in conjunction,
+and when looking at Jolie in a moment, it is crucial to understand these patterns, both API and non-API patterns,
+should be seen as building blocks which are used together to implement the desired architecture.
 
 \section{Jolie}
 Jolie is a service-oriented programming language, which aims to abstract away the communication between services to a certain degree.

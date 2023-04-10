@@ -1,0 +1,82 @@
+\chapter{Using the Visualization Tool}
+
+With the foundational knowledge and context for the microservice architecture, microservice patterns, the Jolie programming language, and the current tools both for Jolie and for visualization in general in place, it is time to get familiar with the tool developed for this thesis.
+
+This chapter will go into how the tool is used to enhance the development experience by going through a simple example microservice application.
+Firstly, an application should be defined. The application for this example is a simple e-commerce platform consisting of seven microservices:
+
+\begin{itemize}
+    \item \textbf{User service} - Handles user authentication. Lets the client create, update and delete their account and also log in to get an authentication token.
+    \item \textbf{Product service} - Handles product information. This service exposes a basic CRUD (Create Read Update Delete) API for products sold on the platform.
+    \item \textbf{Recommended service} - Handles fetching recommended products. A client can query this service which will, based on the user's id, return a list of products which the user might also like.
+    \item \textbf{Order service} - Handles grouping of selected products and all the information required for the user to place an order. This includes shipping and tax fees.
+    \item \textbf{Payment service} - Handles transactions of orders. When the user places an order they must provide some kind of payment method as well as the necessary information to complete the transaction.
+    \item \textbf{Analytics service} - A monitoring service. This service can keep track of popular products, frequent shoppers, what products get bought together, and much more.
+    \item \textbf{Notification service} - Handles sending e-mails to users when the transaction is approved. Can also send promo codes, offers, and discounts to users.
+\end{itemize}
+This example is very simplified, and only the architectural aspect of the microservices will be implemented, meaning the connections between services and the APIs. This means that no business logic will be implemented.
+
+To showcase the visualization capabilities of the tool the application will not be developed using any architectural programming features from Jolie such as embeddings, aggregation, redirection, etc.
+These will, however, be introduced at a later point.
+
+\section{Setup and Requirements}
+The tool is developed to be used with Visual Studio Code, aka VS Code, which is a code editor developed by Microsoft.
+VS Code has a large ecosystem of plugins which are used to enhance the developing experience.
+To start using the tool, it must be downloaded and installed either from the VS Code marketplace under the name: \texttt{\toolname}, or compile the source code and extract a \texttt{.VSIX} file to install manually.
+
+The development starts with creating a \texttt{.JSON} file which \toolname[] uses to know which services are at the top level of the application.
+The plugin has a default file name it will look for, namely, \texttt{architecture.jolie.json} located in the root folder, which is where the developer will define all top-level services, networks, and properties of the services.
+The plugin comes with a command to initialize the architecture file, and this creates the file and populates it with a template service contained in a network.
+
+\subsection{Structure of the Architecture File}
+The architecture file is a JSON file which consists of an array of arrays of services. The outermost array can semantically be understood as the list of all networks.
+Listing \ref*{lst:architecture-file-structure} shows this structure where the \texttt{\{...\}} represents the services. Each network can have any number of services, and it is up to the
+developer to specify what a network represents depending on where the services will deploy.
+
+\begin{jsonlisting}[][caption={Structure of the architecture JSON file showing two networks.}, label=lst:architecture-file-structure]
+[
+    [
+        { "file": "svc1.ol" }
+    ],
+    [
+        { "file": "svc2.ol" }
+    ]
+]
+\end{jsonlisting}
+
+The services have different properties which the user can specify. All properties are showcased in appendix \ref*{appen:architecture-file-structure}.
+For the example in this chapter, only the file needs to be specified for each service.
+
+% each service can be subsection under one big "the services" section
+\section{The User Service}
+In the root folder, a folder called \texttt{user} for all files related to the user service is created.
+In the user folder the main file of the user service is created, called \texttt{main.ol}. The main file is where the service is defined.
+For the user service, one input port should be defined for the client to create, update, and delete their account. This is also the input port where a client can log in to get an authentication token.
+
+The user service should also have an output port which will allow the user service to call the analytics service to log information about how active a user is and other user-specific metrics.
+In listing \ref*{lst:user-svc} the basic implementation of the user service is displayed. A lot of the details, like locations, protocols, imports, and main implementations have been omitted.
+\begin{jolisting}[][caption={The user service with omitted implementation details.}, label={lst:user-svc}]
+service User {
+
+    execution{ concurrent }
+
+    inputPort IP {
+        ...
+        Interfaces: UserIFace
+    }
+
+    outputPort Analytics {
+        ...
+        Interfaces: AnalyticsIFace
+    }
+
+    main {
+        ...
+    }
+}
+\end{jolisting}
+
+\section{The Product Service}
+\section{The Recommended Service}
+
+\section{Other Features}
