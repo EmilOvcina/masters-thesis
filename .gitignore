@@ -11,3 +11,4 @@
 *.gz
 *.toc
 *.lol
+.DS_Store
