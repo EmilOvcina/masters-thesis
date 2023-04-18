@@ -6,7 +6,7 @@
 With the foundational knowledge and context for the microservice architecture, microservice patterns, the Jolie programming language, and the current tools both for Jolie and for visualization in general in place, it is time to get familiar with the tool developed for this thesis.
 
 This chapter will go into how the tool is used to enhance the development experience by going through a simple example microservice application.
-Firstly, an application should be defined. The application for this example is a simple e-commerce platform consisting of seven microservices:
+Firstly, an application is defined. The application for this example is a simple e-commerce platform consisting of seven microservices:
 
 \begin{itemize}
     \item \textbf{User service} - Handles user authentication. Lets the client create, update and delete their account and also log in to get an authentication token.
@@ -164,7 +164,7 @@ After connecting the ports, the connections is be represented in the visualizati
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.5\textwidth]{figures/jv_analytics.png}
-    \caption{The product, user, and analytics services displayed in the visualization tool's UI. The user and product services have an output port (red) each which is connected to the input port (yellow) of the analytics service.}
+    \caption{The product, user, and analytics services displayed in the visualization tool's UI. The user and product services have an output port (red) each of which is connected to the input port (yellow) of the analytics service.}
     \label{figure:jv_analytics}
 \end{figure}
 
@@ -203,10 +203,15 @@ which based on the user ID given finds the most recommended products as a list o
 A possible extension to the service can involve fetching analytics data from the analytics service and doing calculations with that information to avoid sharing databases between services. This will require the analytics service to expose an operation allowing the internal services to get the data, and an output port in the recommended service to invoke that operation.
 This extension will be omitted in this example.
 
-\subsection{The Completed System}
-With all services and ports in place, the system can be seen as one microservice architecture in the visualization UI, as seen in figure \ref*{figure:full_example_lc}.
-From here the developer can start using architectural patterns in Jolie as discussed in the previous chapter. Some refinements of the current services can also be made, for example, the payment service should probably have underlying services to take care of different payment methods.
+\subsection{The Completed Application}
+With all services and ports in place, the application can be seen as one microservice architecture in the visualization UI, as seen in figure \ref*{figure:full_example_lc}.
 % todo write something about inspecting the program using the sidebar
+Having the whole application in the visualization tool allows the developer to inspect the application in detail to get an overview of what is happening between services and what APIs the different services expose.
+Clicking on ports opens the sidebar and displays information about the ports including the interfaces. All the interfaces can be clicked on to further inspect the operations in the interface. All types used for the operations are also clickable and will display information about the type,
+including the subtypes, cardinality and root type.
+
+From here the developer can start using architectural patterns in Jolie as discussed in the previous chapter. Some refinements of the current services can also be made, for example, the payment service should probably have underlying services to take care of different payment methods.
+
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.8\textwidth]{figures/jv_completed.png}
@@ -214,10 +219,53 @@ From here the developer can start using architectural patterns in Jolie as discu
     \label{figure:jv_completed}
 \end{figure}
 
+\section{Improvements}
+Now that the application has all seven services implemented, the developer can apply some of the architectural features allowed in Jolie to improve the application and implement some of the microservices (API) patterns discussed in the last chapter.
 
-\section{Other Features}
-% TODO embedding some service
-% TODO aggregation pattern 
-% TODO snippets
+\subsection{Embedding}
+It is not necessarily the best idea to have all seven services as top-level services. The services not accessed by the client directly should be embedded in the services which need them.
+The analytics service is used by four services: Order, Payment, User, and Product. To embed the analytics service in these four services the input port's location can be changed to \texttt{local}. This is just one way of embedding using local in-memory communication and is not the only way of embedding services. Another method of embedding will be used for another service later.
+Changing the port location to \texttt{local} can be done in the sidebar.
+The output ports in the mentioned services using the analytics interface must also be deleted which, at the moment only can be done in the code, but instead of looking for the main files which contain the ports,
+opening the port in the sidebar and clicking \texttt{\{\}} at the top of the sidebar opens the correct file in the editor.
 
+Now in the architecture file, for the analytics service, the field \texttt{instances:4} can be added to the JSON object representing the analytics service. This will add 4 instances of the analytics service, and by using the mouse and dragging the services, the developer can 
+drag the services onto the four services and embed them one after one. This will add the code in the correct files to specify that the analytics service instances are embedded.
+
+The notification service is also used by other services, and should not be accessed by a client directly. For this service, the ports will not use local in-memory communication as the analytics service did.
+In the architecture file the notification service will need to have two instances, so the field for instances is added to the service JSON. Now two instances of the notification service exist as top-level services. Each instance can be dragged into its respective
+parent service, namely, the order and payment services and the embedding code will be added to both services. The embedding will use the already existing ports to connect so no local ports will be created.
+
+The last service to embed is the payment service in the order service. This can be done by either changing the existing port to use local communication or just dragging the payment service
+as it is now into the order service to use the existing ports as communication and the code will again be changed to reflect the embedding.
+
+The new architecture can be seen in figure \ref*{figure:jv_embedded} and it shows only the services which are accessed by a client. The services which now have embeddings can be seen with a little "plus" sign, which can be clicked on to expand the visualization of the service revealing local ports and embedded services.
+The embedded services can be removed by dragging them out of their embedder. Doing this with local communication will cause the local ports to be removed from the code.
+
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.2\textwidth]{figures/jv_embedded.png}
+    \caption{The e-commerce application after the payment, notification, and analytics services have been embedded.}
+    \label{figure:jv_embedded}
+\end{figure}
+
+\subsection{Aggregation}
+Now all the top-level services are services which a client is directly requesting. It is now possible to add some of the architectural patterns to the system in order to implement some of the ideas mentioned in the previous chapter.
+The tool facilitates the possibility to select services by holding the shift key and clicking the service shapes. The sidebar will show which services are selected and a list of patterns which can be applied based on some
+criteria. Selecting the four top-level services of the example application shows that the aggregator pattern is applicable.
+
+Clicking on the "aggregator" button will open a pop-up allowing the developer to enter all necessary information for creating an aggregator service, and choosing if the aggregator should connect to existing ports or create new input ports for the aggregated services, or if the aggregated services should be embedded in the aggregator service.
+For this example, the aggregator will just connect using the existing ports requiring that the developer types in the locations of the input port for each service correctly.
+After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in figure \ref*{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly redder colour 
+to illustrate that the aggregator is a generated service and is only a scaffolding service which the developer needs to implement the functionality for.
+
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.41\textwidth]{figures/jv_aggregator.png}
+    \caption{The e-commerce application with an aggregator service that serves as a reverse proxy for the services that are invoked by clients.}
+    \label{figure:jv_aggregate}
+\end{figure}
+
+\subsection{Networks}
+The final part of the application is determining which networks each top-level service belongs to. This is relevant when the application is deployed.
 \section{Local Deployment}
