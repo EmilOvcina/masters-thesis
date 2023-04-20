@@ -1,0 +1,19 @@
+\begin{table}[h]
+    \advance
+    \leftskip-1.2cm
+    \begin{tabular}{p{0.12\linewidth} | p{0.48\linewidth} | p{0.1\linewidth} | p{0.30\linewidth}}
+    \toprule
+    \textbf{Field}           & \textbf{Desrciption} & \textbf{Type} & \textbf{Example} \\ \midrule
+    file                 & The location of a Jolie file relative to the architecture file & String & \texttt{main.ol} \\\midrule
+    target & Name of the service in the file & String & \texttt{MainService}\\\midrule
+    name& Name of the service in the file  & String & \texttt{MainService} \\\midrule
+    instances & Number of instances of the service to be visualized  & Long & \texttt{2}\\\midrule
+    container& Name of the container in the deployment yaml file & String & \texttt{MainContainer}\\\midrule
+    args& Jolie arguments which get added to the Dockerfile after building  & String & \texttt{--connlimit 10 --stackTraces}\\\midrule
+    params& Either path to a JSON file containing service parameters, or the parameters as JSON & String or JSON & \texttt{params.json} or \texttt{\{ location: "localhost:1234"\}}\\\midrule
+    env& Deployment environment variables. Gets added in the deployment yaml file & JSON & \texttt{\{username: "test", password: "123"\}} \\\midrule
+    image           & Specifies a remote image which gets added in the deployment yaml file & String & \texttt{emilovcina/somejolieimage}\\\midrule
+    ports             & List of strings defining Docker port mappings & String[] & \texttt{["4000:4000", "3444:9000"]}\\\midrule 
+    volumes              & List of file locations which will get bound as volumes when running the deployment & String[] & \texttt{["/config.ini", "assets/test.txt"]}\\\midrule
+    \end{tabular}
+    \end{table}

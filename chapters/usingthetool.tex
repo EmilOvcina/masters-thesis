@@ -1,4 +1,4 @@
-% Text:              X
+% Text:              √
 % Citations:         X
 % Revision:          X
 % Final Revision:    X
@@ -256,7 +256,7 @@ criteria. Selecting the four top-level services of the example application shows
 
 Clicking on the "aggregator" button will open a pop-up allowing the developer to enter all necessary information for creating an aggregator service, and choosing if the aggregator should connect to existing ports or create new input ports for the aggregated services, or if the aggregated services should be embedded in the aggregator service.
 For this example, the aggregator will just connect using the existing ports requiring that the developer types in the locations of the input port for each service correctly.
-After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in figure \ref*{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly redder colour 
+After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in figure \ref*{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly more orange colour 
 to illustrate that the aggregator is a generated service and is only a scaffolding service which the developer needs to implement the functionality for.
 
 \begin{figure}[h!]
@@ -268,4 +268,28 @@ to illustrate that the aggregator is a generated service and is only a scaffoldi
 
 \subsection{Networks}
 The final part of the application is determining which networks each top-level service belongs to. This is relevant when the application is deployed.
-\section{Local Deployment}
+The services can be dragged out of their dashed box to create a new network and place the service in the network.
+Other services can then be dragged into the new network to add the service to that network, or services can be dragged out of their network to create more networks.
+
+Creating new networks and moving services around to different networks does nothing in the Jolie code. It changes the structure of the architecture file, but that is only for visualization purposes. 
+For this example, the networks can be arbitrary so the services will all reside in the same network for now.
+
+\section{Prototyping}
+The tool facilitates testing in a local deployment. Using the command \textit{Jolie: Docker-Compose} will generate a build folder where all top-level services reside in their respective subfolder containing all dependencies, a package.json file if the project is using JPM, and a Dockerfile to create an image when running the deployment.
+A \texttt{docker-compose.yml} file will also be generated specifying each service and the deployment configurations.
+In the generated deployment file the networks are also specified and added to each service depending on what network the developer added the service to in the architecture file and what networks the service is connected to via ports.
+This is just a generic deployment file and should not be used for anything other than testing the application locally.
+The tool only supports Docker-Compose at the moment, so Docker is required for this feature to be effective.
+
+To make the Jolie service accessible from outside clients it is required that the services follow the requirements for running Jolie services in Docker mentioned in the preliminaries section about Jolie in Docker \ref*{label:jolie_in_docker}.
+This includes changing the location to use the container name as the hostname if TCP/IP communication is used between services and adding an extra field in the architecture file.
+The field is a \texttt{ports} field which is a list of Docker ports the container will expose using the syntax of Docker ports, e.g. \texttt{"3000:3000"} meaning that port 3000 is exposed externally and mapped internally to port 3000.
+Other fields can be added to customize the deployment. The container name can be changed using the field \texttt{"container"} giving more freedom in terms of what the services are called in the code
+because the default container name is the service name. If a service in the deployment needs any dependencies outside of Jolie, e.g. configuration files, a list of files can be specified in a \texttt{"volumes"} field.
+This will add the files to a resource subfolder in the build folder and will be bind mounted when the container is running.
+
+In the architecture file, external dependencies can also be added to the architecture which allows other services to be displayed alongside the Jolie services. The developer can specify a service in a network and give an \texttt{image} field
+which links to an image on Dockerhub or other image repositories. In the visualization UI, this will be shown with a blue shape which indicates that it is an external service, and the ports also need to be specified in the architecture file.
+Building the Docker-Compose file, external services are also added.
+
+When everything is set up and docker is running on the machine, the developer can start the local deployment with Docker-Compose by running \texttt{docker-compose up} in a command line tool or terminal.

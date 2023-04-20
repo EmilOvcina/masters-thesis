@@ -1,4 +1,4 @@
-% Text:              X
+% Text:              √
 % Citations:         X
 % Revision:          X
 % Final Revision:    X
@@ -9,7 +9,7 @@ to understand the purpose of the thesis and why it can be useful for developing 
 essentially builds on the motivation
 described in the previous chapter.
 
-This chapter will highlight some of the relevant definitions and concepts of the microservice architecture paradigm, some of the benefits and consequences, and alternatives, as
+This chapter will highlight some of the relevant definitions and concepts of the microservice architecture paradigm, some of the benefits and consequences, as
  well as provide
 the reader with a quick overview of the Jolie programming language,
 what Docker Compose is, and what tools exist both for Jolie and
@@ -249,6 +249,7 @@ Docker Compose is a container orchestration tool, essentially configuring multip
 of containers if needed.
 
 \subsection{Jolie in Docker}
+\label{label:jolie_in_docker}
 To utilize Docker and Docker Compose when developing a microservice architecture in Jolie, creating images can be done using the Jolie base image \texttt{jolielang/jolie}.
 Using this image when making a Dockerfile will set up Jolie when building the image, so only the exposed ports, source files and possible runtime arguments should be handled by the developer.
 
@@ -269,7 +270,8 @@ Tools like \textit{Stoplight} and \textit{Swagger} can do the same for all langu
 Because of Jolie's way of writing the API as a part of the language, Joliedoc can infer the API from the code without the developer needing to write more lines or comments to achieve this goal.
 Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is more to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
 % TODO
-\newdif{JPM} 
+\newdif{JPM} is a package management tool for Jolie which, similarly to NPM, keeps track of dependencies of a Jolie program.
+
 \subsection{Visualization Tools}
 There are a lot of different visualization tools for software architecture which all fall into some categories and all have different use cases and intentions.
 The subset of tools which fall under the category of \textit{modelling tools} aims to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
