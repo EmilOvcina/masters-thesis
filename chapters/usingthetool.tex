@@ -1,5 +1,5 @@
 % Text:              √
-% Citations:         X
+% Citations:         √
 % Revision:          X
 % Final Revision:    X
 \chapter{Using the Visualization Tool}
@@ -18,11 +18,11 @@ Firstly, an application is defined. The application for this example is a simple
     \item \textbf{Notification service} - Handles sending e-mails to users when the transaction is approved. Can also send promo codes, offers, and discounts to users.
 \end{itemize}
 This example is very simplified, and only the architectural aspect of the microservices will be implemented, meaning the connections between services and the APIs. This means that no business logic will be implemented, and
-the types of interface operations will be heavily simplified since the functionality of the application is not what is in focus in this chapter.
+the types of interface operations will be simplified since the functionality of the application is not in focus in this chapter.
 Other details such as deployment, data persistence, and security will also be omitted from this example. A simple diagram can be seen in figure \ref*{figure:full_example_lc} which displays the desired architecture of the application.
 
 To showcase the visualization capabilities of the tool the application will not be developed using any architectural programming features from Jolie such as embeddings, aggregation, redirection, etc.
-These will, however, be introduced at a later point.
+These will, however, be introduced later.
 
 \begin{figure}[h!]
     \center
@@ -33,9 +33,9 @@ These will, however, be introduced at a later point.
 
 \section{Setup and Requirements}
 In order to use the tool, Jolie must be set up correctly with version \texttt{1.11.0-git}. This section will not specify how this is done, but the Jolie website goes more in detail on how
-the correct git version is installed. From this point onwards it is assumed that the environment variables are set correctly to point to the git version of Jolie.
+the correct git version is installed \footnote{Downloading the newest version of Jolie - \url{https://www.jolie-lang.org/downloads.html}}. From this point onwards it is assumed that the environment variables are set correctly to point to the git version of Jolie.
 
-The tool is developed to be used with Visual Studio Code, aka VS Code, which is a code editor developed by Microsoft.
+The tool is developed to be used with Visual Studio Code\footnote{Visual Studio Code - Code Editing. Redefined. - \url{https://code.visualstudio.com/}}, aka VS Code, which is a code editor developed by Microsoft.
 VS Code has a large ecosystem of plugins which are used to enhance the developing experience.
 To start using the tool, it must be downloaded and installed either from the VS Code marketplace under the name: \texttt{\toolname}, or compile the source code and extract a \texttt{.VSIX} file to install manually.
 
@@ -60,18 +60,18 @@ developer to specify what a network represents depending on where the services w
 \end{jsonlisting}
 
 The services have different properties which the user can specify. All properties are showcased in appendix \ref*{appen:architecture-file-structure}.
-For the example in this chapter, only the file needs to be specified for each service.
+For the example in this chapter, only the file needs to be specified for each service, for now.
 
 \section{Developing the Services}
 All seven services in this example will have a unique folder each in the root directory of the project. This is done to separate which files are belongs the which service.
 In each folder, JPM can be initialized if the developer needs it, and the interfaces, types, and services will all be separated in files as well.
 
 The tool will be utilized as much as possible to create and refactor code, all while every service being developed will be visualized next to the source code in VS Code.
-Every time a service has been declared it is added to the architecture file. This can be done quickly by the developer using code snippets added by the tool. All similar quality-of-life improvements will be discussed in another section.
+Every time a service has been declared it is added to the architecture file. This can be done quickly by the developer using code snippets added by the tool. All architecture JSON file snippets can be seen in appendix \ref*{appen:vscode_snippets}.
 \subsection{The User Service}
 The interface which specifies what operations the user service implements is called \texttt{UserIFace} in this example.
 Listing \ref*{lst:useriface} shows how the interface is set up. The ErrorResponse type is a more universal response type which gives a message and status code, which can be used in case of an error, but with no error, it will simply set the error flag to false.
-Each of the request types represents what data the operation needs to run. For registering users and logging in an email and password are needed. The update request type represents the user to be updated and what is going to be updated for the user. The delete request simply needs the user ID of the user.
+Each of the request types represents what data the operation needs, in order to be invoked. For registering users and logging in an email and password are needed. The update request type represents the user to be updated and what is going to be updated for the user. The delete request simply needs the user ID of the user.
 
 \begin{jolisting}[][caption={The interface for the user service}, label={lst:useriface}]
 interface UserIFace {
@@ -125,16 +125,16 @@ service User {
 }
 \end{jolisting}
 
-The implementation details of the types are omitted here but can be seen in Appendix % TODO
+The implementation details of the types are omitted for all services, but the source code for the application example can be found in the GitHub repository\footnote{Source code: \url{https://github.com/EmilOvcina/jolievisualize/tree/main/microservice_example}}.
 
 \subsection{The Product Service}
 The product service handles all operations of the products. This is a basic CRUD service, which also will send analytics to the analytics service, which can be used to monitor popular products etc.
 The create and update operation's request types require a product, which is a type containing information about the product, and a user ID because only users who own the product should be able to alter it.
 The read operation request type is only an integer corresponding to the product ID. The delete operation request type is a type containing the user ID and product ID to, once again, check if the user is allowed to delete the product and the ID of the product.
 
-When the types and interface (ProductIFace) have been created,
+When the types and interface (\texttt{ProductIFace}) have been created,
 a service named \textit{Product} is created in the main \texttt{.ol} file and once again the execution context is set to \textit{concurrent}.
-The tool is added to the architecture file in the same network as the user service, and can now be seen in the visualization user interface.
+The service is added to the architecture file in the same network as the user service, and can now be seen in the visualization user interface.
 
 By opening the product service in the sidebar the input and output port can be created similarly to the user service previously. The input port will use the \texttt{ProductIFace} interface and the output port will use the \texttt{AnalyticsIFace} interface.
 The two services displayed in the visualization UI can be seen in figure \ref*{figure:jv_product_and_user} with the two ports created for each service.
@@ -144,8 +144,6 @@ The two services displayed in the visualization UI can be seen in figure \ref*{f
     \caption{The product and user services displayed in the visualization tool's UI. They have an input port (yellow) and an output port (red) each and they both are considered to be in the same network.}
     \label{figure:jv_product_and_user}
 \end{figure}
-
-The full code for the product service, types, and interface can be seen in Appendix % TODO 
 
 \subsection{The Analytics Service}
 This service supports one operation for now. This is \texttt{addToLogs(AnalyticsRequest)}, which is a one-way operation. The interface for the service is already defined, so the operation is added there with the request type being \texttt{AnalyticsRequest}. This type holds information about what content will be logged and from which service.
@@ -205,7 +203,7 @@ This extension will be omitted in this example.
 
 \subsection{The Completed Application}
 With all services and ports in place, the application can be seen as one microservice architecture in the visualization UI, as seen in figure \ref*{figure:full_example_lc}.
-% todo write something about inspecting the program using the sidebar
+
 Having the whole application in the visualization tool allows the developer to inspect the application in detail to get an overview of what is happening between services and what APIs the different services expose.
 Clicking on ports opens the sidebar and displays information about the ports including the interfaces. All the interfaces can be clicked on to further inspect the operations in the interface. All types used for the operations are also clickable and will display information about the type,
 including the subtypes, cardinality and root type.
@@ -244,7 +242,7 @@ The embedded services can be removed by dragging them out of their embedder. Doi
 
 \begin{figure}[h!]
     \center
-    \includegraphics[width=0.2\textwidth]{figures/jv_embedded.png}
+    \includegraphics[width=0.17\textwidth]{figures/jv_embedded.png}
     \caption{The e-commerce application after the payment, notification, and analytics services have been embedded.}
     \label{figure:jv_embedded}
 \end{figure}

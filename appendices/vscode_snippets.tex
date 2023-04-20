@@ -1,0 +1,18 @@
+\section*{jv}
+\begin{jsonlisting}[][caption={Scaffolding architecture file.}, label={lst:jv_snippet}]
+[
+    [
+        {"file": "svc.ol", "target": "name", "instances":1}
+    ]
+]
+\end{jsonlisting}
+
+\section*{jvservice}
+\begin{jsonlisting}[][caption={Scaffolding top-level service.}]
+{"file": "svc.ol", "target": "name", "instances":1}
+\end{jsonlisting}
+
+\section*{jvdocker}
+\begin{jsonlisting}[][caption={Scaffolding top-level Docker service.}]
+{"name": "svc", "image": "image", "instances": 1, "ports":["3000:3000"]}
+\end{jsonlisting}
