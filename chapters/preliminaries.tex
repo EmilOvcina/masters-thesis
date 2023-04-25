@@ -96,12 +96,14 @@ to assign a unique token/key to each client which can be used for authorization 
 Adding this to an API Gateway is good to ensure that all clients are monetized accordingly.
 
 Generally, most of the API patterns described in the book are best utilized in conjunction,
-and when looking at Jolie in a moment, it is crucial to understand these patterns, both API and non-API patterns,
+and when looking at Jolie in a moment, it is crucial to understand that these patterns, both API and non-API patterns,
 should be seen as building blocks which are used together to implement the desired architecture.
+It is also worth mentioning that the patterns discussed in this section will not be implemented in this thesis.
+
 
 \section{Jolie}
 Jolie is a service-oriented programming language, where (micro)services are the basic building blocks.
-Everything in Jolie is contained in services and services communicate with each other through APIs which the programmer needs to design and implement in the code.
+Everything in Jolie is contained in services and services communicate with each other through APIs which the programmer needs to design and implement in the code. \cite{jolie}
 
 \subsection{Basic Building Blocks of a Jolie Program}
 This subsection will quickly describe some of the relevant building blocks which are needed for a Jolie service.
@@ -113,7 +115,7 @@ in this block where a developer will create business logic and provide informati
 Jolie-services differentiate between in-going and out-going communication. So building blocks for both exists, namely \texttt{inputPort} and \texttt{outputPort}.
 Ports have their properties which a developer needs to specify. The three main properties of any port are: \textit{location}, \textit{protocol}, and \textit{interfaces}.
 Where location specifies where the port will be listening for messages and where the port will send messages.
-Protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
+The protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
 operations the service is capable of performing, and for output ports, the interfaces specify which
 operations the service is capable of invoking internally. Listing \ref*{lst:simple-inputport} shows a basic input port in Jolie, where all the key properties are set.
 
@@ -284,3 +286,4 @@ The last relevant category of tools is the diagramming tools. Tools like \textit
 This is often done in a drag-and-drop fashion.
 
 One thing all these tools have in common is that they need developers to handle the modelling and diagramming. The developers need to have an overview of the system and then model it using any of these tools.
+\clearpage
