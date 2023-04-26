@@ -12,4 +12,5 @@
 *.toc
 *.lol
 *.pdf
+!/figures/*.pdf
 .DS_Store
