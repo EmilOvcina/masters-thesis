@@ -38,7 +38,7 @@
 %\usepackage{pgfplots}
 
 % BABEL ------------------------------------------------------------------------
-\usepackage[british]{babel}
+\usepackage[danish,british]{babel}
 \usepackage{csquotes}
 \hyphenation{}
 
@@ -364,94 +364,97 @@
 
 \begin{titlepage}
 
-\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
-% Defines a new command for
-% horizontal lines, change thickness here
+  \newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+  % Defines a new command for
+  % horizontal lines, change thickness here
 
-\center % Centre everything on the page
+  \center % Centre everything on the page
 
-	%------------------------------------------------
-	%	Headings
-	%------------------------------------------------
+  %------------------------------------------------
+  %	Headings
+  %------------------------------------------------
 
-	\textsc{\LARGE University of Southern Denmark}\\[1.5cm]
-	% Main heading such as the name of your university/college
+  \textsc{\LARGE University of Southern Denmark}\\[1.5cm]
+  % Main heading such as the name of your university/college
 
-	\textsc{\Large Department of Mathematics and Computer Science}\\[0.5cm]
-	%Major heading such as course name
+  \textsc{\Large Department of Mathematics and Computer Science}\\[0.5cm]
+  %Major heading such as course name
 
-	\textsc{\large SPDM801: Master's thesis in Computer Science}\\[0.5cm]
-	% COURSE ID AND NAME
+  \textsc{\large SPDM801: Master's thesis in Computer Science}\\[0.5cm]
+  % COURSE ID AND NAME
 
-	%------------------------------------------------
-	%	Title
-	%------------------------------------------------
+  %------------------------------------------------
+  %	Title
+  %------------------------------------------------
 
-	\HRule\\[0.5cm]
+  \HRule\\[0.5cm]
 
-	\begin{spacing}{1.9}
-		{\huge\bfseries A tool for eliciting patterns in microservice architectures written in Jolie}\\[0.0cm] % Title of your document
-	\end{spacing}
+  \begin{spacing}{1.9}
+    {\huge\bfseries A tool for eliciting patterns in microservice architectures written in Jolie}\\[0.0cm] % Title of your document
+  \end{spacing}
 
-	\HRule\\[1.0cm]
+  \HRule\\[1.0cm]
 
-	%------------------------------------------------
-	%	Author
-	%------------------------------------------------
-	\large
-	\textit{Author}\\ \bigskip
-	\begin{minipage}[t]{0.45\textwidth}
-	    \begin{center}
-		    \normalsize
-		    Emil Ovcina\\
-		    \href{mailto:emovc18@student.sdu.dk}{emovc18@student.sdu.dk}\\
-		    \href{mailto:emilovcina@gmail.com}{emilovcina@gmail.com}\\ \bigskip    
-	   \end{center}
-	\end{minipage}
-    \vfill\vfill\vfill
-    \large
-	\textit{Supervisor}\\ \bigskip
-	\begin{minipage}[t]{0.45\textwidth}
-	    \begin{center}
-		    \normalsize
-		    Marco Peressotti\\
-		    \href{mailto:peressotti@sdu.dk}{peressotti@sdu.dk}\\ \bigskip    
-	   \end{center}
-	\end{minipage}
+  %------------------------------------------------
+  %	Author
+  %------------------------------------------------
+  \large
+  \textit{Author}\\ \bigskip
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{center}
+      \normalsize
+      Emil Ovcina\\
+      \href{mailto:emovc18@student.sdu.dk}{emovc18@student.sdu.dk}\\
+      \href{mailto:emilovcina@gmail.com}{emilovcina@gmail.com}\\ \bigskip
+    \end{center}
+  \end{minipage}
+  \vfill\vfill\vfill
+  \large
+  \textit{Supervisor}\\ \bigskip
+  \begin{minipage}[t]{0.45\textwidth}
+    \begin{center}
+      \normalsize
+      Marco Peressotti\\
+      \href{mailto:peressotti@sdu.dk}{peressotti@sdu.dk}\\ \bigskip
+    \end{center}
+  \end{minipage}
 
 
-	%------------------------------------------------
-	%	Date
-	%------------------------------------------------
+  %------------------------------------------------
+  %	Date
+  %------------------------------------------------
 
-	\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+  \vfill\vfill\vfill % Position the date 3/4 down the remaining page
 
-	{\large \today}
+  {\large \today}
 
-	%------------------------------------------------
-	%	Logo
-	%------------------------------------------------
+  %------------------------------------------------
+  %	Logo
+  %------------------------------------------------
 
-	\vfill\vfill
-	\begin{centering}
-	\includegraphics[width=0.3\textwidth]{figures/sdu_logo.png}\\[1cm]
-	% Include a
-% department/university logo - this will require the graphicx package
-	\end{centering}
+  \vfill\vfill
+  \begin{centering}
+    \includegraphics[width=0.3\textwidth]{figures/sdu_logo.png}\\[1cm]
+    % Include a
+    % department/university logo - this will require the graphicx package
+  \end{centering}
 
-%-------------------------------------------------------------------------------
+  %-------------------------------------------------------------------------------
 
-	\vfill % Push the date up 1/4 of the remaining page
+  \vfill % Push the date up 1/4 of the remaining page
 \end{titlepage}
 
+\newpage
 \pagenumbering{roman}
 \fancyfoot[C]{\thepage}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
-\begin{Abstract}
-\input{chapters/abstract.tex}
-\end{Abstract}
-\newpage
 
+\begin{center}
+  \section*{Resume}
+\end{center}
+\input{chapters/abstract.tex}
+
+\newpage
 
 \pagenumbering{gobble}
 \addtocontents{toc}{\protect\thispagestyle{empty}}
@@ -479,9 +482,10 @@
 \input{chapters/usingthetool.tex}
 \input{chapters/implementation.tex}
 \input{chapters/synthesis.tex}
+\input{chapters/discussion.tex}
 
 \begin{appendices}
-\input{chapters/appendix.tex}
+  \input{chapters/appendix.tex}
 \end{appendices}
 
 % \chapter{Chapter}
@@ -490,7 +494,6 @@
 % \begin{jolisting}
 % service {}
 % \end{jolisting}
-
 
 % \begin{tslisting}
 % function f(): void { return 5; }

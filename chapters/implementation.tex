@@ -147,27 +147,57 @@ The Docker-Compose builder also has some internal representation of what a servi
 The Docker-Compose builder uses a string builder to create the YAML file content. It goes through all services and creates an internal \textit{compose service} and like with the service folders, composes duplicates and counts replicas.
 
 The networks are also created in the Docker-Compose YAML, which can have another semantic meaning from the networks defined in the architecture file.
-In Docker-Compose networks are used to restrict services connecting, which is not a problem with a system created in Jolie, so to have the Docker-Compose networks work similarly to how Jolie, each service in Docker-Compose is set to be a part of
+In Docker-Compose networks are used to restrict services connecting, which is not a problem with a system created in Jolie, so to have the Docker-Compose networks work similarly to how networks in the tool work, each service in Docker-Compose is set to be a part of
 its network, as specified in the architecture file, but also all other networks that the service has a port connecting to. \footnote{Networks in Docker-Compose - \url{https://docs.docker.com/compose/networking/}}
 
 \section{Visualization User Interface}
-% what is the problem. requirements.
-\subsection{UI Library}
-% discussion
+After the JSON data has been created using the Java program, it needs to be rendered in a user interface, which can handle user input as well.
+There are two aspects of these components, firstly, how to create a reactive user interface which can handle user input and handle updates based on how the user interacts with the tool. Secondly, how the components of the architecture are rendered efficiently and how they should be laid out to make the architecture readable and manageable.
+
+\subsection{User Interface}
+The tool's user interface is essentially a static webpage where the JSON data is loaded when the site is initialized.
+The UI uses CSS for styling and JavaScript for the logic, like most standard websites.
+
+However, creating a very feature-heavy reactive user interface in standard CSS and JavaScript is almost impossible in a reasonable amount of time.
+The first improvement to the development of the UI was to replace JavaScript with TypeScript (TS).
+TS is a compiled and strongly typed programming language, created by Microsoft, which is a superset of JavaScript. It compiles directly to JavaScript which makes it usable by the UI webpage.
+Some of the benefits of using TS include type checking, self-documenting code, interfaces, and in general enhanced productivity. \footnote{TypeScript - \url{https://www.typescriptlang.org/}}
+% todo more about TS??
+
+Writing standard CSS can also be a very tedious process, so to enhance the development experience TailwindCSS, or just Tailwind, is used.
+Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS properties are defined in the class attributes of the HTML components where readable class names have been defined meaning that any combination of these classes can be used to style components.
+Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \textit{postcss} and \textit{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
+
+The last overall part of the UI is the actual content of the webpage. All services, ports and edges between ports are rendered using SVG components.
+Different SVG elements are used for different parts of the UI. Polygons are used to render service shapes, rectangles are used to render ports and paths are used to render edges between ports.
+SVG elements in HTML are easy to manipulate in TS, so when the JSON data is loaded in, the correct HTML components are created and then TS is used to create the SVG data for each component so they get the desired shape and size. \footnote{SVG Elements - \url{https://developer.mozilla.org/en-US/docs/Web/SVG}}
+To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}. \footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
+the ability to select SVG components and apply attributes, event handlers, and stylings.
+
+\subsection{UI Framework}
 % svelte
-\subsection{Rendering}
-% discussion
+To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \textit{Svelte} is used. \footnote{Svelte - \url{https://svelte.dev/}}
+Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue,
+
+\subsection{Rendering \& Layout}
+% first version of the tool
+
 % elk
+In the first version of the tool the service shapes had a direction, meaning that all input ports were on the same side of the service shape, this meant that the layout of the services was easier to solve.
+At first, the layout algorithm used for the services was a naive horizontal layered algorithm where the services were given priority depending on how many input and output ports the service had.
+Services with the highest priority will be rendered in the leftmost layer. Services with only input ports were considered the highest priority and services with only output ports will be rendered in the rightmost layer.
+This solution only worked with services where all input ports where on the left side of the service and all output ports were on the right side of the service.
+
+Services having a direction and all the same types of ports being placed on the same side do not work when larger architectures need to be visualized.
 
 \section{Visual Studio Code Extension}
 % how the vscode extension works
 % vscode api
 % webviews
 % live reload
-
-\section{Refactoring}
 % code ranges and parsing context 
 % live architecture update
+
 \subsection{Code Refactoring}
 % Editing properties of the services and ports using the sidebar
 \subsection{Embedding \& Disembedding}
