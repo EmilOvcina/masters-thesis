@@ -47,7 +47,7 @@ using the Jolie language constraint of no duplicate type names in the same OL fi
 
 The list of types, as mentioned, contains all types used by all interfaces in the architecture.
 Each type object in the list represents the information about a type in the code, this includes the name of the type, the file in which the type is defined, the root type, subtypes which is a list of types as well, and cardinality of the type in case of this being defined.
-If the type is a \textit{choice type}, the two choices are also represented in the type object as strings which reference other types in the global list. \footnote{Types in Jolie - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/data-types/index.html}}
+If the type is a \textit{choice type}, the two choices are also represented in the type object as strings which reference other types in the global list.\footnote{Types in Jolie - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/data-types/index.html}}
 Types from \textit{interface extenders} are also added to this list.
 
 \subsection{Services \& Networks}
@@ -56,7 +56,7 @@ This approach draws inspiration from how bigraphs are used to model software arc
 The nodes in the system of the bigraph can be directly mapped to Jolie services. Bigraphs also model ports which are a component of Jolie services as well.
 The data representation used for the tool draws the most inspiration from the place graph since the link graph is inferred by the locations and protocols of the ports in Jolie.
 A place graph models the topology and the networks, which are called \textit{roots} in bigraph terminology, and also embeddings, which are called \textit{nestings}.
-The inspiration with bigraphs is taken from Context-Aware Systems (Cherfia, Belala \& Barkaoui, 2014)\footnote{Bigraphs paper Context-Aware Systems - \url{https://www.researchgate.net/publication/269703150_Towards_Formal_Modeling_and_Verification_of_Context-Aware_Systems}}, where bigraphs are formally introduced and explained but are not necessary for this use-case.
+The bigraph inspiration is taken from \textit{The Space and Motion of Communicating Agents} by Robin Milner \cite{BigraphBook}, where bigraphs are formally introduced and explained but are not necessary for this use-case.
 
 The place graph component can be seen as a list of trees where the root is the network and contains all top-level services as immediate children and embeddings of the top-level services are the children of those services.
 This fits well with how a Jolie system can be modelled, so the list of services in the global JSON is essentially a place graph or a list of trees where each node is a service in the system.
@@ -104,7 +104,7 @@ The Java program is used to gather the required information from the Jolie code.
 
 The Java program has two types of outputs which is used by the tool. The JSON representation of the entire system and the information used by the prototyping functionality. Both functionalities of the Java program require the whole system to be parsed using the Jolie parser.
 Firstly, the tool creates the networks by parsing the architecture JSON file and making an internal representation of what it contains. The networks contain a map of top-level services mapped to a \texttt{ServiceNode} which is the abstract syntax tree (AST) node of a service from the Jolie parser. The top-level service is a representation of a Jolie service in the architecture file, as seen in appendix \ref*{appen:architecture-file-structure}.
-The Java program uses a lightweight JSON library, \textit{json-simple}, to parse files and create JSON objects \footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
+The Java program uses a lightweight JSON library, \textit{json-simple}, to parse files and create JSON objects\footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
 To get the ServiceNode AST node from the parser, the Jolie parser is invoked using its module parsing method. This returns the whole AST of a file, called a \textit{program}. All ServiceNodes are then captured and added to the network's map object.
 
 When the networks have been created, depending on if the program should send visualization data or prototyping data, all the necessary information about the services, ports, etc. is created.
@@ -148,7 +148,7 @@ The Docker-Compose builder uses a string builder to create the YAML file content
 
 The networks are also created in the Docker-Compose YAML, which can have another semantic meaning from the networks defined in the architecture file.
 In Docker-Compose networks are used to restrict services connecting, which is not a problem with a system created in Jolie, so to have the Docker-Compose networks work similarly to how networks in the tool work, each service in Docker-Compose is set to be a part of
-its network, as specified in the architecture file, but also all other networks that the service has a port connecting to. \footnote{Networks in Docker-Compose - \url{https://docs.docker.com/compose/networking/}}
+its network, as specified in the architecture file, but also all other networks that the service has a port connecting to.\footnote{Networks in Docker-Compose - \url{https://docs.docker.com/compose/networking/}}
 
 \section{Visualization User Interface}
 After the JSON data has been created using the Java program, it needs to be rendered in a user interface, which can handle user input as well.
@@ -161,7 +161,7 @@ The UI uses CSS for styling and JavaScript for the logic, like most standard web
 However, creating a very feature-heavy reactive user interface in standard CSS and JavaScript is almost impossible in a reasonable amount of time.
 The first improvement to the development of the UI was to replace JavaScript with TypeScript (TS).
 TS is a compiled and strongly typed programming language, created by Microsoft, which is a superset of JavaScript. It compiles directly to JavaScript which makes it usable by the UI webpage.
-Some of the benefits of using TS include type checking, self-documenting code, interfaces, and in general enhanced productivity.\footnote{TypeScript - \url{https://www.typescriptlang.org/}}
+Some of the benefits of using TS include type checking, self-documenting code, interfaces, and generally enhanced productivity.\footnote{TypeScript - \url{https://www.typescriptlang.org/}}
 % todo more about TS??
 
 Writing standard CSS can also be a very tedious process, so to enhance the development experience TailwindCSS, or just Tailwind, is used.
@@ -169,15 +169,16 @@ Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS p
 Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \textit{postcss} and \textit{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
 
 The last overall part of the UI is the actual content of the webpage. All services, ports and edges between ports are rendered using SVG components.
-Different SVG elements are used for different parts of the UI. Polygons are used to render service shapes, rectangles are used to render ports and paths are used to render edges between ports.
-SVG elements in HTML are easy to manipulate in TS, so when the JSON data is loaded in, the correct HTML components are created and then TS is used to create the SVG data for each component so they get the desired shape and size. \footnote{SVG Elements - \url{https://developer.mozilla.org/en-US/docs/Web/SVG}}
-To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}. \footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
+Different SVG\footnote{SVG Elements - \url{https://developer.mozilla.org/en-US/docs/Web/SVG}} elements are used for different parts of the UI. Polygons are used to render service shapes, rectangles are used to render ports and paths are used to render edges between ports.
+SVG elements in HTML are easy to manipulate in TS, so when the JSON data is loaded in, the correct HTML components are created and then TS is used to create the SVG data for each component so they get the desired shape and size.
+To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}.\footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
 the ability to select SVG components and apply attributes, event handlers, and stylings.
 
 \subsection{UI Framework}
 % svelte
-To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \textit{Svelte} is used. \footnote{Svelte - \url{https://svelte.dev/}}
-Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue,
+To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \textit{Svelte}\footnote{Svelte - \url{https://svelte.dev/}} is used.
+Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue. The benefit of using Svelte instead of any of the other frameworks mentioned is that Svelte compiles into highly efficient JavaScript,
+whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron, and the speed is a factor in this case.
 
 \subsection{Rendering \& Layout}
 % first version of the tool
@@ -199,7 +200,7 @@ Services having a direction and all the same types of ports being placed on the 
 % live architecture update
 
 \subsection{Code Refactoring}
-% Editing properties of the services and ports using the sidebar
+% Editing properties of the services and ports using the sidebar we
 \subsection{Embedding \& Disembedding}
 % auto import
 \subsection{The Aggregator Pattern}
