@@ -1,7 +1,13 @@
 \chapter{Discussion}
 
-\section{First Version}
+\section{The First Version}
 
 \subsection{User Interface}
+In the first version of the tool, the service shapes had a direction, meaning that all input ports were on the same side of the service shape. The layout of the services was easier to solve.
+At first, the layout algorithm used for the services was a naive horizontal layered algorithm where the services were given priority depending on how many input and output ports the service had.
+Services with the highest priority will be rendered in the leftmost layer. Services with only input ports were considered the highest priority and services with only output ports will be rendered in the rightmost layer.
+This solution only worked with services where all input ports where on the left side of the service and all output ports were on the right side of the service.
+
+Services having a direction and all the same types of ports being placed on the same side do not work when larger architectures need to be visualized.
 
 \subsection{Language Server Protocol}

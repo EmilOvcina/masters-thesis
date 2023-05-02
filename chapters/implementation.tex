@@ -168,38 +168,133 @@ Writing standard CSS can also be a very tedious process, so to enhance the devel
 Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS properties are defined in the class attributes of the HTML components where readable class names have been defined meaning that any combination of these classes can be used to style components.
 Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \textit{postcss} and \textit{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
 
-The last overall part of the UI is the actual content of the webpage. All services, ports and edges between ports are rendered using SVG components.
+\subsection{Rendering \& Layout}
+All services, ports and edges between ports are rendered using SVG components.
 Different SVG\footnote{SVG Elements - \url{https://developer.mozilla.org/en-US/docs/Web/SVG}} elements are used for different parts of the UI. Polygons are used to render service shapes, rectangles are used to render ports and paths are used to render edges between ports.
 SVG elements in HTML are easy to manipulate in TS, so when the JSON data is loaded in, the correct HTML components are created and then TS is used to create the SVG data for each component so they get the desired shape and size.
 To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}.\footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
 the ability to select SVG components and apply attributes, event handlers, and stylings.
 
+% elk
+The problem with D3 is that it has no way of doing the layout of the services and ports.
+To ensure that the architecture is always readable from the UI, and the connections of ports are visualized practically, a framework/library is used.
+The framework needs to support the visualization of embeddings, networks and connections between ports.
+
+Different frameworks were tested to see which gave the best results while providing the capabilities needed for the tool.
+The first framework tested was MermaidJS\footnote{MermaidJS diagramming tool - \url{https://mermaid.js.org}} which is a diagramming and charting tool. Mermaid uses markdown to represent components in a diagram and does the rendering and layout of the components. Using this tool would mean that D3 was no longer necessary, however, MermaidJS uses D3 internally for the rendering along with Dagre-D3\footnote{Dagre-D3 - \url{https://github.com/dagrejs/dagre-d3}} for layout.
+The problem with MermaidJS is that it is not generic enough, it supports rendering and layout for a long list of specific diagram types, but none of the types would fit the rendering of services in a microservice architecture.
+MermaidJS can draw simple graphs which could work as a foundation for the tool, but this is wasteful. The framework has a lot of capabilities which would go unused.
+
+As mentioned, MermaidJS uses Dagre-D3 for the layout of components, which is the next framework tried for the tool.
+Dagre is a graph layout library which primarily focuses on the layout of directed graphs. Dagre-D3 provides rendering using D3 on top of the base Dagre library.
+Dagre and Dagre-D3 are both deprecated libraries, even though it is still used by many including MermaidJS.
+The problem with Dagre-D3 is that the scope of the library is directed graphs, and nothing more.
+Embeddings are not possible to represent.
+It is possible to have \textit{Clusters}\footnote{Dagre-D3 clusters - \url{https://dagrejs.github.io/project/dagre-d3/latest/demo/clusters.html}}
+but the clusters work more like a grouping of vertices in a graph and not like a vertex having vertices inside it, which is essentially how the embeddings should be represented if a graph library is to be used.
+
+Another library that was also tried but has many of the same drawbacks as Dagre-D3 and MermaidJS is Cytoscape.\footnote{CytoscapeJS - \url{https://js.cytoscape.org}}
+This library is also a graph visualization and layout library. It comes with a lot of features out of the box like animations and dragging of the vertices. The main issue of this library is that embeddings are
+not possible, but also that many of the built-in features do not fit the visualization tool.
+
+The framework that was chosen for the tool is Eclipse Layout Kernel (ELK)\footnote{Eclipse Layout Kernel - \url{https://www.eclipse.org/elk/}}
+which is a layout framework with a collection of different layout algorithms. ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
+ELK only does layout, however, so a rendering needs to be done by a separate library, where D3 was chosen to render the components of the architecture when ELK has done the layout.
+Figure \ref*{figure:elk_example} shows a system being laid out using ELK.
+
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.80\textwidth]{figures/elk.png}
+    \caption{A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are also calculated. The rendering of the system is not done using ELK. Source: \url{https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}}
+    \label{figure:elk_example}
+\end{figure}
+
+The drawback of using ELK is that in a highly reactive UI, the user might want to position the services themselves, which is not yet possible with ELK.
+So when the components of the architecture have been positioned in a network, for example, a service cannot be positioned inside the network. It can however be moved outside the network to move it to another network.
+The drawbacks of using ELK do not outweigh the benefits. Having direct support for ports and embeddings is very valuable for the tool, and that is why it has been chosen as the layout framework.
+
+ELK has a TypeScript version, so it can easily be used with the rest of the user interface. To make ELK calculate the layout of the JSON data from \javatoolname[] it needs to be converted into a format which ELK understands.
+ELK has a textual graph DSL but also supports a specific JSON format, which is used by the tool because of simpler conversion.
+
+\begin{jsonlisting}[][caption={The ELK JSON format}, label={lst:elk_json}]
+{
+    "id": "root",
+    "layoutOptions": { "algorithm": "layered" },
+    "children": [
+        { "id": "n1", "width": 30, "height": 30 },
+        { "id": "n2", "width": 30, "height": 30 },
+        {
+            "id": "n3",
+            "width": 30,
+            "height": 30,
+            "ports": [
+                { "id": "p1", "width": 5, "height": 5 },
+                { "id": "p1", "width": 5, "height": 5 }
+            ]
+        }
+    ],
+    "edges": [
+        { "id": "e1", "sources": [ "n1" ], "targets": [ "n2" ] },
+        { "id": "e2", "sources": [ "n1" ], "targets": [ "n3" ] } 
+    ]
+}
+\end{jsonlisting}
+
+When the UI receives the JSON data containing the networks with services, the ELK graph is created based on the JSON data.
+The networks are the children of the root node of the ELK graph. This is specified in the \texttt{"children"} field of the ELK JSON.
+ELK nodes in the graph have a field for ports, which are positioned around the node when the layout algorithm is invoked.
+
+To connect the ports with edges, edge objects can be added to the ELK nodes. Embedded connections will be placed in the parent's edge list in the ELK graph, and inter-service connections will have edges in the network containing the services.
+If the edge goes over networks, the edges are placed in the root of the ELK graph. To determine what edges should be added to the graph, all output ports will be checked to see if a matching input port exists anywhere.
+
+When the ELK graph has been populated with the necessary nodes and edges, the layout is calculated. All the components of the graph get a position and size, and all edges get a list of points. D3 can then render the graph components.
+The ELK JSON represents what is rendered in the UI, so embeddings of the top-level services are not added to the ELK graph. When the user of the tool expands a service the embedded services will be added to the ELK graph and
+everything gets recalculated and then they are re-rendered correctly in the UI. Generally, every time the user does something in the UI which requires the ELK graph to be modified, the layout algorithm is run.
+
 \subsection{UI Framework}
-% svelte
 To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \textit{Svelte}\footnote{Svelte - \url{https://svelte.dev/}} is used.
 Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue. The benefit of using Svelte instead of any of the other frameworks mentioned is that Svelte compiles into highly efficient JavaScript,
-whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron, and the speed is a factor in this case.
+whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron\footnote{Electronjs - \url{https://www.electronjs.org/}}, and the speed is a factor in this case.
 
-\subsection{Rendering \& Layout}
-% first version of the tool
+% todo more about how Svelte works.
+Svelte is component-based and works by combining stylings, markup and JavaScript/TypeScript into one file type. Svelte allows the injection of JS variables into the markup, and updating the variables will force a redrawing of the DOM, which makes the user interface reactive.
+The user interface is composed of a component tree where the "app" component is the root which holds information about the current ELK graph. Figure \ref*{figure:component_tree} shows the component tree of the user interface. The sidebar and popup window are child components of the root app component, meaning when they are updated, the DOM is re-rendered. 
+The parent component also contains the SVG parent component which holds all shapes of the system.
+The ELK graph is used here to create network child components. The network components take in the corresponding subgraph as input, which the network can use to create the service and edge child components.
+The service components also have edge components which represent the internal edges which connect output ports to the input ports of embedded services.
+The zoom component which handles the scaling and transposition of the SVG is also added to the root component to enhance user experience.
 
-% elk
-In the first version of the tool the service shapes had a direction, meaning that all input ports were on the same side of the service shape, this meant that the layout of the services was easier to solve.
-At first, the layout algorithm used for the services was a naive horizontal layered algorithm where the services were given priority depending on how many input and output ports the service had.
-Services with the highest priority will be rendered in the leftmost layer. Services with only input ports were considered the highest priority and services with only output ports will be rendered in the rightmost layer.
-This solution only worked with services where all input ports where on the left side of the service and all output ports were on the right side of the service.
+\begin{figure}[h!]
+    \center
+    \includegraphics[width=0.70\textwidth]{figures/component_tree.png}
+    \caption{The component tree of the user interface created in Svelte. When the root component is updated an update is cascaded down the component tree.}
+    \label{figure:component_tree}
+\end{figure}
 
-Services having a direction and all the same types of ports being placed on the same side do not work when larger architectures need to be visualized.
+All components in Svelte have lifecycles which are utilized to render the components with D3.js.
+The lifecycle loop consists of four stages where all of which have event handlers directly accessible in the TypeScript code in Svelte files. This means that each component can run code at any stage of its lifecycle.
+The four events are: \textit{before update}, \textit{on mount}, \textit{after update}, and \textit{on destroy}.
+\textit{Before update} happens before anything else. It runs every time the component is updated and before the DOM is created.
+\textit{On mount} runs only once when the component is created and runs right after the DOM is created. 
+\textit{After update} runs after the DOM is created and runs every time the component is updated.
+Lastly, \textit{On Destroy} runs once when the component is destroyed.\footnote{Svelte lifecycle functions - \url{https://svelte.dev/docs\#run-time-svelte}}
+All components of the graph will have position and size when they are created because ELK has done the layout at that point.
+So when creating the DOM elements for each component, the size and position are already known.
+Components which are rendered with D3 have an "after update" event handler which will run \textit{after} the DOM for the component is created. This code will use D3 to render the desired shapes.
+
+The \textit{before update} event handler is used to map the ELK graph component to an object from the Jolie system JSON, because it runs before the DOM is created, it can be used to check if a service component is expanded or not, which allows the DOM of the service to change.
 
 \section{Visual Studio Code Extension}
 % how the vscode extension works
+% webviewens
+\subsection{The VS Code API}
 % vscode api
-% webviews
+\subsection{Live Updates}
 % live reload
-% code ranges and parsing context 
 % live architecture update
 
 \subsection{Code Refactoring}
+% code ranges and parsing context
 % Editing properties of the services and ports using the sidebar we
 \subsection{Embedding \& Disembedding}
 % auto import
