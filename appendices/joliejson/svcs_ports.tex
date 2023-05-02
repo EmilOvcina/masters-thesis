@@ -1,0 +1,40 @@
+\begin{jsonlisting}[][caption={Services and ports from Jolie represented in JSON}, label={lst:appen_joliejson_svcs_ports}]
+{
+  "services": [
+    [
+      {
+        "execution": "concurrent",
+        "file": "/product/main.ol",
+        "outputPorts": [
+          {
+            "name": "Analytics",
+            "protocol": "sodep",
+            "interfaces": [
+              {
+                "name": "AnalyticsIFace",
+                "id": 3
+              }
+            ],
+            "location": "socket://localhost:5554",
+          }
+        ],
+        "name": "Product",
+        "inputPorts": [
+          {
+            "name": "IP",
+            "protocol": "sodep",
+            "interfaces": [
+              {
+                "name": "ProductIFace",
+                "id": 4
+              }
+            ],
+            "location": "socket://localhost:7777",
+          }
+        ],
+        "id": 3
+      }
+    ]
+  ]
+}
+\end{jsonlisting}

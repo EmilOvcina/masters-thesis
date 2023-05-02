@@ -10,29 +10,28 @@ explain what the tool consists of and how the components work together to create
 The specifics of the code will be omitted, but the general control flow of each part of the tool will be explained.
 
 \section{Overview of the Components}
-The tool essentially consists of four components: The VS Code extension, the Svelte user interface, the Java program, and the NodeJS utility program.
-The Java program is used to run the Jolie parser, which is also written in Java, and that will gather all information from the Jolie code needed by the visualization tool.
+The tool essentially consists of four components: The VS Code extension, the user interface written in Svelte, the \javatoolname[] program and a wrapper program for \javatoolname[] which uses NodeJS called \nodetoolname[].
+The \javatoolname[] program is used to run the Jolie parser, which is also written in Java, and that will gather all information from the Jolie code needed by the visualization tool.
 
 The Svelte user interface is the component which takes in the user input and renders the services, ports and connections.
-In order for the UI to get the relevant data from the Jolie code, the VS Code extension invokes the NodeJS utility program, with the correct parameters, which invokes the Java program.
-The NodeJS program listens for the output of the Java program,
-meaning that the NodeJS program functions as a wrapper for the Java tool so the VS Code extension does not have to invoke the Java tool directly,
-and sends the data to the VS Code extension, which sends the data to the Svelte UI.
+In order for the UI to get the relevant data from the Jolie code, the VS Code extension invokes the \nodetoolname[] program, with the correct parameters, which invokes the \javatoolname[] program.
+\nodetoolname[] program listens for the output of the \javatoolname[] program,
+
+meaning that the \nodetoolname[] program functions as a wrapper for the \javatoolname[] program so the VS Code extension does not have to invoke \javatoolname[] directly,
+and sends the data to the VS Code extension, which sends the data to the user interface.
 
 Figure \ref*{figure:init_tool_sequence} shows the process of initializing the tool in VS Code, which is done using the \textit{visualize} command in VS Code.
-
-\clearpage
-\section{Data Representation}
 
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.70\textwidth]{figures/init_tool_sequence.png}
-    \caption{A sequence diagram showing the sequence of requests and invocations between the four components that the tool consists of. The VS Code extension invokes the utility program using NodeJS which will handle running the Java program with the correct parameters, and afterwards, the VS Code extension sends that data to the Svelte UI which will visualize it in VS Code.}
+    \caption{A sequence diagram showing the sequence of requests and invocations between the four components that the tool consists of. The VS Code extension invokes the \nodetoolname[] program using NodeJS which will handle running the \javatoolname[] program with the correct parameters, and afterwards, the VS Code extension sends that data to the UI which will visualize it in VS Code.}
     \label{figure:init_tool_sequence}
 \end{figure}
 
-The data which the Java program will output is consistent through all
-four components of the tool. The chosen data format is JSON data because it is easy to parse in TypeScript, which all components consist of except for the Java program.
+\section{Data Representation}
+The data which the \javatoolname[] program will output is consistent through all
+four components of the tool. The chosen data format is JSON data because it is easy to parse in TypeScript, which all components consist of.
 The data needed for the tool is a list of interfaces, a list of types and the list of services.
 
 \subsection{Interfaces \& Types}
@@ -50,6 +49,8 @@ Each type object in the list represents the information about a type in the code
 If the type is a \textit{choice type}, the two choices are also represented in the type object as strings which reference other types in the global list.\footnote{Types in Jolie - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/data-types/index.html}}
 Types from \textit{interface extenders} are also added to this list.
 
+An example of the JSON data used to represent interfaces and types from Jolie can be seen in appendix \ref*{appen:joliejson_iface_types}.
+
 \subsection{Services \& Networks}
 The last list in the global JSON is the list of services. The list of services is also used to infer how the networks are set up and which services reside in each network.
 This approach draws inspiration from how bigraphs are used to model software architecture. Bigraphs are a type of graph consisting of two sub-graph components. The link graph and the place graph. The link graph models the connection between nodes in the system while the place graph models the topology.
@@ -65,7 +66,8 @@ Each root in the list of trees is a network. In the sense of JSON, the network i
 The services in the JSON also need to contain all other information which is used by the tool.
 This includes the input and output ports, execution target, name, identifier, and file path but also the information specified in the architecture file, which is container name, volumes, parameters etc.
 
-\clearpage
+An example of the JSON data used to represent services and ports from Jolie can be seen in appendix \ref*{appen:joliejson_services}.
+
 \subsection{Architectural Programming}
 The architectural programming features in Jolie also need to be represented in the data to visualize it in the tool's UI.
 This includes couriers, collections, aggregations, and redirections. All of these aspects are created at the Jolie port level in the code, so the information is also represented in the ports of the JSON.
@@ -80,6 +82,8 @@ Redirections for an input port are a list of pairs of resource and output port n
 However, since the resource of the redirect is defined using the location of the output port, the output port will not be connected correctly unless the resource part of the string is removed, so the resource part of the location, namely,
 the part after \texttt{/!/} is removed and placed in a separate field in the JSON for the output ports.
 
+All types of architectural programming features in the JSON representation of Jolie can be seen in appendix \ref*{appen:joliejson_architecture}.
+
 \subsection{Prototype Data}
 The data used to create the prototype is also represented in JSON and is split into two parts, the Docker-Compose YAML file content and the service folders which contains the Jolie files, dependencies, and Dockerfile.
 The Docker-Compose file content is simply a string, which will be written to the file. The build folders are used to generate this string, but this will be explained more in detail in a later section.
@@ -89,22 +93,24 @@ The build folders have to represent what a Docker image will contain, so each fo
 Each build folder contains a list of files which will be added to the folder itself, but also a list of files which will be added to the shared resource folder.
 Information such as runtime arguments, exposed Docker ports, and the service name is also added to the build folder JSON because the Dockerfile needs this information when it is being generated.
 
-\section{NodeJS Utility Program}
-% why it is created and how it works
-The NodeJS utility program functions as a wrapper for the Java program. It is created so the VS Code application does not have to execute the Java program directly and also if the tool should be extended to other code editors or run in the browser, this functionality should not be implemented in the VS Code extension.
-The NodeJS program also makes sure to return errors if a parsing error occurs or if Jolie is not installed correctly.
+The JSON data generated to create the prototype can be seen in appendix \ref*{appen:joliejson_prototype}, but with omitted docker-compose YAML content.
 
-This part of the tool consists of three parts, the data fetching part which executes the Java program and checks for errors, the server part which allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality, and
+\section{The \nodetoolname[] Program}
+% why it is created and how it works
+The \nodetoolname[] program functions as a wrapper for the \javatoolname[] program. It is created so the VS Code application does not have to execute the \javatoolname[] program directly and also if the tool should be extended to other code editors or run in the browser, this functionality should not be implemented in the VS Code extension.
+The \nodetoolname[] program also makes sure to return errors if a parsing error occurs or if Jolie is not installed correctly.
+
+This part of the tool consists of three parts, the data fetching part which executes the \javatoolname[] program and checks for errors, the server part which allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality, and
 prototyping which is identical to the functionality in the VS Code extension, but this can be used if the user of the tool installs only this part of the tool without the VS Code extension.
 The server uses the express framework\footnote{Express Framework - \url{https://expressjs.com/}} to open an endpoint to get the JSON data and also serve the webpage as static assets on localhost.
 
-\section{Java Program}
+\section{The \javatoolname[] Program}
 % how the data is fetched in the Java tool
-The Java program is used to gather the required information from the Jolie code. The Jolie parser is written in Java and therefore the Java program here uses the parser directly to get the abstract syntax tree nodes and create the JSON objects.
+The \javatoolname[] program is written in Java and is used to gather the required information from the Jolie code. The Jolie parser is written in Java and therefore the \javatoolname[] program here uses the parser directly to get the abstract syntax tree nodes and create the JSON objects.
 
-The Java program has two types of outputs which is used by the tool. The JSON representation of the entire system and the information used by the prototyping functionality. Both functionalities of the Java program require the whole system to be parsed using the Jolie parser.
+The \javatoolname[] program has two types of outputs which is used by the tool. The JSON representation of the entire system and the information used by the prototyping functionality. Both functionalities of the \javatoolname[] program require the whole system to be parsed using the Jolie parser.
 Firstly, the tool creates the networks by parsing the architecture JSON file and making an internal representation of what it contains. The networks contain a map of top-level services mapped to a \texttt{ServiceNode} which is the abstract syntax tree (AST) node of a service from the Jolie parser. The top-level service is a representation of a Jolie service in the architecture file, as seen in appendix \ref*{appen:architecture-file-structure}.
-The Java program uses a lightweight JSON library, \textit{json-simple}, to parse files and create JSON objects\footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
+The \javatoolname[] program uses a lightweight JSON library, \textit{json-simple}, to parse files and create JSON objects\footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
 To get the ServiceNode AST node from the parser, the Jolie parser is invoked using its module parsing method. This returns the whole AST of a file, called a \textit{program}. All ServiceNodes are then captured and added to the network's map object.
 
 When the networks have been created, depending on if the program should send visualization data or prototyping data, all the necessary information about the services, ports, etc. is created.
@@ -118,7 +124,7 @@ Relevant child nodes for a service are: \textit{ExecutionInfo}, \textit{CourierD
 Service objects can also have a list of services which are considered embeddings. When looping through the AST nodes of a service, embedded service nodes will be used to create services, which are added to the parent's list of services instead of the global list of services.
 This will enforce the place graph structure of services mentioned in the data representation section.
 
-The most complex of the child nodes are the two types of port nodes. Input and output ports also have an internal representation in the Java program which keeps track of all the necessary information about the ports used by the tool.
+The most complex of the child nodes are the two types of port nodes. Input and output ports also have an internal representation in the \javatoolname[] program which keeps track of all the necessary information about the ports used by the tool.
 Ports have to contain information about the location, protocol, name, interfaces and operations.
 When the ports are being created, the interfaces which are used by the ports will also be created. These interfaces are also represented internally and will store information about the operations.
 The operations are also parsed using type comparison, since two types of operation declaration AST nodes exist in Jolie, namely, request-response and one-way.
@@ -132,12 +138,12 @@ This representation stores information about the root type, cardinality, subtype
 The types in Jolie can also be three different AST node types, namely definition links, inline definitions and choice definitions. Type comparison is also used here to parse the type correctly depending on the AST node type.
 Types are, similarly to interfaces, added to the system's global list of types.
 
-Each building block of a Jolie service has an internal representation in the Java program, and all of them have a \texttt{toJSON} method which takes all information stored in the objects and creates a JSON object.
-When the tool invokes the Java program to get the JSON data, the \texttt{getJSON} method is invoked on the global JolieSystem object which cascades and invokes the getJSON method for all internal objects which also carcades to its internal objects.
+Each building block of a Jolie service has an internal representation in the \javatoolname[] program and all of them have a \texttt{toJSON} method which takes all information stored in the objects and creates a JSON object.
+When the tool invokes the \javatoolname[] program to get the JSON data, the \texttt{getJSON} method is invoked on the global JolieSystem object which cascades and invokes the getJSON method for all internal objects which also carcades to its internal objects.
 This will result in a JSON object which resembles the data representation discussed in the previous section, and this JSON can be used by the other components of the tool.
 
 \subsection{Generating the Prototype Data}
-The Java program also creates data for making the prototype. This includes the content of the Docker-Compose YAML file and the information needed for creating the service folders and the resource folder.
+The \javatoolname[] also creates data for making the prototype. This includes the content of the Docker-Compose YAML file and the information needed for creating the service folders and the resource folder.
 After the whole system has been parsed and a JolieSystem is created, the system will be given as a parameter to a \textit{build} object which will handle the logic for creating the JSON data.
 The builder will first create the service folders using the services in the networks from the JolieSystem object. Duplicate build folders will be checked for at this stage, which is done to make sure that duplicate images will not be generated when using Docker-Compose.
 However, as mentioned in a previous section, two identical services can be two different images if the runtime arguments are different, which is also handled here.
@@ -151,7 +157,7 @@ In Docker-Compose networks are used to restrict services connecting, which is no
 its network, as specified in the architecture file, but also all other networks that the service has a port connecting to.\footnote{Networks in Docker-Compose - \url{https://docs.docker.com/compose/networking/}}
 
 \section{Visualization User Interface}
-After the JSON data has been created using the Java program, it needs to be rendered in a user interface, which can handle user input as well.
+After the JSON data has been created using the \javatoolname[], it needs to be rendered in a user interface, which can handle user input as well.
 There are two aspects of these components, firstly, how to create a reactive user interface which can handle user input and handle updates based on how the user interacts with the tool. Secondly, how the components of the architecture are rendered efficiently and how they should be laid out to make the architecture readable and manageable.
 
 \subsection{User Interface}
@@ -162,7 +168,6 @@ However, creating a very feature-heavy reactive user interface in standard CSS a
 The first improvement to the development of the UI was to replace JavaScript with TypeScript (TS).
 TS is a compiled and strongly typed programming language, created by Microsoft, which is a superset of JavaScript. It compiles directly to JavaScript which makes it usable by the UI webpage.
 Some of the benefits of using TS include type checking, self-documenting code, interfaces, and generally enhanced productivity.\footnote{TypeScript - \url{https://www.typescriptlang.org/}}
-% todo more about TS??
 
 Writing standard CSS can also be a very tedious process, so to enhance the development experience TailwindCSS, or just Tailwind, is used.
 Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS properties are defined in the class attributes of the HTML components where readable class names have been defined meaning that any combination of these classes can be used to style components.
@@ -175,7 +180,6 @@ SVG elements in HTML are easy to manipulate in TS, so when the JSON data is load
 To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}.\footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
 the ability to select SVG components and apply attributes, event handlers, and stylings.
 
-% elk
 The problem with D3 is that it has no way of doing the layout of the services and ports.
 To ensure that the architecture is always readable from the UI, and the connections of ports are visualized practically, a framework/library is used.
 The framework needs to support the visualization of embeddings, networks and connections between ports.
@@ -245,7 +249,9 @@ The networks are the children of the root node of the ELK graph. This is specifi
 ELK nodes in the graph have a field for ports, which are positioned around the node when the layout algorithm is invoked.
 
 To connect the ports with edges, edge objects can be added to the ELK nodes. Embedded connections will be placed in the parent's edge list in the ELK graph, and inter-service connections will have edges in the network containing the services.
-If the edge goes over networks, the edges are placed in the root of the ELK graph. To determine what edges should be added to the graph, all output ports will be checked to see if a matching input port exists anywhere.
+Multiple local output ports are handled so the UI can differentiate between local output ports when embedding and disembedding services to avoid removing unwanted ports or rendering connections between ports which should not be there.
+This is done in a preprocessing step when the UI gets the Jolie system JSON, where local input ports will be matched to the corresponding output port of the embedder and the location will be unique between the two ports to remove ambiguity.
+Connections that are happening between networks are placed at the root of the ELK graph. To determine what edges should be added to the graph, all output ports will be checked to see if a matching input port exists anywhere.
 
 When the ELK graph has been populated with the necessary nodes and edges, the layout is calculated. All the components of the graph get a position and size, and all edges get a list of points. D3 can then render the graph components.
 The ELK JSON represents what is rendered in the UI, so embeddings of the top-level services are not added to the ELK graph. When the user of the tool expands a service the embedded services will be added to the ELK graph and
@@ -256,7 +262,6 @@ To facilitate the reactivity needed for the UI when the user starts manipulating
 Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue. The benefit of using Svelte instead of any of the other frameworks mentioned is that Svelte compiles into highly efficient JavaScript,
 whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron\footnote{Electronjs - \url{https://www.electronjs.org/}}, and the speed is a factor in this case.
 
-% todo more about how Svelte works.
 Svelte is component-based and works by combining stylings, markup and JavaScript/TypeScript into one file type. Svelte allows the injection of JS variables into the markup, and updating the variables will force a redrawing of the DOM, which makes the user interface reactive.
 The user interface is composed of a component tree where the "app" component is the root which holds information about the current ELK graph. Figure \ref*{figure:component_tree} shows the component tree of the user interface. The sidebar and popup window are child components of the root app component, meaning when they are updated, the DOM is re-rendered. 
 The parent component also contains the SVG parent component which holds all shapes of the system.
@@ -284,15 +289,45 @@ Components which are rendered with D3 have an "after update" event handler which
 
 The \textit{before update} event handler is used to map the ELK graph component to an object from the Jolie system JSON, because it runs before the DOM is created, it can be used to check if a service component is expanded or not, which allows the DOM of the service to change.
 
+The whole component tree does not re-render if a service is changed by the user. Only when the ELK graph in the root component is updated, will the whole component tree be re-rendered. To make sure that the ELK graph is updated when a service or port is changed, an event dispatcher is used to 
+send events up the component tree. Ports and services can send events which their parents listen for and will aggregate towards the root. When the root gets a specific event, it will trigger the ELK layout algorithm and re-render the whole component tree.
+
+The last Svelte-specific concept used is \textit{stores}.\footnote{Svelte stores - \url{https://svelte.dev/docs\#run-time-svelte-store}} Stores in Svelte are global states which can be used by all components of the program. Stores can be written to, which overwrites the object saved in the store, and they can be subscribed to by components which will run some code every time a store is changed.
+In this UI, stores are used to keep a state of what is displayed in the sidebar and popup window. This allows all components of the application to write to the store and determine what is displayed in the sidebar or the popup window. 
+
 \section{Visual Studio Code Extension}
-% how the vscode extension works
-% webviewens
-\subsection{The VS Code API}
-% vscode api
+% How the VS Code extension works
+The VS Code extension generally consists of the activation events, contribution points and a web view.
+The activation events determine what will activate the extension. An example could be that would be when a certain file type is opened, the plugin is activated.
+For this extension, the activation events happen by commands which the user can type into VS Code. The commands are displayed in appendix \ref*{appen:vscode_commands}.
+
+The contribution points\footnote{Contribution Points in VS Code - \url{https://code.visualstudio.com/api/references/contribution-points}} are declarations of enhancement that the extension does. There is a long list of different functionalities which can be extended.
+This extension's contribution points only include snippets. The snippets are used when creating the architecture file. The snippets work by suggesting auto-completion in JSON files, where the user can press the tab key to jump to different points in the inserted code to quickly edit.
+The list of snippets from this plugin can be seen in appendix \ref*{appen:vscode_snippets}.
+
+The last overall part is the web view that VS Code facilitates.\footnote{Webviews - \url{https://code.visualstudio.com/api/extension-guides/webview\#scripts-and-message-passing}} The web view can be used to fully render web content in the editor.
+This can be seen as an iframe within VS Code. When the web view is created custom HTML can be set. This HTML can reference JavaScript and CSS code from the host machine's local resources, meaning that the compiled JavaScript and CSS from the user interface made in Svelte, can be used directly in the VS Code extension web view.
+This is done by having the extension install the JolieVisualize node package and referencing the compiled code in the \texttt{node\_modules} folder.
+
+The extension can send messages to the web view using a post message function which sends serializable JSON data to the web view.
+The JavaScript running in the web view can create an event listener which listens for messages. The payload of the messages declares what type of message is sent and then the web view can act accordingly.
+This is useful when the UI should update based on some event in the editor.
+
+% todo something about initializing the extension - flow diagram - wait until name of node program exists
+
+\subsection{The VS Code API \& Commands}
+VS Code exposes an API\footnote{VS Code API - \url{https://code.visualstudio.com/api/references/vscode-api}} with a long list of operations and events
+which is used in this extension to handle all inputs from the UI, and the code editor.
+The API is split into different namespaces where this extension primarily uses the \texttt{workspace}
+namespace. This includes all operations and events regarding folders and files in the working directory.
+Specific events and operations will be explained more in detail when discussing their applications in this extension.
+
+The built-in commands\footnote{VS Code Commands - \url{https://code.visualstudio.com/api/references/commands}} which VS Code provides can be used directly in the logic of the extension.
+% todo commands execute providers - lsp
+
 \subsection{Live Updates}
 % live reload
 % live architecture update
-
 \subsection{Code Refactoring}
 % code ranges and parsing context
 % Editing properties of the services and ports using the sidebar we

@@ -9,68 +9,72 @@ to understand the purpose of the thesis and why it can be useful for developing 
 essentially builds on the motivation
 described in the previous chapter.
 
-This chapter will highlight some of the relevant definitions and concepts of the microservice architecture paradigm, some of the benefits and consequences, as
+This chapter will highlight some of the relevant definitions and concepts of microservice API patterns, some of the benefits and consequences, as
  well as provide
 the reader with a quick overview of the Jolie programming language,
 what Docker Compose is, and what tools exist both for Jolie and
-other programming languages which can be used in some way to visualize.
+other programming languages which can be used in some way to visualize and diagram.
 
-\section{Microservice Architecture}
-Building software requires a lot of careful considerations when it comes
-to choosing a software architecture. Many developers will choose a more monolithic architecture where all
- the functionality of the application
-is in one codebase. This seems like the simpler approach because everything is deployed as one solution, however,
- there are many drawbacks
-with this approach when the software starts getting bigger, and a larger number of users starts
-interacting with the platform.
+This chapter will \textbf{not} go into detail on microservice architectures or APIs in general. It is
+expected that the reader will be familiar with the common terminology used when talking about microservices and APIs.
+The general microservice terminology used throughout the thesis is referenced in the book \textit{Microservices Patterns} by Chris Richardson.\cite{microservicepatterns}
 
-For this section and the following subsections, the book \textit{Microservices Patterns} by Chris Richardson \cite*{microservicepatterns} will serve as a good foundation. 
-The definitions and concepts described by him will be used throughout this thesis.
+% \section{Microservice Architecture}
+% Building software requires a lot of careful considerations when it comes
+% to choosing a software architecture. Many developers will choose a more monolithic architecture where all
+%  the functionality of the application
+% is in one codebase. This seems like the simpler approach because everything is deployed as one solution, however,
+%  there are many drawbacks
+% with this approach when the software starts getting bigger, and a larger number of users starts
+% interacting with the platform.
 
-\subsection{Some of the Problems with Monoliths}
-Drawbacks exist in all parts of using monolith software architecture, everything from development to
-deploying and maintaining the production application.
-From a development standpoint, it can be slow to introduce new features into a monolithic application's
- codebase. As the project grows, so will the complexity, and trying to somehow weave in a new feature in a large, cluttered project can seem almost impossible.
+% For this section and the following subsections, the book \textit{Microservices Patterns} by Chris Richardson \cite*{microservicepatterns} will serve as a good foundation. 
+% The definitions and concepts described by him will be used throughout this thesis.
 
-After developing a new feature, or fixing a bug, the developer would ideally like to see their change
-in production as fast as possible. This can, however, be a long and tedious process when developing in one large codebase.
-First, all tests must run, which can take a long time. The codebase is complex so the likelihood of a
-test failing is big, meaning that the tests must be run multiple times.
+% \subsection{Some of the Problems with Monoliths}
+% Drawbacks exist in all parts of using monolith software architecture, everything from development to
+% deploying and maintaining the production application.
+% From a development standpoint, it can be slow to introduce new features into a monolithic application's
+%  codebase. As the project grows, so will the complexity, and trying to somehow weave in a new feature in a large, cluttered project can seem almost impossible.
 
-When the project runs in production, a whole new set of issues can quickly arise. It can be difficult
-to scale an application when the whole application is one big instance.
-The only thing to do is give the machine running the application more processing power and memory
-storage capacity, in other words, vertically scale the application. Another significant problem with having the application be one instance of everything, is that a single point of failure exists. If one functionality of the program is faulty, it can affect other parts of the application
-even if the other parts seemingly have nothing to do with the faulty code.
+% After developing a new feature, or fixing a bug, the developer would ideally like to see their change
+% in production as fast as possible. This can, however, be a long and tedious process when developing in one large codebase.
+% First, all tests must run, which can take a long time. The codebase is complex so the likelihood of a
+% test failing is big, meaning that the tests must be run multiple times.
 
-\subsection{Utilizing the Microservice Architecture}
-To avoid all the problems with the monolith architecture, developers can try to go for a more
- distributed approach, where the microservice architecture is one of those approaches.
+% When the project runs in production, a whole new set of issues can quickly arise. It can be difficult
+% to scale an application when the whole application is one big instance.
+% The only thing to do is give the machine running the application more processing power and memory
+% storage capacity, in other words, vertically scale the application. Another significant problem with having the application be one instance of everything, is that a single point of failure exists. If one functionality of the program is faulty, it can affect other parts of the application
+% even if the other parts seemingly have nothing to do with the faulty code.
 
-The microservice architecture aims to make the application modular. This means that all business logic is broken up into different services 
-where each service serves only one cohesive set of purposes, and the services can be replicated.
-The services will have some API which other services can use for communication. This provides some forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
-This helps in preserving modularity and keeps services decoupled.
-The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
+% \subsection{Utilizing the Microservice Architecture}
+% To avoid all the problems with the monolith architecture, developers can try to go for a more
+%  distributed approach, where the microservice architecture is one of those approaches.
 
-The microservice architecture also addresses the more \textit{non-functional} aspects of the application.
-This includes maintainability, extensibility and testability, as well as the important aspect of
-\textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
-faster response times and eliminating the single point of failure mentioned before.
+% The microservice architecture aims to make the application modular. This means that all business logic is broken up into different services 
+% where each service serves only one cohesive set of purposes, and the services can be replicated.
+% The services will have some API which other services can use for communication. This provides some forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
+% This helps in preserving modularity and keeps services decoupled.
+% The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
 
-There can be some difficulties in working with microservices, so it is not a one-solution-fits-all.
-The communication between microservices can be a whole new dimension of complexity. The developer has several ways of implementing communication
-and all have their benefits and consequences. The microservices can communicate through event channels, they can expose a REST API, and one could set up a service mesh to handle inter-service communication.
-Another set of problems is data consistency. Different patterns can be used to ensure that data between services stay consistent. This includes \textit{sagas}, \textit{event sourcing} and many more.
-% TODO write something more here
+% The microservice architecture also addresses the more \textit{non-functional} aspects of the application.
+% This includes maintainability, extensibility and testability, as well as the important aspect of
+% \textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
+% faster response times and eliminating the single point of failure mentioned before.
+
+% There can be some difficulties in working with microservices, so it is not a one-solution-fits-all.
+% The communication between microservices can be a whole new dimension of complexity. The developer has several ways of implementing communication
+% and all have their benefits and consequences. The microservices can communicate through event channels, they can expose a REST API, and one could set up a service mesh to handle inter-service communication.
+% Another set of problems is data consistency. Different patterns can be used to ensure that data between services stay consistent. This includes \textit{sagas}, \textit{event sourcing} and many more.
+%
 
 \section{Microservice API Patterns}
-This section aims to highlight some microservice API patterns which have been discussed in the book by Olaf Zimmermann et al.
+This section aims to highlight some microservice API patterns which have been discussed in the book \textit{Patterns for API design}.\cite{PatternsForAPIDesign:2022}
 
-As mentioned before, microservices often communicate with each other through defined APIs and often the client of a microservice application will also communicate using an API.
+Microservices often communicate with each other through defined APIs and often the client of a microservice application also communicates using an API.
 Thinking about and incorporating good design patterns when creating any service-oriented architecture can be a big benefit.
-The design patterns can be partitioned into five categories of design patterns each trying to solve different problems.
+The microservice API patterns can be partitioned into five categories of design patterns each trying to solve different problems.
 
 The first category of patterns is the \textit{Foundation Patterns}. These patterns aim to deal with executive decisions of the APIs, including: Where the API should be
 accessible from, how a client interacts with the system through an API and how is the system landscape with multiple services handled. Some of the patterns in this category include frontend- and backend integration which aims

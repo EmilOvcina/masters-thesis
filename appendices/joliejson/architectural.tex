@@ -1,0 +1,111 @@
+\subsection{Aggregation}
+\begin{jsonlisting}[][caption={Aggregation represented in JSON of an input port}, label={lst:appen_aggregates}]
+{
+  "inputPorts": [
+    {
+      "name": "IP",
+      "protocol": "sodep",
+      "location": "socket://localhost:9999",
+      "aggregates": [
+        {
+          "name": "OP_s2"
+        },
+        {
+          "name": "OP_s3"
+        }
+      ]
+    }
+  ]
+}
+\end{jsonlisting}
+
+\subsection{Redirection}
+\begin{jsonlisting}[][caption={Redirection represented in JSON of an input port}, label={lst:appen_redirects}]
+{
+    "inputPorts": [
+        {
+            "name": "IP",
+            "protocol": "sodep",
+            "location": "socket://localhost:9999",
+            "redirects": [
+                {
+                    "name": "S3",
+                    "port": "OP_s3"
+                },
+                {
+                  "name": "S2",
+                  "port": "OP_s2"
+                }
+            ]
+        }
+    ]
+}
+\end{jsonlisting}
+
+\subsection{Couriers}
+\begin{jsonlisting}[][caption={Couriers represented in JSON of an input port}, label={lst:appen_couriers}]
+{
+  "inputPorts": [
+    {
+      "couriers": [
+        {
+          "name": "IP",
+          "operationOneWay": [
+            {
+              "name": "dummy"
+            }
+          ]
+        }
+      ],
+      "protocol": "sodep",
+      "name": "IP",
+      "location": "socket://localhost:9999",
+      "aggregates": [
+        {
+          "name": "OP_s2"
+        },
+        {
+          "name": "OP_s3"
+        }
+      ]
+    }
+  ]
+}
+\end{jsonlisting}
+
+\subsection{Collections}
+\begin{jsonlisting}[][caption={Collections represented in JSON of an input port}, label={lst:appen_collection}]
+{
+  "inputPorts": [
+    {
+      "name": "IP",
+      "protocol": "sodep",
+      "location": "socket://localhost:9999",
+      "aggregates": [
+        {
+          "name": "OP_s2OP_s3",
+          "collection": [
+            {
+              "name": "OP_s2"
+            },
+            {
+              "name": "OP_s3"
+            }
+          ]
+        },
+        {
+          "name": "OP_s4OP_s5",
+          "collection": [
+            {
+              "name": "OP_s4"
+            },
+            {
+              "name": "OP_s5"
+            }
+          ]
+        }
+      ],
+    }
+  ]
+}
+\end{jsonlisting}

@@ -1,0 +1,33 @@
+\begin{jsonlisting}[][caption={Interfaces and types from Jolie represented in JSON}, label={lst:appen_joliejson_typesiface}]
+{
+  "interfaces": [
+    {
+      "name": "NotificationIFace",
+      "file": "/notification/notificationInterface.ol",
+      "id": 0,
+      "oneway": [
+        {
+          "name": "sendNotification",
+          "req": {
+            "name": "Notification",
+            "file": "/notification/notificationInterface.ol"
+          }
+        }
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Notification",
+      "subTypes": [
+        {
+          "name": "content",
+          "file": "/notification/notificationTypes.ol",
+          "type": "string"
+        }
+      ],
+      "file": "/notification/notificationTypes.ol"
+    }
+  ]
+}
+\end{jsonlisting}
