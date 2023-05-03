@@ -296,7 +296,6 @@ The last Svelte-specific concept used is \textit{stores}.\footnote{Svelte stores
 In this UI, stores are used to keep a state of what is displayed in the sidebar and popup window. This allows all components of the application to write to the store and determine what is displayed in the sidebar or the popup window. 
 
 \section{Visual Studio Code Extension}
-% How the VS Code extension works
 The VS Code extension generally consists of the activation events, contribution points and a web view.
 The activation events determine what will activate the extension. An example could be that would be when a certain file type is opened, the plugin is activated.
 For this extension, the activation events happen by commands which the user can type into VS Code. The commands are displayed in appendix \ref*{appen:vscode_commands}.
@@ -322,21 +321,82 @@ The API is split into different namespaces where this extension primarily uses t
 namespace. This includes all operations and events regarding folders and files in the working directory.
 Specific events and operations will be explained more in detail when discussing their applications in this extension.
 
-The built-in commands\footnote{VS Code Commands - \url{https://code.visualstudio.com/api/references/commands}} which VS Code provides can be used directly in the logic of the extension.
-% todo commands execute providers - lsp
+The built-in commands\footnote{VS Code Commands - \url{https://code.visualstudio.com/api/references/commands}} which VS Code provides can be programmatically executed.
+Many of the commands use \textit{providers} to define how they are implemented. This means that the commands essentially execute a provider which can be implemented by the language server protocol (LSP).\footnote{Language Server Protocol - \url{https://microsoft.github.io/language-server-protocol/}}
+Providers can also be implemented in the extension or any other extension.
+This is useful because the extension can invoke LSP functions programmatically. How the LSP can be utilized for this tool will be discussed in a later section.
 
 \subsection{Live Updates}
-% live reload
-% live architecture update
+When the user of the tool changes something in the code while the tool is running, the visualization reflects the changes done in the code.
+Two event listeners are used to keep the UI up-to-date with the code when a change happens in the code. \texttt{OnWillSave} and \texttt{OnSave}.
+\texttt{OnWillSave} is an event which fires when the user saves a document but before the \texttt{OnSave} event is fired. The purpose of this event listener is
+to check if a service name of a service which is declared in the architecture file has been changed. If the name of a service was changed, the event listener updates the architecture file content to reflect the change before moving on to the \texttt{OnSave} event listener.
+
+The \texttt{OnSave} event listener is used to check if the architecture is updated in the code, if the code was updated in the UI, the listener will not be executed. The event listener also checks the architecture file to see if that has any changes.
+If the architecture file has been changed the event listener simply invokes \nodetoolname[] and gets the new JSON data and sends it to the UI to be rendered.
+If a Jolie file has been changed the \nodetoolname[] is invoked and the JSON data is checked to see if it matches the data currently used by the UI. If not, the new data is sent to the UI to be rendered.
+
 \subsection{Code Refactoring}
-% code ranges and parsing context
-% Editing properties of the services and ports using the sidebar we
+To facilitate the refactoring of code from the UI, the JSON data also needs to contain information about where certain components are in the Jolie source code files.
+This is done using the \textit{parsing context} from the Jolie parser. When the Jolie parser creates the AST it keeps track of where tokens are in the file and what ranges a code block spans over.
+This information is saved in the JSON which \javatoolname[] creates as ranges with a name indicating what the range spans over.
+Listing \ref*{lst:code_ranges} shows how the code range is saved in the Jolie system JSON.
+
+\begin{jsonlisting}[][caption={JSON representing a code range created by the Jolie parser}, label={lst:code_ranges}]
+{
+    "ranges": [
+        {
+            "name": "svc_name"
+            "start": {
+                "line": 21,
+                "char": 10
+            },
+            "end": {
+                "line": 22,
+                "char": -1
+            }
+        }
+    ]
+}
+\end{jsonlisting}
+
+All refactorable components in the code must have a corresponding code range. Protocols,
+locations and port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
+
+When the user makes an edit in the UI, this can be either creation of ports or the renaming of properties, the UI sends a message to VS Code using the VS Code message API, with the necessary data for the refactor. This includes
+the code range, the new text and what file it happens in. VS Code has an API to create \textit{workspace edits} which will add or replace text in code using internal position and range representations.
+VS Code has an internal object which represents a code range, which is used by the VS Code API to make workspace edits. This is not identical to the code range representation created by the Jolie parser.
+This means that conversion needs to happen when the code range is used in the VS Code extension.
+
+When the edit has been created internally it is not yet applied to the document, because it is often the case that multiple edits should happen when a change happens in the UI.
+All edits are saved to a list, and when the last edit request comes from the UI, the whole list of edits is sorted according to position in the file, so the edits which are applied further down the document gets applied first to keep the positions and ranges intact for the other edits not yet applied.
+After the edits have been applied, the reflected changes can be seen in the source code as well as the UI.
+
+This functionality is used for all types of edits done in the UI, including embedding and applying architectural patterns, to make all edits atomic without having to make specific interfaces for all types of edits possible. 
+This allows reusability of the refactor requests, and also the possibility to send multiple refactor requests without suffering from outdated code ranges and latency.
+
+Another type of edit can be used when renaming symbols, like service names, interface names, type names, or port names. This must be done carefully because these names can be imported by other files which means that the names must be updated everywhere.
+The LSP specification provides functionality for renaming a symbol which must be implemented by the language server protocol implementation for Jolie.
+VS Code can execute this function using the built-in command highlighted earlier. This needs a position of the symbol and what the new name is. The LSP then returns a list of workspace edits which can be applied directly in VS Code.
+
 \subsection{Embedding \& Disembedding}
-% auto import
+The user of the tool can drag around the services in the UI, and by dropping them on top of another service or outside the parent service, it will embed or disembed respectively.
+Much like the code refactoring functionality, when the user changes the architecture of the system, the UI sends a group of requests which contains the necessary information to reflect the change in the code base.
+
+% Todo something about what happens on the UI side, and how that is reflected in VS Code
+% Todo - also the different cases and how they are handled.
+
+% Todo auto import of services, interfaces and types here
+
 \subsection{The Aggregator Pattern}
+Applying architectural patterns, like the aggregator pattern, is more extensive than the other operations discussed so far.
+Potentially a lot of ports need to be created, as well as, a whole service which needs to be added to the architecture file.
+
+% Todo something about what request is sent from the UI, and how VS Code handles it.
+% Todo - mention the case with existing ports, local ports (automatic embedding) and base case.
 
 \section{Prototyping}
-% generating docker compose files
+% generating docker-compose files
 % getting dependencies
 \subsection{Dependencies}
 \clearpage
