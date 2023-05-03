@@ -11,20 +11,21 @@ Firstly, an application is defined. The application for this example is a simple
 \begin{itemize}
     \item \textbf{User service} - Handles user authentication. Lets the client create, update and delete their account and also log in to get an authentication token.
     \item \textbf{Product service} - Handles product information. This service exposes a basic CRUD (Create Read Update Delete) API for products sold on the platform.
-    \item \textbf{Recommended service} - Handles fetching recommended products. A client can query this service which will, based on the user's id, return a list of products which the user might also like.
+    \item \textbf{Recommendation service}\todo{MP: Rename to recommendation} - Handles fetching recommended products. A client can query this service which will, based on the user's id, return a list of products which the user might also like.
     \item \textbf{Order service} - Handles grouping of selected products and all the information required for the user to place an order. This includes shipping and tax fees.
     \item \textbf{Payment service} - Handles transactions of orders. When the user places an order they must provide some kind of payment method as well as the necessary information to complete the transaction.
     \item \textbf{Analytics service} - A monitoring service. This service can keep track of popular products, frequent shoppers, what products get bought together, and much more.
     \item \textbf{Notification service} - Handles sending e-mails to users when the transaction is approved. Can also send promo codes, offers, and discounts to users.
 \end{itemize}
-This example is very simplified, and only the architectural aspect of the microservices will be implemented, meaning the connections between services and the APIs. This means that no business logic will be implemented, and
-the types of interface operations will be simplified since the functionality of the application is not in focus in this chapter.
-Other details such as deployment, data persistence, and security will also be omitted from this example. A simple diagram can be seen in figure \ref*{figure:full_example_lc} which displays the desired architecture of the application.
+This example will focus on the architectural aspect of the microservices, meaning the connections between services and the APIs.
+%, omitting the implementation of the concrete behaviours for brevity. 
+This means that no business logic will be implemented, and the types of interface operations will be simplified since the functionality of the application is not in focus in this chapter.
+Other details such as deployment, data persistence, and security will also be omitted from this example. A simple diagram can be seen in \cref{figure:full_example_lc} which displays the desired architecture of the application.
 
-To showcase the visualization capabilities of the tool the application will not be developed using any architectural programming features from Jolie such as embeddings, aggregation, redirection, etc.
+To showcase the core visualization capabilities of the tool the application will not be developed using any architectural programming features from Jolie such as embeddings, aggregation, redirection, etc.
 These will, however, be introduced later.
 
-\begin{figure}[h!]
+\begin{figure}[t]
     \center
     \includegraphics[width=0.70\textwidth]{figures/full_example_lc.png}
     \caption{A diagram of the example architecture of the e-commerce application. The output ports (red) represent internal communication between the services via their input ports (yellow).}
@@ -45,7 +46,7 @@ The plugin comes with a command to initialize the architecture file, and this cr
 
 \subsection{Structure of the Architecture File}
 The architecture file is a JSON file which consists of an array of arrays of services. The outermost array can semantically be understood as the list of all networks.
-Listing \ref*{lst:architecture-file-structure} shows this structure where the \texttt{\{...\}} represents the services. Each network can have any number of services, and it is up to the
+\cref{lst:architecture-file-structure} shows this structure where the \texttt{\{...\}} represents the services. Each network can have any number of services, and it is up to the
 developer to specify what a network represents depending on where the services will deploy.
 
 \begin{jsonlisting}[][caption={Structure of the architecture JSON file showing two networks.}, label=lst:architecture-file-structure]
