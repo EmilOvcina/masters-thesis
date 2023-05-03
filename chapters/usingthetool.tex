@@ -5,22 +5,21 @@
 \chapter{Using the Visualization Tool}
 With the foundational knowledge and context for the microservice architecture, microservice patterns, the Jolie programming language, and the current tools both for Jolie and for visualization in general in place, it is time to get familiar with the tool developed for this thesis.
 
-This chapter will go into how the tool is used to enhance the development experience by going through a simple example microservice application.
-Firstly, an application is defined. The application for this example is a simple e-commerce platform consisting of seven microservices:
+This chapter will go into how the tool is used to enhance the development experience by going through an example microservice application.
+Firstly, an application is defined. The application for this example is an e-commerce platform consisting of seven microservices:
 
 \begin{itemize}
     \item \textbf{User service} - Handles user authentication. Lets the client create, update and delete their account and also log in to get an authentication token.
     \item \textbf{Product service} - Handles product information. This service exposes a basic CRUD (Create Read Update Delete) API for products sold on the platform.
-    \item \textbf{Recommendation service}\todo{MP: Rename to recommendation} - Handles fetching recommended products. A client can query this service which will, based on the user's id, return a list of products which the user might also like.
+    \item \textbf{Recommendation service} - Handles fetching recommended products. A client can query this service which will, based on the user's id, return a list of products which the user might also like.
     \item \textbf{Order service} - Handles grouping of selected products and all the information required for the user to place an order. This includes shipping and tax fees.
     \item \textbf{Payment service} - Handles transactions of orders. When the user places an order they must provide some kind of payment method as well as the necessary information to complete the transaction.
     \item \textbf{Analytics service} - A monitoring service. This service can keep track of popular products, frequent shoppers, what products get bought together, and much more.
     \item \textbf{Notification service} - Handles sending e-mails to users when the transaction is approved. Can also send promo codes, offers, and discounts to users.
 \end{itemize}
 This example will focus on the architectural aspect of the microservices, meaning the connections between services and the APIs.
-%, omitting the implementation of the concrete behaviours for brevity. 
-This means that no business logic will be implemented, and the types of interface operations will be simplified since the functionality of the application is not in focus in this chapter.
-Other details such as deployment, data persistence, and security will also be omitted from this example. A simple diagram can be seen in \cref{figure:full_example_lc} which displays the desired architecture of the application.
+This means omitting the implementation of the concrete behaviours, and the types of interface operations will be simplified since the functionality of the application is not in focus in this chapter.
+Other details such as deployment, data persistence, and security will also be omitted from this example. A diagram can be seen in \cref{figure:full_example_lc} which displays the desired architecture of the application.
 
 To showcase the core visualization capabilities of the tool the application will not be developed using any architectural programming features from Jolie such as embeddings, aggregation, redirection, etc.
 These will, however, be introduced later.
@@ -60,7 +59,7 @@ developer to specify what a network represents depending on where the services w
 ]
 \end{jsonlisting}
 
-The services have different properties which the user can specify. All properties are showcased in appendix \ref*{appen:architecture-file-structure}.
+The services have different properties which the user can specify. All properties are showcased in \cref{appen:architecture-file-structure}.
 For the example in this chapter, only the file needs to be specified for each service, for now.
 
 \section{Developing the Services}
@@ -68,10 +67,10 @@ All seven services in this example will have a unique folder each in the root di
 In each folder, JPM can be initialized if the developer needs it, and the interfaces, types, and services will all be separated in files as well.
 
 The tool will be utilized as much as possible to create and refactor code, all while every service being developed will be visualized next to the source code in VS Code.
-Every time a service has been declared it is added to the architecture file. This can be done quickly by the developer using code snippets added by the tool. All architecture JSON file snippets can be seen in appendix \ref*{appen:vscode_snippets}.
+Every time a service has been declared it is added to the architecture file. This can be done quickly by the developer using code snippets added by the tool. All architecture JSON file snippets can be seen in \cref{appen:vscode_snippets}.
 \subsection{The User Service}
 The interface which specifies what operations the user service implements is called \texttt{UserIFace} in this example.
-Listing \ref*{lst:useriface} shows how the interface is set up. The ErrorResponse type is a more universal response type which gives a message and status code, which can be used in case of an error, but with no error, it will simply set the error flag to false.
+\cref{lst:useriface} shows how the interface is set up. The ErrorResponse type is a more universal response type which gives a message and status code, which can be used in case of an error, but with no error, it will simply set the error flag to false.
 Each of the request types represents what data the operation needs, in order to be invoked. For registering users and logging in an email and password are needed. The update request type represents the user to be updated and what is going to be updated for the user. The delete request simply needs the user ID of the user.
 
 \begin{jolisting}[][caption={The interface for the user service}, label={lst:useriface}]
@@ -89,7 +88,7 @@ The service can now be added to the architecture file. Since only one service is
 Now the visualization tool can be run using the command \textit{Jolie: Visualize} in VS Code, and a single service called \textit{User} can be seen.
 
 To use the tool to add the ports, double-click on the service to open the service in the sidebar. Next to the empty lists of ports, a \texttt{"+"} button can be clicked to add either an input port or an output port.
-This will bring up a pop-up window, shown in figure \ref*{figure:popup_create_inputport}, where the user can specify the details of the port such as name, location, protocol and a list of interfaces.
+This will bring up a pop-up window, shown in \cref{figure:popup_create_inputport}, where the user can specify the details of the port such as name, location, protocol and a list of interfaces.
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.35\textwidth]{figures/popup_create_inputport.png}
@@ -101,7 +100,7 @@ Using this feature. The service needs to have an input port which uses the inter
 The analytics interface is called \texttt{AnalyticsIFace}, and the operations will be discussed in another section. For now, it is just an empty interface.
 
 After clicking 'confirm' on the popups, the interfaces are correctly imported if they exist. The code for the user service is displayed in
-listing \ref*{lst:user-svc}, where some of the implementation details are omitted, but the general structure of the service can be seen.
+\cref{lst:user-svc}, where some of the implementation details are omitted, but the general structure of the service can be seen.
 
 \begin{jolisting}[][caption={The user service after the ports have been created with omitted implementation details.}, label={lst:user-svc}]
 from .userInterface import UserIFace
@@ -138,8 +137,8 @@ a service named \textit{Product} is created in the main \texttt{.ol} file and on
 The service is added to the architecture file in the same network as the user service, and can now be seen in the visualization user interface.
 
 By opening the product service in the sidebar the input and output port can be created similarly to the user service previously. The input port will use the \texttt{ProductIFace} interface and the output port will use the \texttt{AnalyticsIFace} interface.
-The two services displayed in the visualization UI can be seen in figure \ref*{figure:jv_product_and_user} with the two ports created for each service.
-\begin{figure}[h!]
+The two services displayed in the visualization UI can be seen in \cref{figure:jv_product_and_user} with the two ports created for each service.
+\begin{figure}[t]
     \center
     \includegraphics[width=0.5\textwidth]{figures/jv_product_and_user.png}
     \caption{The product and user services displayed in the visualization tool's UI. They have an input port (yellow) and an output port (red) each and they both are considered to be in the same network.}
@@ -158,11 +157,11 @@ If the ports are not connected in the visualization UI, it is possible to change
 By clicking on the ports, the sidebar will open displaying information about the ports. Double-clicking on the location field allows the user to change it.
 Doing this for both output ports to make sure they have the same value in the location field will connect the output ports to the input port in the UI, as well as, change the code to match the changes made in the code.
 
-After connecting the ports, the connections is be represented in the visualization UI. This can be seen in figure \ref*{figure:jv_analytics} where the user and product services are connected to the newly created analytics service.
+After connecting the ports, the connections is be represented in the visualization UI. This can be seen in \cref{figure:jv_analytics} where the user and product services are connected to the newly created analytics service.
 
-\begin{figure}[h!]
+\begin{figure}[t]
     \center
-    \includegraphics[width=0.5\textwidth]{figures/jv_analytics.png}
+    \includegraphics[width=0.65\textwidth]{figures/jv_analytics.png}
     \caption{The product, user, and analytics services displayed in the visualization tool's UI. The user and product services have an output port (red) each of which is connected to the input port (yellow) of the analytics service.}
     \label{figure:jv_analytics}
 \end{figure}
@@ -194,16 +193,16 @@ The payment service will be invoked through the order service, so when the user 
 
 The tool can either help in connecting the correct ports as done with the other services, but the developer can do that in the code as well, and when the developer does a change in the code manually and saves the document, the visualization UI is automatically updated to reflect the changes made in the code.
 
-\subsection{The Recommended Service}
+\subsection{The Recommendation Service}
 The last service is a standalone service, which only the client needs to invoke.
-The recommended service interface consists of one request-response, \texttt{getRecommendations},
+The recommendation service interface consists of one request-response, \texttt{getRecommendations},
 which based on the user ID given finds the most recommended products as a list of products.
 
-A possible extension to the service can involve fetching analytics data from the analytics service and doing calculations with that information to avoid sharing databases between services. This will require the analytics service to expose an operation allowing the internal services to get the data, and an output port in the recommended service to invoke that operation.
+A possible extension to the service can involve fetching analytics data from the analytics service and doing calculations with that information to avoid sharing databases between services. This will require the analytics service to expose an operation allowing the internal services to get the data, and an output port in the recommendation service to invoke that operation.
 This extension will be omitted in this example.
 
 \subsection{The Completed Application}
-With all services and ports in place, the application can be seen as one microservice architecture in the visualization UI, as seen in figure \ref*{figure:full_example_lc}.
+With all services and ports in place, the application can be seen as one microservice architecture in the visualization UI, as seen in \cref{figure:full_example_lc}.
 
 Having the whole application in the visualization tool allows the developer to inspect the application in detail to get an overview of what is happening between services and what APIs the different services expose.
 Clicking on ports opens the sidebar and displays information about the ports including the interfaces. All the interfaces can be clicked on to further inspect the operations in the interface. All types used for the operations are also clickable and will display information about the type,
@@ -211,7 +210,7 @@ including the subtypes, cardinality and root type.
 
 From here the developer can start using architectural patterns in Jolie as discussed in the previous chapter. Some refinements of the current services can also be made, for example, the payment service should probably have underlying services to take care of different payment methods.
 
-\begin{figure}[h!]
+\begin{figure}[t]
     \center
     \includegraphics[width=0.8\textwidth]{figures/jv_completed.png}
     \caption{The entire e-commerce application is displayed in the visualization tool's UI. All services exist in the same network and all are top-level.}
@@ -222,6 +221,13 @@ From here the developer can start using architectural patterns in Jolie as discu
 Now that the application has all seven services implemented, the developer can apply some of the architectural features allowed in Jolie to improve the application and implement some of the microservices (API) patterns discussed in the last chapter.
 
 \subsection{Embedding}
+\begin{figure}[t]
+    \center
+    \includegraphics[width=0.17\textwidth]{figures/jv_embedded.png}
+    \caption{The e-commerce application after the payment, notification, and analytics services have been embedded.}
+    \label{figure:jv_embedded}
+\end{figure}
+
 It is not necessarily the best idea to have all seven services as top-level services. The services not accessed by the client directly should be embedded in the services which need them.
 The analytics service is used by four services: Order, Payment, User, and Product. To embed the analytics service in these four services the input port's location can be changed to \texttt{local}. This is just one way of embedding using local in-memory communication and is not the only way of embedding services. Another method of embedding will be used for another service later.
 Changing the port location to \texttt{local} can be done in the sidebar.
@@ -238,15 +244,8 @@ parent service, namely, the order and payment services and the embedding code wi
 The last service to embed is the payment service in the order service. This can be done by either changing the existing port to use local communication or just dragging the payment service
 as it is now into the order service to use the existing ports as communication and the code will again be changed to reflect the embedding.
 
-The new architecture can be seen in figure \ref*{figure:jv_embedded} and it shows only the services which are accessed by a client. The services which now have embeddings can be seen with a little "plus" sign, which can be clicked on to expand the visualization of the service revealing local ports and embedded services.
+The new architecture can be seen in \cref{figure:jv_embedded} and it shows only the services which are accessed by a client. The services which now have embeddings can be seen with a little "plus" sign, which can be clicked on to expand the visualization of the service revealing local ports and embedded services.
 The embedded services can be removed by dragging them out of their embedder. Doing this with local communication will cause the local ports to be removed from the code.
-
-\begin{figure}[h!]
-    \center
-    \includegraphics[width=0.17\textwidth]{figures/jv_embedded.png}
-    \caption{The e-commerce application after the payment, notification, and analytics services have been embedded.}
-    \label{figure:jv_embedded}
-\end{figure}
 
 \subsection{Aggregation}
 Now all the top-level services are services which a client is directly requesting. It is now possible to add some of the architectural patterns to the system in order to implement some of the ideas mentioned in the previous chapter.
@@ -255,7 +254,7 @@ criteria. Selecting the four top-level services of the example application shows
 
 Clicking on the "aggregator" button will open a pop-up allowing the developer to enter all necessary information for creating an aggregator service, and choosing if the aggregator should connect to existing ports or create new input ports for the aggregated services, or if the aggregated services should be embedded in the aggregator service.
 For this example, the aggregator will just connect using the existing ports requiring that the developer types in the locations of the input port for each service correctly.
-After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in figure \ref*{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly more orange colour 
+After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in \cref{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly more orange colour 
 to illustrate that the aggregator is a generated service and is only a scaffolding service which the developer needs to implement the functionality for.
 
 \begin{figure}[h!]
@@ -280,7 +279,7 @@ In the generated deployment file the networks are also specified and added to ea
 This is just a generic deployment file and should not be used for anything other than testing the application locally.
 The tool only supports Docker-Compose at the moment, so Docker is required for this feature to be effective.
 
-To make the Jolie service accessible from outside clients it is required that the services follow the requirements for running Jolie services in Docker mentioned in the preliminaries section about Jolie in Docker \ref*{label:jolie_in_docker}.
+To make the Jolie service accessible from outside clients it is required that the services follow the requirements for running Jolie services in Docker mentioned in the preliminaries \cref{label:jolie_in_docker}.
 This includes changing the location to use the container name as the hostname if TCP/IP communication is used between services and adding an extra field in the architecture file.
 The field is a \texttt{ports} field which is a list of Docker ports the container will expose using the syntax of Docker ports, e.g. \texttt{"3000:3000"} meaning that port 3000 is exposed externally and mapped internally to port 3000.
 Other fields can be added to customize the deployment. The container name can be changed using the field \texttt{"container"} giving more freedom in terms of what the services are called in the code

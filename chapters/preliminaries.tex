@@ -15,59 +15,9 @@ the reader with a quick overview of the Jolie programming language,
 what Docker Compose is, and what tools exist both for Jolie and
 other programming languages which can be used in some way to visualize and diagram.
 
-This chapter will \textbf{not} go into detail on microservice architectures or APIs in general. It is
+This chapter will not go into detail on microservice architectures or APIs in general. It is
 expected that the reader will be familiar with the common terminology used in microservice architectures and APIs.
 The general microservice terminology used throughout the thesis is referenced in the book \textit{Microservices Patterns} by Chris Richardson.\cite{microservicepatterns}
-
-% \section{Microservice Architecture}
-% Building software requires a lot of careful considerations when it comes
-% to choosing a software architecture. Many developers will choose a more monolithic architecture where all
-%  the functionality of the application
-% is in one codebase. This seems like the simpler approach because everything is deployed as one solution, however,
-%  there are many drawbacks
-% with this approach when the software starts getting bigger, and a larger number of users starts
-% interacting with the platform.
-
-% For this section and the following subsections, the book \textit{Microservices Patterns} by Chris Richardson \cite*{microservicepatterns} will serve as a good foundation. 
-% The definitions and concepts described by him will be used throughout this thesis.
-
-% \subsection{Some of the Problems with Monoliths}
-% Drawbacks exist in all parts of using monolith software architecture, everything from development to
-% deploying and maintaining the production application.
-% From a development standpoint, it can be slow to introduce new features into a monolithic application's
-%  codebase. As the project grows, so will the complexity, and trying to somehow weave in a new feature in a large, cluttered project can seem almost impossible.
-
-% After developing a new feature, or fixing a bug, the developer would ideally like to see their change
-% in production as fast as possible. This can, however, be a long and tedious process when developing in one large codebase.
-% First, all tests must run, which can take a long time. The codebase is complex so the likelihood of a
-% test failing is big, meaning that the tests must be run multiple times.
-
-% When the project runs in production, a whole new set of issues can quickly arise. It can be difficult
-% to scale an application when the whole application is one big instance.
-% The only thing to do is give the machine running the application more processing power and memory
-% storage capacity, in other words, vertically scale the application. Another significant problem with having the application be one instance of everything, is that a single point of failure exists. If one functionality of the program is faulty, it can affect other parts of the application
-% even if the other parts seemingly have nothing to do with the faulty code.
-
-% \subsection{Utilizing the Microservice Architecture}
-% To avoid all the problems with the monolith architecture, developers can try to go for a more
-%  distributed approach, where the microservice architecture is one of those approaches.
-
-% The microservice architecture aims to make the application modular. This means that all business logic is broken up into different services 
-% where each service serves only one cohesive set of purposes, and the services can be replicated.
-% The services will have some API which other services can use for communication. This provides some forced boundary because a service can never access the internal classes and code of another service unless the API allows it.
-% This helps in preserving modularity and keeps services decoupled.
-% The definition of a microservice can be a bit indistinct, so it is often up to the individual development team what a microservice entails.
-
-% The microservice architecture also addresses the more \textit{non-functional} aspects of the application.
-% This includes maintainability, extensibility and testability, as well as the important aspect of
-% \textit{horizontal scaling} where multiple instances of the same business logic can be deployed giving 
-% faster response times and eliminating the single point of failure mentioned before.
-
-% There can be some difficulties in working with microservices, so it is not a one-solution-fits-all.
-% The communication between microservices can be a whole new dimension of complexity. The developer has several ways of implementing communication
-% and all have their benefits and consequences. The microservices can communicate through event channels, they can expose a REST API, and one could set up a service mesh to handle inter-service communication.
-% Another set of problems is data consistency. Different patterns can be used to ensure that data between services stay consistent. This includes \textit{sagas}, \textit{event sourcing} and many more.
-%
 
 \section{Microservice API Patterns}
 This section aims to highlight some microservice API patterns which have been discussed in the book \textit{Patterns for API design}.\cite{PatternsForAPIDesign:2022}
@@ -121,7 +71,7 @@ Ports have their properties which a developer needs to specify. The three main p
 Where location specifies where the port will be listening for messages and where the port will send messages.
 The protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
 operations the service is capable of performing, and for output ports, the interfaces specify which
-operations the service is capable of invoking internally. Listing \ref*{lst:simple-inputport} shows a basic input port in Jolie, where all the key properties are set.
+operations the service is capable of invoking internally. \cref{lst:simple-inputport} shows a basic input port in Jolie, where all the key properties are set.
 
 \begin{jolisting}[][caption={Simple input port in Jolie},label=lst:simple-inputport]
 inputPort IP {
@@ -142,7 +92,7 @@ and \texttt{OneWay} where the operation takes in a request type but returns noth
 \textbf{Type}: interfaces use types to define what is expected to be given to an operation, and in some cases what the operation will return. In Jolie, there are basic
 data types which include: \texttt{void}, \texttt{int}, \texttt{string}, \texttt{bool}, etc. However, it is also to define custom types which can contain subtypes.
 This could be used when an operation needs more data types.
-Listing \ref*{lst:type-with-interf} is an example of a custom type used in an interface in Jolie:
+\cref{lst:type-with-interf} is an example of a custom type used in an interface in Jolie:
 \begin{jolisting}[][caption={Custom type used in an interface in Jolie},label=lst:type-with-interf]
 type SomeType: void {
     content: string
@@ -168,9 +118,11 @@ Another benefit of embedding is that the language will take care of the connecti
 This also potentially hides the connection from the outside world.
 
 The in-memory communication channel can be utilized here. The developer can specify if the embedder should create a new local port and connect automatically via that. This requires that the embedded service contains an input port which shares protocol and location.
-Listing \ref*{lst:embed-as} showcases this functionality.
+The following Listing showcases this functionality.
 
-\begin{jolisting}[][caption={Embedding of a service called "svc" via a local output port "OP"}, label=lst:embed-as]
+\begin{jolisting}[][caption={
+    % Embedding of a service called "svc" via a local output port "OP"
+    }, label=lst:embed-as]
 embed svc as OP
 \end{jolisting}
 
@@ -196,7 +148,7 @@ inputPort AggregatorPort {
 
 To Showcase this feature in an example: imagine that an app wants to support different payment methods but doesn't want the client to know the location and protocol of each of them. An aggregator can be set up between the 
 client and the services, and depending on the payment method, the aggregator can send the payment request to the correct service.
-Figure \ref*{figure:aggregator_example} shows a system with a service which can aggregate requests by having an output port to each of the aggregated services and a single input port where the aggregation is specified. The aggregated services can either be embedded or not.
+\cref{figure:aggregator_example} shows a system with a service which can aggregate requests by having an output port to each of the aggregated services and a single input port where the aggregation is specified. The aggregated services can either be embedded or not.
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.5\textwidth]{figures/aggregator_example.png}
@@ -206,7 +158,7 @@ Figure \ref*{figure:aggregator_example} shows a system with a service which can 
 \end{figure}
 \newdif{Redirection} is a pattern which works similarly to the aggregator, but architecturally is very different.
 A service with an input port can specify that a resource name gets redirected to a specific service via an output port.
-Listing \ref*{lst:redirector-inputport} displays how an input port can specify resources and map them to an output port.
+\cref{lst:redirector-inputport} displays how an input port can specify resources and map them to an output port.
 This means that a client sending a request to the redirector can specify a resource name in the communication media, and the redirector will forward the message to the correct service based on that resource name.
 To specify a resource name the client simply needs to specify it in the URL, e.g \texttt{socket://localhost:9000/!/rss} where the \texttt{/!/rss} part is what specifies the resource name.
 
@@ -226,13 +178,13 @@ inputPort RedirectorPort {
 
 A simple example of what the redirector could be used for is: imagine that an e-commerce application wants to have one point-of-entry for the system. The application could set up an \textit{API Gateway} which will act as that point of entry. 
 When a client wants to get information for a product page, it can specify what it needs in the resource names. This also handles protocol transformation so the client does not need to know the internal service's required protocols.
-The example is showcased in figure \ref*{figure:redirector_example}. The client makes requests to the redirector specifying the resource name to fetch the relevant data.
+The example is showcased in \cref{figure:redirector_example}. The client makes requests to the redirector specifying the resource name to fetch the relevant data.
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.5\textwidth]{figures/redirector_example.png}
     \caption{A group of microservices which can be accessed through an API gateway. 
     The client can specify a resource name to specify which service to send the request to.
-    The product service fetches information about a product. The recommended service fetches
+    The product service fetches information about a product. The recommendation service fetches
     the recommended products based on the user and the shipping service fetches shipping information given the user's location.}
     \label{figure:redirector_example}
 \end{figure}
