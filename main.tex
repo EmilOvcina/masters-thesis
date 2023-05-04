@@ -178,6 +178,16 @@
   morestring=[b]"
 }
 
+\lstdefinelanguage{yaml}{
+  basicstyle=\color{blue}\footnotesize,
+  rulecolor=\color{black},
+  string=[s]{'}{'},
+  stringstyle=\color{blue},
+  comment=[l]{:},
+  commentstyle=\color{black},
+  morecomment=[l]{-}
+}
+
 \definecolor{JSONnumb}{RGB}{106, 109, 32}
 \lstdefinelanguage{json}{
     numbers=left,
@@ -330,7 +340,6 @@
   \expandafter\def\csname\n\endcsname{\lstinline[language=#2,style=solarized-light]}
 }
 
-
 %   Generate the environment for the abstract:
 \newcommand\summaryname{Abstract}
 \newenvironment{Abstract}%
@@ -344,7 +353,7 @@
 
 % listings and inlining of Jolie code
 \newlang[jo]{jolie}{Jolie}{syellow}
-
+\newlang[yaml]{yaml}{YAML}{sred}
 \newlang[json]{json}{JSON}{sgreen}
 
 % listings and inlining of JavaScript code

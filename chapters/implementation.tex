@@ -147,6 +147,9 @@ The \javatoolname[] also creates data for making the prototype. This includes th
 After the whole system has been parsed and a JolieSystem is created, the system will be given as a parameter to a \textit{build} object which will handle the logic for creating the JSON data.
 The builder will first create the service folders using the services in the networks from the JolieSystem object. Duplicate build folders will be checked for at this stage, which is done to make sure that duplicate images will not be generated when using Docker-Compose.
 However, as mentioned in a previous section, two identical services can be two different images if the runtime arguments are different, which is also handled here.
+The build folders contain a list of files which are needed for the service to run. This is essentially the file in which the target service resides and all dependency files.
+To get all the dependencies of a service, the service representation in the system inspector has a set of strings corresponding to the file URIs of the imported symbols.
+When the inspector goes through embeddings, types, interfaces, etc, of a service it adds all file URIs to the set which can be used to make the list of dependencies when creating the build folder.
 
 After the build folders have been created as internal objects, they are parsed onto another object which builds the Docker-Compose YAML string. The JolieSystem is also used here to create the networks in the Docker-Compose file.
 The Docker-Compose builder also has some internal representation of what a service is, since two services in Docker-Compose can use the same image but have different deployment properties, which means that they should be created as separate services in Docker-Compose, but they will not have two different service folders.
@@ -379,24 +382,48 @@ Another type of edit can be used when renaming symbols, like service names, inte
 The LSP specification provides functionality for renaming a symbol which must be implemented by the language server protocol implementation for Jolie.
 VS Code can execute this function using the built-in command highlighted earlier. This needs a position of the symbol and what the new name is. The LSP then returns a list of workspace edits which can be applied directly in VS Code.
 
+\subsection{Port Creation}
+% Todo auto import of services, interfaces and types here
+
 \subsection{Embedding \& Disembedding}
 The user of the tool can drag around the services in the UI, and by dropping them on top of another service or outside the parent service, it will embed or disembed respectively.
 Much like the code refactoring functionality, when the user changes the architecture of the system, the UI sends a group of requests which contains the necessary information to reflect the change in the code base.
 
-% Todo something about what happens on the UI side, and how that is reflected in VS Code
-% Todo - also the different cases and how they are handled.
+When the embedding is happening in the UI, three cases can occur between two services. The two services can already have a non-local connection between them, which means that the embedding should just continue to use that connection. This adds the line \jo{embed SVC} to the embedder service.
+Case two is when the embedded service already has a local port which is not connected to anything. This will just add the line \jo{embed SVC as SVC} in the embedder service.
+The final case is when no free ports exist in the services, and new ports should be created to accommodate the embedding. A pop-up window will appear requiring the user to 
+type in the necessary information to create a new local input port for the embedded service. This is a shortcut to first creating a local port using the sidebar and then embedding using case 2.
 
-% Todo auto import of services, interfaces and types here
+On the side of the VS Code extension, embeddings are a change to the architecture file, a port creation in some cases, and an addition of an "embed" line.
+The importing of service symbols is also handled here, where the embedded service will be automatically imported.
 
 \subsection{The Aggregator Pattern}
 Applying architectural patterns, like the aggregator pattern, is more extensive than the other operations discussed so far.
 Potentially a lot of ports need to be created, as well as, a whole service which needs to be added to the architecture file.
 
-% Todo something about what request is sent from the UI, and how VS Code handles it.
-% Todo - mention the case with existing ports, local ports (automatic embedding) and base case.
+The selected services in the UI must be checked before the aggregator pattern can be applied. At the moment the two criteria for applying the pattern is that all the services must be top-level services. This is done to 
+prevent edge cases where some of the services are embedded in other services and can potentially be embedded in the aggregator as well. 
+The second criterion is that all selected services must be different services, meaning no selected services can be different instances of the same service.
+
+There are three cases when the user specifies the location of the input ports of the aggregated services.
+If the user specifies a location of a port which already exists, the aggregator will aggregate to that input port, meaning no extra input port needs to be created for that service.
+Case two is if the user specifies a local connection between the aggregator and the aggregated service. This will automatically embed the aggregated service in the aggregator service.
+The default case is that a new input port will be created in the aggregated service, which connects to a corresponding output port in the aggregator service. 
+The request sent from the UI when creating the aggregator must contain information to create the new aggregator service with all its ports, all the potential new input ports for the aggregated services, and the embeddings needed to be added to the aggregator service, in case the user specifies that any of the services should use local ports for communication.
+
+When VS Code receives the request the corresponding service is created in the file of the first service selected.
+All symbols are imported if they are not already, and all input ports are created in the corresponding aggregated service's file.
+The service is created with one edit because no code ranges of the service exist yet, so the components cannot be created separately.
 
 \section{Prototyping}
 % generating docker-compose files
-% getting dependencies
-\subsection{Dependencies}
-\clearpage
+When the user executes the \textit{Docker-Compose} command from the VS Code extension or the command line, the
+the \javatoolname[] is invoked via the adapter and fetches the JSON needed for creating the prototype.
+First, the docker-compose file is created by simply writing the generated content into the YAML file.
+\cref{appen:docker_yaml} shows an example of how the docker-compose YAML can be generated.
+Then, all the build folders need to be created, this is done by going through the list of build folders from the JSON data and copying the files and dependencies into the correct folders.
+VS Code runs on Electron which uses NodeJS as runtime, meaning that a NodeJS library is used to access the filesystem to make folders, copy files and write to the YAML file.
+
+The binding volumes specified in the architecture file are copied into a global resource folder called \texttt{-res}. The name is chosen so a service's name can never clash with the resources folder and potentially overwrite everything in the folder.
+
+% todo more about how the service names in docker-compose are chosen, and build folder names etc.
