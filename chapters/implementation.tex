@@ -1,4 +1,4 @@
-% Text:              X
+% Text:              √
 % Citations:         X
 % Revision:          X
 % Final Revision:    X
@@ -14,10 +14,10 @@ The tool essentially consists of four components: The VS Code extension, the use
 The \javatoolname[] program is used to run the Jolie parser, which is also written in Java, and that will gather all information from the Jolie code needed by the visualization tool.
 
 The Svelte user interface is the component which takes in the user input and renders the services, ports and connections.
-In order for the UI to get the relevant data from the Jolie code, the VS Code extension invokes the \nodetoolname[] program, with the correct parameters, which invokes the \javatoolname[] program.
-\nodetoolname[] program listens for the output of the \javatoolname[] program,
+In order for the UI to get the relevant data from the Jolie code, the VS Code extension invokes the \nodetoolname[], with the correct parameters, which invokes the \javatoolname[] program.
+\nodetoolname[] listens for the output of the \javatoolname[] program,
 
-meaning that the \nodetoolname[] program functions as a wrapper for the \javatoolname[] program so the VS Code extension does not have to invoke \javatoolname[] directly,
+meaning that the \nodetoolname[] functions as a wrapper for the \javatoolname[] program so the VS Code extension does not have to invoke \javatoolname[] directly,
 and sends the data to the VS Code extension, which sends the data to the user interface.
 
 \cref{figure:comp_diagram} displays the connection between the different components.
@@ -95,10 +95,10 @@ Information such as runtime arguments, exposed Docker ports, and the service nam
 
 The JSON data generated to create the prototype can be seen in \cref{appen:joliejson_prototype}, but with omitted docker-compose YAML content.
 
-\section{The \nodetoolname[] Program}
+\section{The \nodetoolname[]}
 % why it is created and how it works
-The \nodetoolname[] program functions as a wrapper for the \javatoolname[] program. It is created so the VS Code application does not have to execute the \javatoolname[] program directly and also if the tool should be extended to other code editors or run in the browser, this functionality should not be implemented in the VS Code extension.
-The \nodetoolname[] program also makes sure to return errors if a parsing error occurs or if Jolie is not installed correctly.
+The \nodetoolname[] functions as a wrapper for the \javatoolname[] program. It is created so the VS Code application does not have to execute the \javatoolname[] program directly and also if the tool should be extended to other code editors or run in the browser, this functionality should not be implemented in the VS Code extension.
+The \nodetoolname[] also makes sure to return errors if a parsing error occurs or if Jolie is not installed correctly.
 
 This part of the tool consists of three parts, the data fetching part which executes the \javatoolname[] program and checks for errors, the server part which allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality, and
 prototyping which is identical to the functionality in the VS Code extension, but this can be used if the user of the tool installs only this part of the tool without the VS Code extension.
@@ -315,8 +315,6 @@ The extension can send messages to the web view using a post message function wh
 The JavaScript running in the web view can create an event listener which listens for messages. The payload of the messages declares what type of message is sent and then the web view can act accordingly.
 This is useful when the UI should update based on some event in the editor.
 
-% todo something about initializing the extension - flow diagram - wait until name of node program exists
-
 \subsection{The VS Code API \& Commands}
 VS Code exposes an API\footnote{VS Code API - \url{https://code.visualstudio.com/api/references/vscode-api}} with a long list of operations and events
 which is used in this extension to handle all inputs from the UI, and the code editor.
@@ -367,7 +365,7 @@ All refactorable components in the code must have a corresponding code range. Pr
 locations and port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
 
 When the user makes an edit in the UI, this can be either creation of ports or the renaming of properties, the UI sends a message to VS Code using the VS Code message API, with the necessary data for the refactor. This includes
-the code range, the new text and what file it happens in. VS Code has an API to create \textit{workspace edits} which will add or replace text in code using internal position and range representations.
+the code range, the new text and what file it happens in. VS Code has an API to create \textit{workspace edits}\footnote{VS Code workspace API - \url{https://code.visualstudio.com/api/references/vscode-api\#workspace}} which will add or replace text in code using internal position and range representations.
 VS Code has an internal object which represents a code range, which is used by the VS Code API to make workspace edits. This is not identical to the code range representation created by the Jolie parser.
 This means that conversion needs to happen when the code range is used in the VS Code extension.
 
@@ -382,8 +380,6 @@ Another type of edit can be used when renaming symbols, like service names, inte
 The LSP specification provides functionality for renaming a symbol which must be implemented by the language server protocol implementation for Jolie.
 VS Code can execute this function using the built-in command highlighted earlier. This needs a position of the symbol and what the new name is. The LSP then returns a list of workspace edits which can be applied directly in VS Code.
 
-\subsection{Port Creation}
-% Todo auto import of services, interfaces and types here
 
 \subsection{Embedding \& Disembedding}
 The user of the tool can drag around the services in the UI, and by dropping them on top of another service or outside the parent service, it will embed or disembed respectively.
@@ -395,7 +391,17 @@ The final case is when no free ports exist in the services, and new ports should
 type in the necessary information to create a new local input port for the embedded service. This is a shortcut to first creating a local port using the sidebar and then embedding using case 2.
 
 On the side of the VS Code extension, embeddings are a change to the architecture file, a port creation in some cases, and an addition of an "embed" line.
-The importing of service symbols is also handled here, where the embedded service will be automatically imported.
+
+\subsection{Auto Import}
+When a port is created the interfaces specified are not necessarily imported correctly into the service needing it.
+If the correct interface is not imported, either explicitly or via the \texttt{*} notation,
+the VS Code extension goes through all Jolie source code files in the workspace, using the workspace API, and tries to find the symbol needed. If it is interfaces that it is trying to find
+it will look for the interface name prefixed with \textit{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
+
+The path of the file containing the interface declaration and the path to the file to the newly created port will be used to remove the common path prefix. This will give a relative path.
+This path is then converted into the path notation which Jolie uses and is added to the top of the document with the newly created port, using the stack of edits as mentioned previously.
+
+The auto-import feature is not only used when a port is created with interfaces. When a service is embedded into another service, the service symbol should be imported into the file of the embedder.
 
 \subsection{The Aggregator Pattern}
 Applying architectural patterns, like the aggregator pattern, is more extensive than the other operations discussed so far.
@@ -416,14 +422,28 @@ All symbols are imported if they are not already, and all input ports are create
 The service is created with one edit because no code ranges of the service exist yet, so the components cannot be created separately.
 
 \section{Prototyping}
-% generating docker-compose files
 When the user executes the \textit{Docker-Compose} command from the VS Code extension or the command line, the
-the \javatoolname[] is invoked via the adapter and fetches the JSON needed for creating the prototype.
+\javatoolname[] is invoked via the adapter and fetches the JSON needed for creating the prototype.
 First, the docker-compose file is created by simply writing the generated content into the YAML file.
-\cref{appen:docker_yaml} shows an example of how the docker-compose YAML can be generated.
+\cref{appen:docker_yaml} shows an example of docker-compose YAML which can be generated.
 Then, all the build folders need to be created, this is done by going through the list of build folders from the JSON data and copying the files and dependencies into the correct folders.
-VS Code runs on Electron which uses NodeJS as runtime, meaning that a NodeJS library is used to access the filesystem to make folders, copy files and write to the YAML file.
+The Jolie source code files must be placed with the correct relative path to each other inside the build folder, so imports do not break when prototyping.
+The build folders are named using the service name and the service ID as a prefix. This is done to prevent any edge cases where two services are named the same thing.
+When creating the Docker-Compose YAML file content the build folders are referenced and the services follow the same pattern in the naming to prevent any cases of ambiguity.
+
+If \textit{JPM} is used in the project, the \texttt{package.json} file is also copied into the folders.
+A custom Dockerfile is created in each build folder. The Dockerfile contains any runtime arguments defined in the architecture file, and if the service uses JPM it will be added to the Dockerfile to make sure that the container installs the external dependencies correctly.
+VS Code runs on Electron which uses NodeJS as runtime, meaning that a NodeJS library\footnote{File system API in NodeJS - \url{https://nodejs.org/api/fs.html}} is used to access the filesystem to make folders, copy files and write to the YAML file.
 
 The binding volumes specified in the architecture file are copied into a global resource folder called \texttt{-res}. The name is chosen so a service's name can never clash with the resources folder and potentially overwrite everything in the folder.
+The file structure is also copied in the resource folder relative to the architecture file to make sure that identically named resources still get added and will be referenced correctly by the Docker-Compose YAML file.
 
-% todo more about how the service names in docker-compose are chosen, and build folder names etc.
+\cref{figure:buildfolder_structure} Shows the structure of the build folders for the prototyping of the example in Chapter 3.  
+
+\begin{figure}[t]
+    \center
+    \includegraphics[width=0.35\textwidth]{figures/bf_p1.png}
+    \includegraphics[width=0.35\textwidth]{figures/bf_p2.png}
+    \caption{The structure of the build folders used in prototyping from the example in Chapter 3. It shows how the file structure is preserved for each service to maintain import paths. For binding volumes, the relative path to the architecture file is also maintained.}
+    \label{figure:buildfolder_structure}
+\end{figure}

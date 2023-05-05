@@ -1,5 +1,5 @@
 % Text:              √
-% Citations:         X
+% Citations:         √
 % Revision:          X
 % Final Revision:    X
 \chapter{Preliminaries}
@@ -47,7 +47,7 @@ processing, the \textit{Rate Limit} pattern that prevents excessive usage of an 
 Many of the patterns can be used in conjunction to enhance the effect of the desired functionality. For example: \textit{Pricing Plan} can use \textit{Rate Limit} to allow the provider to have different levels of pricing plans.
 To further enhance the functionality of the pricing plan pattern, \textit{API Keys} (A structure API pattern which allows the API provider
 to assign a unique token/key to each client which can be used for authorization purposes) can be used together to allow the API provider to safely and reliably monetize the API using different billing plans. 
-Adding this to an API Gateway is good to ensure that all clients are monetized accordingly.
+Adding this to an API Gateway\footnote{API Gateway - \url{https://microservices.io/patterns/apigateway.html}} is good to ensure that all clients are monetized accordingly.
 
 Generally, most of the API patterns described in the book are best utilized in conjunction,
 and when looking at Jolie in a moment, it is crucial to understand that these patterns, both API and non-API patterns,
@@ -56,8 +56,11 @@ It is also worth mentioning that the patterns discussed in this section will not
 
 
 \section{Jolie}
-Jolie is a service-oriented programming language, where (micro)services are the basic building blocks.
-Everything in Jolie is contained in services and services communicate with each other through APIs which the programmer needs to design and implement in the code. \cite{jolie}
+Jolie is a service-oriented programming language, where services are the basic building blocks.
+Everything in Jolie is contained in services and services communicate with each other through APIs which the programmer needs to design and implement in the code. All information about Jolie 
+is taken from the language documentation. \cite{jolie}
+
+The following subsections will use the documentation to highlight the relevant components and features of the language.
 
 \subsection{Basic Building Blocks of a Jolie Program}
 This subsection will quickly describe some of the relevant building blocks which are needed for a Jolie service.
@@ -71,9 +74,13 @@ Ports have their properties which a developer needs to specify. The three main p
 Where location specifies where the port will be listening for messages and where the port will send messages.
 The protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
 operations the service is capable of performing, and for output ports, the interfaces specify which
-operations the service is capable of invoking internally. \cref{lst:simple-inputport} shows a basic input port in Jolie, where all the key properties are set.
+operations the service is capable of invoking internally. 
 
-\begin{jolisting}[][caption={Simple input port in Jolie},label=lst:simple-inputport]
+The following Listing shows a basic input port in Jolie, where all the key properties are set:
+
+\begin{jolisting}[][caption={
+    % Simple input port in Jolie
+    },label=lst:simple-inputport]
 inputPort IP {
     Location: "socket://localhost:9999"
     Protocol: sodep
@@ -92,8 +99,11 @@ and \texttt{OneWay} where the operation takes in a request type but returns noth
 \textbf{Type}: interfaces use types to define what is expected to be given to an operation, and in some cases what the operation will return. In Jolie, there are basic
 data types which include: \texttt{void}, \texttt{int}, \texttt{string}, \texttt{bool}, etc. However, it is also to define custom types which can contain subtypes.
 This could be used when an operation needs more data types.
-\cref{lst:type-with-interf} is an example of a custom type used in an interface in Jolie:
-\begin{jolisting}[][caption={Custom type used in an interface in Jolie},label=lst:type-with-interf]
+
+This Listing is an example of a custom type used in an interface in Jolie:
+\begin{jolisting}[][caption={
+    % Custom type used in an interface in Jolie
+    },label=lst:type-with-interf]
 type SomeType: void {
     content: string
     id: int
@@ -118,7 +128,7 @@ Another benefit of embedding is that the language will take care of the connecti
 This also potentially hides the connection from the outside world.
 
 The in-memory communication channel can be utilized here. The developer can specify if the embedder should create a new local port and connect automatically via that. This requires that the embedded service contains an input port which shares protocol and location.
-The following Listing showcases this functionality.
+The following Listing showcases this functionality:
 
 \begin{jolisting}[][caption={
     % Embedding of a service called "svc" via a local output port "OP"
@@ -134,7 +144,7 @@ is the intention, the developer can simply remove the \texttt{as OP} part of the
 Jolie also facilitates the programming of the communication topology. This includes aggregation, redirection, couriers, and collections, which is useful when 
 implementing some of the microservice design patterns mentioned before.
 \newdif{Aggregation} is an architectural pattern where a service has an input port which exposes all operations of a specified set of output ports. This essentially works like a reverse proxy, where the aggregated service distributes requests to aggregated services without
-requiring the aggregated services to be publically exposed or known. Listing \ref{lst:aggregator-inputport} displays how an input port can expose the API of two other output ports.
+requiring the aggregated services to be publically exposed or known. \cref{lst:aggregator-inputport} displays how an input port can expose the API of two other output ports.
 The API of the output ports being aggregated can be extended by the aggregator service. This is done by using \textit{interface extenders} which does as the name implies and allows any client to access more operations than the output port's interfaces specify.
 This is a simple architectural pattern but can be used to implement some widely used architectural strategies. This includes load balancing, caching, encryption and cyber attack prevention.
 
@@ -164,7 +174,7 @@ To specify a resource name the client simply needs to specify it in the URL, e.g
 
 Redirection can be used to implement several different microservice (API) patterns since it essentially is a proxy.
 Generally, a lot of API structures can be implemented using redirectors, because of how a client can specify a specific resource.
-\text{API Gateway} is one of the API patterns which can be implemented using redirectors, which are used a lot by heavily visited sites like Netflix.
+\text{API Gateway} is one of the API patterns which can be implemented using redirectors, which are used a lot by heavily visited sites like Netflix.\footnote{Optimizing the Netflix API - \url{https://netflixtechblog.com/optimizing-the-netflix-api-5c9ac715cf19}}
 
 \begin{jolisting}[][caption={Input port which redirects requests using resource names}, label=lst:redirector-inputport]
 inputPort RedirectorPort {
@@ -199,11 +209,11 @@ They are specified by grouping output ports when defining aggregates.
 This together with courier processes can fully, and easily, implement a load balancer for services sharing interfaces because the courier can forward the requests to any of the aggregated services based on some condition.
 Since collections are an extension of aggregates, they can have the same use cases, but the collections can group services that share the same interfaces but can have much different underlying business logic.
 
-\section{Docker \& Docker Compose}
-Docker is a containerization tool used for deploying applications. It builds an \textit{image} which specifies how the container should build and start when it is created.
-Docker handles a single container, and \textit{Docker Compose} is used to handle multi-container applications. Docker Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
+\section{Docker \& Docker-Compose}
+Docker\footnote{Docker - \url{https://www.docker.com}} is a containerization tool used for deploying applications. It builds an \textit{image} which specifies how the container should build and start when it is created.
+Docker handles a single container, and \textit{Docker-Compose}\footnote{Docker-Compose - \url{https://docs.docker.com/compose/}} is used to handle multi-container applications. Docker-Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
 
-Docker Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas
+Docker-Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas
 of containers if needed.
 
 \subsection{Jolie in Docker}
@@ -212,7 +222,7 @@ To utilize Docker and Docker Compose when developing a microservice architecture
 Using this image when making a Dockerfile will set up Jolie when building the image, so only the exposed ports, source files and possible runtime arguments should be handled by the developer.
 
 When running a container, the developer needs to specify what container ports to expose, what parameters should be parsed into the Jolie program, and if it needs to connect to other services the developer needs to first create the network and then assign each container to that network.
-This is where Docker Compose, or \textit{Kubernetes} which is another container orchestration tool, can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
+This is where Docker Compose, or \textit{Kubernetes}\footnote{Kubernetes - \url{https://kubernetes.io}} which is another container orchestration tool, can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
 
 Connecting ports over a Docker network needs some extra work from the developer. Ports which use TCP/IP sockets for communication cannot use "localhost" as seen in the previous examples, they need to use the container name as the host address so Docker can figure out where to send messages inside the network.
 This can look something like: \texttt{socket://auth:9999}, where \texttt{auth} is the name of the container.
@@ -221,24 +231,24 @@ This can look something like: \texttt{socket://auth:9999}, where \texttt{auth} i
 Jolie, and other programming languages, do have some tools in order to enhance the developer experience. This section will go through some of the tools
 which have been developed for Jolie and then look at some of the counterparts in other languages.
 %
-\newdif{Joliedoc} generates a documentation page for a single Jolie service. This gives an overview of the API a Jolie service exposes. It shows the input ports and output ports of the service as well as their location and protocol.
+\newdif{Joliedoc}\footnote{Joliedoc - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/documenting-api/index.html}} generates a documentation page for a single Jolie service. This gives an overview of the API a Jolie service exposes. It shows the input ports and output ports of the service as well as their location and protocol.
 This tool is useful when the developer wants a simple and easy-to-follow representation of a single service's API, which include operations, types, port information, and dependencies.
-For other programming languages, there are tools like \textit{JSDoc} which look at the comments in the code to generate the API documentation. This requires the developer to write more lines for the same result.
-Tools like \textit{Stoplight} and \textit{Swagger} can do the same for all languages, but this requires the developer to set up a markdown or YAML file and specify the whole API in that.
+For other programming languages, there are tools like \textit{JSDoc}\footnote{JSDoc - \url{https://jsdoc.app}} which look at the comments in the code to generate the API documentation. This requires the developer to write more lines for the same result.
+Tools like \textit{Stoplight}\footnote{Stoplight - \url{https://stoplight.io}} and \textit{Swagger}\footnote{Swagger - \url{https://swagger.io}} can do the same for all languages, but this requires the developer to set up a markdown or YAML file and specify the whole API in that.
 Because of Jolie's way of writing the API as a part of the language, Joliedoc can infer the API from the code without the developer needing to write more lines or comments to achieve this goal.
 Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is more to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
 % TODO
-\newdif{JPM} is a package management tool for Jolie which, similarly to NPM, keeps track of dependencies of a Jolie program.
+\newdif{JPM}\footnote{Jolie Package Manager - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/package-manager/index.html}} is a package management tool for Jolie which, similarly to NPM, keeps track of dependencies of a Jolie program.
 
 \subsection{Visualization Tools}
 There are a lot of different visualization tools for software architecture which all fall into some categories and all have different use cases and intentions.
 The subset of tools which fall under the category of \textit{modelling tools} aims to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
-Tools like \textit{IcePanel} and \textit{Aplas} allow the developer of a system to use C4 modelling to create a model of their system, on any level of abstraction.
+Tools like \textit{IcePanel}\footnote{IcePanel - \url{https://icepanel.io/}} and \textit{Aplas}\footnote{Aplas - \url{https://aplas.com/}} allow the developer of a system to use C4 modelling to create a model of their system, on any level of abstraction.
 
-Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \textit{mermaid}, \textit{ELK} and \textit{graphviz} belong.
+Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \textit{mermaid}\footnote{MermaidJS - \url{https://mermaid.js.org/}}, \textit{ELK}\footnote{Eclipse Layout Kernel - \url{https://www.eclipse.org/elk/}} and \textit{graphviz}\footnote{Graphviz - \url{https://graphviz.org/}} belong.
 These tools allow the developer to write structured text or code and then they will render the diagram. Developers do not have to use any specific modelling technique, if they can write it in text or code it will be visualized.
 
-The last relevant category of tools is the diagramming tools. Tools like \textit{draw.io} and \textit{lucidchart} allows the user to diagram everything from E/R, UML and FlowCharts to complex systems.
+The last relevant category of tools is the diagramming tools. Tools like \textit{draw.io}\footnote{Draw.io - \url{https://drawio-app.com/}} and \textit{lucidchart}\footnote{Lucidchart - \url{https://www.lucidchart.com/pages/product}} allows the user to diagram everything from E/R, UML and FlowCharts to complex systems.
 This is often done in a drag-and-drop fashion.
 
 One thing all these tools have in common is that they need developers to handle the modelling and diagramming. The developers need to have an overview of the system and then model it using any of these tools.

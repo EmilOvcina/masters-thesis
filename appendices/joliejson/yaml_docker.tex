@@ -1,41 +1,41 @@
 \begin{yamllisting}
 services:
-    notification0:
+    s0_notification:
         container_name: Notification
         build: ./0Notification
         ports:
             - "4444:4444"
         networks:
             - network0
-    analytics1:
+    s1_analytics:
         container_name: Analytics
         build: ./1Analytics
         ports:
             - "5554:5554"
         networks:
             - network0
-    order2:
+    s2_order:
         container_name: Order
         build: ./2Order
         ports:
             - "5432:5432"
         networks:
             - network0
-    recommendation3:
+    s3_recommendation:
         container_name: Recommendation
         build: ./3Recommendation
         ports:
             - "7788:7788"
         networks:
             - network0
-    payment4:
+    s4_payment:
         container_name: Payment
         build: ./4Payment
         ports:
             - "10000:10000"
         networks:
             - network0
-    product5:
+    s5_product:
         container_name: Product
         build: ./5Product
         ports:

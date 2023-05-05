@@ -11,6 +11,7 @@
 *.gz
 *.toc
 *.lol
+*.txt
 *.pdf
 !/figures/*.pdf
 .DS_Store
