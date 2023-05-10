@@ -1,15 +1,129 @@
-\chapter{Discussions}
+\chapter{Discussion}
+The implementation details of the tool have been explained in depth. Some of the design decisions which has been made during the development of the tool have also been briefly discussed.
+This discussion chapter will dive more into the details of the development process, and elaborate more on what else was tried and tested to achieve the current result.
+
+This chapter will also elaborate on the important discussion topics being made throughout the development process of the tool, and explain how
+some of the bigger design decisions were made.
+
+Lastly, this chapter will discuss how the tool can be developed further to enhance user experience, and what features and changes could be made to the tool to either make it more useable
+or solve more problems for the user of the tool. This will also serve as a discussion of the shortcomings of the tool.
 
 \section{The First Version}
+The tool has been through one major revision before reaching the state that it is in now. This section
+will explain the \textit{first version} of the tool, briefly how it was implemented, and why the revision was needed.
+
+The general structure of the tool was very different. The first version tried to be more decoupled from VS Code than what the tool currently is.
+The first version was a Java service which had an open server socket. From this server socket, a lot of endpoints were exposed which would serve the whole user interface as well as provide the Jolie system JSON data.
+This approach requires that a port is open on the machine whenever the tool is running.
+
+It was never tested with VS Code so it is not certain how VS Code would incorporate a tool like this. One idea is
+that the tool must be running on the host machine, essentially as a server, and a client in VS Code would need to fetch the user interface from the specified endpoints.
+The client in the VS Code extension would be a web view as it is at the moment.
+Whenever an update to the Jolie code is made the client in the VS Code web view will have to fetch data from all endpoints again.
+
+\subsection{The Program Inspector}
+To get the JSON data from the Java service, an internal \texttt{ProgramInspector} was used to fetch the information about the Jolie services. This inspector exists within the Jolie parser but has limitations with how it gathers information about services.
+It looks at a file and gathers all information meaning that if multiple services exist in one file, the ProgramInspector will not differentiate between components in one service and components in another service.
+When the ProgramInspector has gathered all the AST nodes of a Jolie source file, the JSON objects are created directly. No internal representation of each component was created for this version of the tool.
+
+Another problem with the first version is that no sense of top-level services is present. The tool simply parses all files in the root directory recursively. This creates a lot of bloating of the visualization and JSON data because unwanted services, interfaces, and types may be present in the user interface.
+This resulted in all services, both top-level and embeddings being in one global list of services.
+This is ultimately why the architecture file is introduced. So the user can specify exactly what services in what files should be parsed and visualized in the user interface. The other benefit of the architecture file is that the user of the tool can specify parameters for the visualization and prototyping of the services.
 
 \subsection{User Interface}
-In the first version of the tool, the service shapes had a direction, meaning that all input ports were on the same side of the service shape. The layout of the services was easier to solve.
-At first, the layout algorithm used for the services was a naive horizontal layered algorithm where the services were given priority depending on how many input and output ports the service had.
-Services with the highest priority will be rendered in the leftmost layer. Services with only input ports were considered the highest priority and services with only output ports will be rendered in the rightmost layer.
-This solution only worked with services where all input ports where on the left side of the service and all output ports were on the right side of the service.
+In the first version of the tool, the user interface is vastly different. A lot of inspiration was taken from the documentation of Jolie.\footnote{An example of how services are displayed in the Jolie documentation - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/architectural-patterns/synchronous-vs-asynchronous/index.html}}
+This shape of services is easy to implement because they all have a direction, all input ports are on one side and all output ports are on the opposite side.
 
-Services having a direction and all the same types of ports being placed on the same side do not work when larger architectures need to be visualized.
+\cref{figure:old_ui} shows a very early version of how the user interface displayed the service shapes. This is without any layout algorithm being applied to the service which is why all services are next to each other.
+The red triangles on the left side of the shapes represent the output ports and the yellow squares on the right side represent the input ports, and the height of the service is simply determined by how many ports it needs to fit.
 
-\section{Language Server Protocol}
+The problem with this approach is that in some architectures, the visualization can be very hard to understand.
+It gives the sense that there exists some sort of direction or flow between services which is not necessarily the case.
+Embeddings are not represented intuitively. If a service is embedded by another service it is simply placed to the left of the embedder service and a dashed square is drawn around the two services indicating that an embedding is happening, but it 
+is not clear to an inexperienced Jolie developer what is the embedder service and what is the embedded service.
+This is why the current version of the tool has chosen a more \textit{traditional} approach to the service shapes. It does not imply a flow and it can be easier to visualize more complicated architectures.
+
+The UI for the first version is grid-based where all services can be moved around and will snap to the grid.
+The reason a grid is used is that the edges that represent the connection between ports are calculated using the \textit{A*} pathfinding algorithm\footnote{A* pathfinding algorithm - \url{https://en.wikipedia.org/wiki/A*_search_algorithm}}, so each point in the grid is essentially used as a point in a graph that the pathfinding algorithm can use.
+This also means that invisible walls are created around the services and ports to ensure that paths does not go through other services or ports.
+The current version of the tool has hexagons as service shapes, so to facilitate the possibility of having ports on all sides of the shape, the pathfinding from the output port to the input port must be handled differently.
+One idea which was tried is connecting services instead of ports, and then drawing the port shapes at the edge of the service shape where the connection intersects the service shape.
+A grid is not used in the current version of the tool because ELK is used to make the edges between ports. 
+
+\begin{figure}[t]
+\center
+\includegraphics[width=0.8\textwidth]{figures/old_ui.png}
+\caption{A very early version of how the first version of the tool displayed service shapes and the sidebar. No layout algorithm is used to place the services correctly on the grid in this version.}
+\label{figure:old_ui}
+\end{figure}
+
+
+\subsection{Layout Algorithm}
+The first version of the tool uses a simple custom layered layout algorithm. This is possible because the services have a direction.
+The algorithm works by placing each service in a horizontal layer based on how many of each port it has. The starting number of layers is determined by the width of the screen and each layer has a set height limit so when services exceed the limit an adjacent layer is created.
+Services with only one input port are placed in the left-most layer, and services with only one output layer are placed in the right-most layer.
+The services in between will be ordered so the service with most \textit{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
+
+This algorithm is very simple. It worked on the handful of tested examples from the Jolie GitHub repository.\footnote{Jolie Examples on GitHub - \url{https://github.com/jolie/examples/tree/master}}
+But when the system becomes more complex connection-wise, it can quickly break or look very bad. One advantage of using this algorithm is that the user can drag around the services if the initial layout is bad.
+The algorithm does not necessarily break because of the hexagon shapes which were introduced after. The switch to ELK was made because connections can become complex, and having a highly customizable framework is much safer in terms of the systems the tool will potentially have to visualize.
+
+\subsection{UI Framework}
+The introduction of a UI framework was made because of the component tree, lifecycle events, and reactivity. Before Svelte was used to create the user interface, it was created in pure TypeScript.
+The UI in the first version has no lifecycle events, all JavaScript is loaded after the DOM is created.
+The control flow of the user interface is that after the DOM has loaded all the Jolie system JSON data is loaded and preprocessed very similarly to the current version, but here, the custom layout algorithm is used.
+Then all components are added to the DOM, under one parent container, using jQuery\footnote{jQuery - \url{https://jquery.com}} and rendered using D3.js. Lastly, the event listeners are added to the system components. The listeners include the mouse listener for moving the service shapes around and opening the sidebar to display information about the components.
+When the user interface is updated by the user, a re-rendering happens. Since all system DOM elements are added under one parent container element, that specific element is simply cleared and the rendering is invoked to populate it with the updated elements.
+
+This approach of using pure TypeScript/JavaScript is not inherently wrong. After all, Svelte compiles down to optimized JavaScript.
+There are general benefits and consequences of using a UI framework. Some of the important benefits are efficiency in handling reactivity, reusable components, and enhanced maintainability.
+Efficient reactivity means no manual manipulation of the DOM is necessary. The code will update the state of the components which automatically updates the DOM.
+Some of the consequences of using a UI framework are the learning curve, performance, and framework-specific limitations.
+Some UI frameworks have a steep learning curve, especially for newer web developers, so having to learn and understand the framework can in some cases take more time than just implementing the functionality in JavaScript.
+The performance is not necessarily a problem for Svelte since the overhead is minimal, but for larger UI frameworks like React and Angular, performance can become an issue since they ship a virtual DOM\footnote{React virtual DOM - \url{https://legacy.reactjs.org/docs/faq-internals.html}} which in VS Code can be a bottleneck.
+For this specific tool, there are no apparent framework-specific limitations with Svelte, which is one of the reasons it was chosen.
+
+\section{Data Representation}
+Different representations of the Jolie system JSON were tested. There are some tradeoffs to consider when structuring the JSON which can affect size and computation in the user interface.
+The interface list in the JSON does not have to be a global array. Interfaces are only used by ports which reside in the services, structurally, and at the moment the interfaces in a port simply contain the names of the interfaces used. This could be switched out with the whole interface object.
+This would, however, result in at least twice the size of all interfaces, because each time an interface is used the whole interface JSON object is created. Input and output ports share interfaces which means that for every connection between ports, an interface is duplicated.
+
+The global list of types has a similar problem but can be avoided a bit easier. Types can be created under the interfaces which use them, which would remove the need for a global list, but again if the interfaces are created under ports, each type will be duplicated in the JSON. 
+If the global list of interfaces is kept, but the types are created under the individual interface that uses them, much of the duplication can be avoided if the user never reuses any types. Doing this duplication of the interfaces and types can save computation when the user interface needs to determine which interface and type is used by a port. 
+When the types and interfaces are displayed in the sidebar, the correct type or interface in the global lists must be found in order to display the correct information. This search can be removed if the ports simply have a copy of the interfaces it uses, and the interfaces have copies of the types.
+
+However, this duplication approach was not chosen as the final solution for the tool.
+The amount of duplicate data does not weigh up for the amount of computation needed if no duplicated data is present.
+The components in the tool communicate via messages and parse the whole Jolie system JSON many times, so having to send a larger payload with each request is much slower than the UI component simply doing a bit of extra computation once in a while, especially since the payload has to be serialized and deserialized between each component.
+
+\section{Jolie}
+\subsection{Conventions}
+% What?
+
+\subsection{Generic Jolie}
+% It is not possible to make a generic circuit breaker
+% Many of the microservices patterns cannot be made generically in Jolie
+
+\subsection{Language Server Protocol}
+The language server protocol implementation has some missing language features which the tool would like to utilize.
+The renaming capabilities are very useful when renaming interfaces, types, and services if they are imported elsewhere. This feature of the LSP is not working at the time of writing this thesis.
+The tool is simply using the LSP for renaming \textit{as if} the renaming feature is implemented correctly, so if the feature will be added to the LSP the tool does not need any further update.
+No alternative implementation of this language feature has been developed for the tool. If the LSP does not implement the renaming feature, the VS Code extension should have a custom renaming provider.
+This can be implemented in various ways, but one idea is to have a big symbol table where all symbols are added with references to everywhere it is used. This way the VS Code extension can go through all locations and create the corresponding workspace edits.
+
+The other language feature from the LSP that the tool should utilize is the auto import of symbols when creating a port or embedding a service which is declared in another file.
+This is done through the Code Actions\footnote{LSP Code Actions - \url{https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/\#textDocument_codeAction}}
+feature. Unlike the renaming capabilities, the auto import is implemented in the tool manually, but if the LSP implements code actions a provider is then present and the tool needs to be updated to utilize that provider for auto import.
+This would make the feature a lot more robust since the LSP has a way of collecting and resolving symbols, so it would be optimal if the tool could utilize that. The current solution simply looks for which file in the workspace the symbol is declared in.
 
 \section{Future Development}
+% ux features - place services anywhere
+% LSP needs to work
+\subsection{Additional Patterns \& Refactorings}
+% Redirector and circuit breaker
+\subsection{Migrate From VS Code}
+% Create an API similar to the VS Code one but in pure nodeJS
+\subsection{Prototyping Improvements} % from prototyping to build
+% Use docker-compose to get top-level networks and services
+% Cut down on code duplication
+% Make it a separate tool
