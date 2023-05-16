@@ -57,7 +57,6 @@ A grid is not used in the current version of the tool because ELK is used to mak
 \label{figure:old_ui}
 \end{figure}
 
-
 \subsection{Layout Algorithm}
 The first version of the tool uses a simple custom layered layout algorithm. This is possible because the services have a direction.
 The algorithm works by placing each service in a horizontal layer based on how many of each port it has. The starting number of layers is determined by the width of the screen and each layer has a set height limit so when services exceed the limit an adjacent layer is created.
@@ -99,32 +98,27 @@ The components in the tool communicate via messages and parse the whole Jolie sy
 \section{Jolie}
 This section will go into different aspects where Jolie is lacking either features or concepts.
 This is in the context of the tool only, meaning that these aspects would benefit the tool in some way.
-% todo: more here
-Jolie is a language in development which means that 
 
-\subsection{Conventions}
+% todo: more here
+Jolie is a language in development which means that some useful conventions have not been defined yet.
 The prototyping feature tries to be as general as possible which in some way prevents the feature to be fully fletched
 and being a tool for creating deployment instead of just a prototyping tool.
 The tool will benefit a lot from having more language-specific conventions like project file structures.
-This will make the tool more robust when creating the prototyping.
-
-JPM is the package manager of Jolie, which is in development at the time of writing this. Having a tool like JPM to create conventions on how a project should be structured can be a way to help the tool move from a prototyping tool to a build tool.
-It can be argued that if the development reaches a point where the prototyping feature will act as a build tool, the functionality
-should migrate the visualization tool and be used separately, and then have the visualization utilize the build folder structure.
-
-In the current version, it is assumed that almost no convention exists, so it has to work for most types of projects.
-
+This will make the tool more robust when creating the prototyping. The Jolie package manager can be a solution
+to the problem with the file structure. JPM is still in development which means that the specification can change, so the tool does not utilize any set file structure by JPM.
 
 \subsection{Architecture File}
 Jolie currently has no way of representing the architecture in code which is why the architecture JSON file is needed.
+A JSON configuration file is a common practice but can be unnecessary overhead if it is not intuitive to the user of the tool.
+Another idea is to use Docker-Compose to represent networks and top-level services. The point is to have the user define the architecture while they are creating the deployment.
+This is however not the chosen solution because the tool should not lock the user to a specific deployment tool or software.
+There is also more customizability in using JSON because Docker-Compose does not allow for custom fields to be set. So if the tool needs any information not Docker-Compose specific about the services or networks it would likely not be possible to parse the information to the tool in an intuitive way.
 
-% API patterns in Jolie - architectures in Jolie - architecture file
-% Jolie needs some way of defining architecture. 
-
-
-% \subsection{Generic Jolie}
-% It is not possible to make a generic circuit breaker
-% Many of the microservices patterns cannot be made generically in Jolie
+If Jolie has a way of defining the networks and the top-level services it would remove the need for an architecture file.
+However, one of the principles of Jolie is that it does not care about deployment.
+So either a separate tool or this tool will need to keep track of the architecture and a common representation should be made so all tools for Jolie agree on how the architecture is represented.
+LEMMA\footnote{LEMMA - \url{https://github.com/SeelabFhdo/lemma}} is a language/tool which could be used to extend the possible refactorings. LEMMA is a language used to model architectures, and it has a tool for exporting the architecture to Jolie services.\footnote{LEMMA2Jolie - \url{https://www.sciencedirect.com/science/article/abs/pii/S0167642323000382}} The drawback
+of introducing a separate language representing the architecture is a steeper learning curve for new Jolie developers.
 
 \subsection{Language Server Protocol}
 The language server protocol implementation has some missing language features which the tool would like to utilize.
@@ -156,42 +150,53 @@ CodeSee and docker-compose-viz do not offer any form of refactoring capabilities
 % find tools that refactor code?
 Most IDEs provide refactor capabilities using the language server protocol, which often happens directly in the code.
 However, several tools exist for code analysis and code generation but are not tied to any visualization.
-% todo LEMMA2Jolie
 
 \section{Future Development}
 In this section, some potential future improvements will be discussed.
 This is only in the scope of the tool and is assuming that other shortcomings of Jolie are resolved, so things like the LSP and a definition of architecture in Jolie will not be discussed further.
 
-% UX features - place services anywhere
 The UX of the tool is one aspect which has not been focused on. This is something that can be heavily improved.
 The services are stationary within their network, which removes a lot of the freedom in visualizing the architecture of a program.
 In ELK it is possible to give nodes and ports a fixed position, so to have this improvement would require that when the user drags and drops a service inside the same network it will set a fixed position depending on the translation and scale of the whole graph and the mouse position in the web view.
 
 \subsection{Additional Patterns \& Refactorings}
 A lot of features about the refactoring of Jolie code can be added to enhance the functionality of the tool.
-The current version of the tool supports only basic operations, but appending this set of operations with new operations will not be too difficult. 
+The current version of the tool supports only basic operations, but appending this set of operations with new operations will not be too difficult.
 The VS Code extension would simply need to specify the operation in its API and have the user interface implement the functionality and make a request to that API.
 The VS Code extension then needs to get the request and make the appropriate edits to the codebase.
 
 The tool currently supports the application of the aggregator pattern but this can be extended to include
 more patterns. Another pattern to implement is the redirector pattern for creating API gateways.
-This is very identical to the aggregator but the resources need to be specified in the user interface along with everything else which is also needed for the aggregator pattern. 
+This is very identical to the aggregator but the resources need to be specified in the user interface along with everything else which is also needed for the aggregator pattern.
+
+The refactoring and application of microservice API patterns are limited by the missing architecture representation in Jolie.
+Many of the patterns described in the preliminary chapter can be developed using architectural programming in Jolie but the behaviour of the architecture cannot be created in Jolie.
+This means that the number of patterns which can be applied on a service level is significantly smaller.
+Either the tool should create specific implementations of the different patterns and let the user edit it themselves or the architecture should be 
+defined in a separate language which the tool could support, like LEMMA.
 
 % Redirector and circuit breaker
 % 2 options - stick to Jolie or have a separate architecture language and focus on that.
 % Lemma for Jolie. Sometimes I need to look at the behaviour of the architecture
 \subsection{Migrating From VS Code}
 Having the tool directly integrated into VS Code is very powerful, no switch of windows is needed to view the architecture. Jolie source code and visualization side by side.
-However, it is desirable to not be locked into a specific technology or editor, so creating more clients for the tool can be a useful addition. 
-The tool utilizes the VS Code API in order to edit the code. However, since VS Code uses NodeJS as runtime, it is possible to create 
+However, it is desirable to not be locked into a specific technology or editor, so creating more clients for the tool can be a useful addition.
+The tool utilizes the VS Code API in order to edit the code. However, since VS Code uses NodeJS as runtime, it is possible to create
 a simplified version of the VS Code API, at least the part of the API which the tool uses, to be more inclusive to other editors.
 The API can be contained within the NPM package and will then run anywhere where NodeJS can run, and the visualization can be in the browser, which is much more versatile than locking into VS Code.
-implementing this would be time-consuming and outsourcing this to VS Code is safer than creating a custom simplified API for the tool,
+implementing this would be time-consuming and outsourcing this to VS Code is more robust than creating a custom simplified API for the tool,
 but is something that should be introduced at a later point.
 
 % Create an API similar to the VS Code one but in pure nodeJS
 \subsection{Prototyping Improvements} % from prototyping to build
-% Use docker-compose to get top-level networks and services
-% Do not lock in to docker-compose
-% Cut down on code duplication
-% Make it a separate tool
+The prototyping only supports Docker-Compose at the moment, but the tool is not locked into Docker-Compose. The functionality for other tools is not implemented yet, but the ability to choose what kind of technology the user would like to use is implemented in Jolie2JSON.
+Practically this is implemented using command-line arguments where the VS Code extension invokes Jolie2JSON with the set command-line argument. So extending this would require more commands in VS Code which invokes Jolie2JSON with different command-line arguments.
+The tool is however locked into Docker as the containerization tool. This is justifiable by the fact that Docker is the de facto standard in containerization technology.
+
+The way the Docker image/build folders are created is not very efficient in terms of space. If two services share a file as a dependency the file will be duplicated.
+This is done for simplicity's sake. A more complex solution where file duplication is avoided would be to copy all Jolie files once and mimic the file structure of the project. 
+Then each Dockerfile should be smarter in the way it copies resources into the image. In this simpler version, it copies all files in the build folder into the image, but all files are needed for the image so the size of the image is not bloated using this approach, only the destination folder of the prototype creation is bloated with duplicate files.
+
+The prototyping tool fits well with the tool because the architecture is defined for visualization. 
+The prototyping is an extension of the visualization but if Jolie develops a universal way of representing the architecture, the prototyping tool should move to be its separate tool.
+This will also allow for more general functionality which can move the tool from a prototyping tool to a build tool where the user can get a deployment of the architecture.
