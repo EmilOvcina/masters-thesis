@@ -100,14 +100,14 @@ This section will go into different aspects where Jolie is lacking either featur
 This is in the context of the tool only, meaning that these aspects would benefit the tool in some way.
 
 % todo: more here
-Jolie is a language in development which means that some useful conventions have not been defined yet.
+Jolie is a language in development which means that some useful conventions still need to be defined.
 The prototyping feature tries to be as general as possible which in some way prevents the feature to be fully fletched
 and being a tool for creating deployment instead of just a prototyping tool.
 The tool will benefit a lot from having more language-specific conventions like project file structures.
 This will make the tool more robust when creating the prototyping. The Jolie package manager can be a solution
 to the problem with the file structure. JPM is still in development which means that the specification can change, so the tool does not utilize any set file structure by JPM.
 
-\subsection{Architecture File}
+\subsection{The Architecture}
 Jolie currently has no way of representing the architecture in code which is why the architecture JSON file is needed.
 A JSON configuration file is a common practice but can be unnecessary overhead if it is not intuitive to the user of the tool.
 Another idea is to use Docker-Compose to represent networks and top-level services. The point is to have the user define the architecture while they are creating the deployment.
@@ -137,7 +137,6 @@ There are many tools which can be used to visualize the architecture of an appli
 The tools mentioned are not comparable with this tool since they all require the user to manually sketch out the architecture, which requires the user to have an understanding of the architecture before using the tool.
 This tool aims to help the developer get an understanding of the architecture while they are building it, and not only serve as a tool to convey the architecture to others.
 
-% find tools that visualize code automatically
 This tool analyzes the code in order to visualize the architecture, which a handful of other tools also do. 
 The level of abstraction varies a lot from tool to tool. Some tools analyse the flow of a codebase, which means how the different classes or files in 
 a codebase are connected. This is similar to how a UML diagram will visualize a system. \textit{Code2Flow}\footnote{Code2Flow Github - \url{https://github.com/scottrogowski/code2flow}} is a tool which visualizes the control flow of the source code of a handful of dynamic languages. Other tools like \textit{CodeSee}\footnote{CodeSee - \url{https://www.codesee.io}} visualize different levels of abstraction allowing the user to see the architecture of the application.
@@ -147,7 +146,6 @@ CodeSee also has a VS Code extension which allows the users to visualize directl
 is \textit{docker-compose-viz}\footnote{docker-compose-viz - \url{https://github.com/pmsipilot/docker-compose-viz}} which creates a simple graph visualization based on a Docker-Compose YAML file.
 CodeSee and docker-compose-viz do not offer any form of refactoring capabilities of the architecture or the code.
 
-% find tools that refactor code?
 Most IDEs provide refactor capabilities using the language server protocol, which often happens directly in the code.
 However, several tools exist for code analysis and code generation but are not tied to any visualization.
 
@@ -175,9 +173,6 @@ This means that the number of patterns which can be applied on a service level i
 Either the tool should create specific implementations of the different patterns and let the user edit it themselves or the architecture should be 
 defined in a separate language which the tool could support, like LEMMA.
 
-% Redirector and circuit breaker
-% 2 options - stick to Jolie or have a separate architecture language and focus on that.
-% Lemma for Jolie. Sometimes I need to look at the behaviour of the architecture
 \subsection{Migrating From VS Code}
 Having the tool directly integrated into VS Code is very powerful, no switch of windows is needed to view the architecture. Jolie source code and visualization side by side.
 However, it is desirable to not be locked into a specific technology or editor, so creating more clients for the tool can be a useful addition.
@@ -187,8 +182,7 @@ The API can be contained within the NPM package and will then run anywhere where
 implementing this would be time-consuming and outsourcing this to VS Code is more robust than creating a custom simplified API for the tool,
 but is something that should be introduced at a later point.
 
-% Create an API similar to the VS Code one but in pure nodeJS
-\subsection{Prototyping Improvements} % from prototyping to build
+\subsection{Prototyping Improvements}
 The prototyping only supports Docker-Compose at the moment, but the tool is not locked into Docker-Compose. The functionality for other tools is not implemented yet, but the ability to choose what kind of technology the user would like to use is implemented in Jolie2JSON.
 Practically this is implemented using command-line arguments where the VS Code extension invokes Jolie2JSON with the set command-line argument. So extending this would require more commands in VS Code which invokes Jolie2JSON with different command-line arguments.
 The tool is however locked into Docker as the containerization tool. This is justifiable by the fact that Docker is the de facto standard in containerization technology.
