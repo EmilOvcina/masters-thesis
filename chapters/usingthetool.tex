@@ -1,9 +1,5 @@
-% Text:              √
-% Citations:         √
-% Revision:          X
-% Final Revision:    X
 \chapter{Using the Visualization Tool}
-With the foundational knowledge and context for the microservice architecture, microservice patterns, the Jolie programming language, and the current tools both for Jolie and for visualization in general in place, it is time to get familiar with the tool developed for this thesis.
+With the foundational knowledge and context for the microservice API patterns, the Jolie programming language, and the current tools both for Jolie and for visualization in general in place, it is time to get familiar with the tool developed for this thesis.
 
 This chapter will go into how the tool is used to enhance the development experience by going through an example microservice application.
 Firstly, an application is defined. The application for this example is an e-commerce platform consisting of seven microservices:
@@ -33,7 +29,7 @@ These will, however, be introduced later.
 
 \section{Setup and Requirements}
 In order to use the tool, Jolie must be set up correctly with version \texttt{1.11.0-git}. This section will not specify how this is done, but the Jolie website goes more in detail on how
-the correct git version is installed \footnote{Downloading the newest version of Jolie - \url{https://www.jolie-lang.org/downloads.html}}. From this point onwards it is assumed that the environment variables are set correctly to point to the git version of Jolie.
+the correct git version is installed.\footnote{Downloading the newest version of Jolie - \url{https://www.jolie-lang.org/downloads.html}} From this point onwards it is assumed that the environment variables are set correctly to point to the git version of Jolie.
 
 The tool is developed to be used with Visual Studio Code\footnote{Visual Studio Code - Code Editing. Redefined. - \url{https://code.visualstudio.com/}}, aka VS Code, which is a code editor developed by Microsoft.
 VS Code has a large ecosystem of plugins which are used to enhance the developing experience.
@@ -223,7 +219,7 @@ Now that the application has all seven services implemented, the developer can a
 \subsection{Embedding}
 \begin{figure}[t]
     \center
-    \includegraphics[width=0.17\textwidth]{figures/jv_embedded.png}
+    \includegraphics[width=0.14\textwidth]{figures/jv_embedded.png}
     \caption{The e-commerce application after the payment, notification, and analytics services have been embedded.}
     \label{figure:jv_embedded}
 \end{figure}
@@ -259,7 +255,7 @@ to illustrate that the aggregator is a generated service and is only a scaffoldi
 
 \begin{figure}[h!]
     \center
-    \includegraphics[width=0.41\textwidth]{figures/jv_aggregator.png}
+    \includegraphics[width=0.32\textwidth]{figures/jv_aggregator.png}
     \caption{The e-commerce application with an aggregator service that serves as a reverse proxy for the services that are invoked by clients.}
     \label{figure:jv_aggregate}
 \end{figure}
