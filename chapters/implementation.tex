@@ -202,7 +202,7 @@ This library is also a graph visualization and layout library. It comes with a l
 not possible, but also that many of the built-in features do not fit the visualization tool.
 
 The framework that was chosen for the tool is Eclipse Layout Kernel (ELK)\footnote{Eclipse Layout Kernel - \url{https://www.eclipse.org/elk/}}
-which is a layout framework with a collection of different layout algorithms. ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
+which is a layout framework with a collection of different layout algorithms. The tools currently use the layered layout algorithm which is based on \textit{Methods for Visual Understanding of Hierarchical System Structures} by Sugiyama, Tagawa and Toda.\cite{4308636} ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
 ELK only does layout, however, so the rendering needs to be done by a separate library, where D3 is chosen to render the components of the architecture when ELK has done the layout.
 \cref{figure:elk_example} shows a system being laid out using ELK.
 
