@@ -42,8 +42,8 @@ using the Jolie language constraint of no duplicate type names in the same OL fi
 
 The list of types, as mentioned, contains all types used by all interfaces in the architecture.
 Each type object in the list represents the information about a type in the code, this includes the name of the type, the file in which the type is defined, the root type, subtypes which is a list of types as well, and cardinality of the type in case of this being defined.
-If the type is a \textit{choice type}, the two choices are also represented in the type object as strings which reference other types in the global list.\footnote{Types in Jolie - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/data-types/index.html}}
-Types from \textit{interface extenders} are also added to this list.
+If the type is a \emph{choice type}, the two choices are also represented in the type object as strings which reference other types in the global list.\footnote{Types in Jolie - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/data-types/index.html}}
+Types from \emph{interface extenders} are also added to this list.
 
 An example of the JSON data used to represent interfaces and types from Jolie can be seen in \cref{appen:joliejson_iface_types}.
 
@@ -52,12 +52,12 @@ The last list in the global JSON is the list of services. The list of services i
 This approach draws inspiration from how bigraphs are used to model software architecture. Bigraphs are a type of graph consisting of two sub-graph components. The link graph and the place graph. The link graph models the connection between nodes in the system while the place graph models the topology.
 The nodes in the system of the bigraph can be directly mapped to Jolie services. Bigraphs also model ports which are a component of Jolie services as well.
 The data representation used for the tool draws the most inspiration from the place graph since the link graph is inferred by the locations and protocols of the ports in Jolie.
-A place graph models the topology and the networks, which are called \textit{roots} in bigraph terminology, and also embeddings, which are called \textit{nestings}.
-The bigraph inspiration is taken from \textit{The Space and Motion of Communicating Agents} by Robin Milner \cite{BigraphBook}, where bigraphs are formally introduced and explained but are not necessary for this use-case.
+A place graph models the topology and the networks, which are called \emph{roots} in bigraph terminology, and also embeddings, which are called \emph{nestings}.
+The bigraph inspiration is taken from \emph{The Space and Motion of Communicating Agents} by Robin Milner \cite{BigraphBook}, where bigraphs are formally introduced and explained but are not necessary for this use-case.
 
 The place graph component can be seen as a list of trees where the root is the network and contains all top-level services as immediate children and embeddings of the top-level services are the children of those services.
 This fits well with how a Jolie system can be modelled, so the list of services in the global JSON is essentially a place graph or a list of trees where each node is a service in the system.
-Each root in the list of trees is a network. In the sense of JSON, the network is a list of services since it can have any number of children, and the \textit{embeddings} list of each service is also a list of services.
+Each root in the list of trees is a network. In the sense of JSON, the network is a list of services since it can have any number of children, and the \emph{embeddings} list of each service is also a list of services.
 
 The services in the JSON also need to contain all other information which is used by the tool.
 This includes the input and output ports, execution target, name, identifier, and file path but also the information specified in the architecture file, which is container name, volumes, parameters etc.
@@ -107,8 +107,8 @@ The \javatoolname[] program is written in Java and is used to gather the require
 The \javatoolname[] program has two types of outputs which is used by the tool. The JSON representation of the entire system and the information used by the prototyping functionality. Both functionalities of the \javatoolname[] program require the whole system to be parsed using the Jolie parser.
 Firstly, the tool creates the networks by parsing the architecture JSON file and making an internal representation of what it contains. The networks contain a map of top-level services mapped to a \texttt{ServiceNode} which is the abstract syntax tree (AST) node of a service from the Jolie parser. The top-level service is a representation of a Jolie service in the architecture file, as seen in \cref{appen:architecture-file-structure}.
 
-The \javatoolname[] program uses a lightweight JSON library, \textit{json-simple}, to parse files and create JSON objects\footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
-To get the ServiceNode AST node from the parser, the Jolie parser is invoked using its module parsing method. This returns the whole AST of a file, called a \textit{program}. All ServiceNodes are then captured and added to the network's map object.
+The \javatoolname[] program uses a lightweight JSON library, \emph{json-simple}, to parse files and create JSON objects.\footnote{JSON-simple - \url{https://code.google.com/archive/p/json-simple/}}.
+To get the ServiceNode AST node from the parser, the Jolie parser is invoked using its module parsing method. This returns the whole AST of a file, called a \emph{program}. All ServiceNodes are then captured and added to the network's map object.
 
 When the networks have been created, depending on if the program should send visualization data or prototyping data, all the necessary information about the services, ports, etc. is created.
 \subsection{Parsing the Jolie System}
@@ -116,7 +116,7 @@ A system inspector has been created in order to parse the networks.
 The system inspector uses the created list of networks containing the top-level services and ServiceNodes.
 The inspector goes through each network's map object and creates a service object which is an internal representation of the services used by the tool.
 It creates the services by looking at all the child nodes of the ServiceNode AST node in a loop and using type comparison to check what child node is being looked at and how to parse the information correctly.
-Relevant child nodes for a service are: \textit{ExecutionInfo}, \textit{CourierDefinitionNodes}, \textit{EmbedServiceNodes}, \textit{InputPortInfo}, and \textit{OutputPortInfo} nodes.
+Relevant child nodes for a service are: \emph{ExecutionInfo}, \emph{CourierDefinitionNodes}, \emph{EmbedServiceNodes}, \emph{InputPortInfo}, and \emph{OutputPortInfo} nodes.
 
 Service objects can also have a list of services which are considered embeddings. When looping through the AST nodes of a service, embedded service nodes will be used to create services, which are added to the parent's list of services instead of the global list of services.
 This will enforce the place graph structure of services mentioned in the data representation section.
@@ -125,7 +125,7 @@ The most complex of the child nodes are the two types of port nodes. Input and o
 Ports have to contain information about the location, protocol, name, interfaces and operations.
 When the ports are being created, the interfaces which are used by the ports will also be created. These interfaces are also represented internally and will store information about the operations.
 The operations are also parsed using type comparison, since two types of operation declaration AST nodes exist in Jolie, namely, request-response and one-way.
-The interfaces are added to a global object \textit{JolieSystem} which has information about all parsed services, interfaces and types.
+The interfaces are added to a global object \emph{JolieSystem} which has information about all parsed services, interfaces and types.
 
 For input ports specifically, information about aggregates, collections, couriers and redirects is also stored. Redirects can be seen as a mapping where a resource is mapped to a port name. This is how the Jolie parser represents redirects as well, so this is simply copied over to the tool's representation.
 Aggregates are simply a name of an output port but can contain collections and interface extenders, however, Jolie's internal representation of aggregates contains this information so the interface extender just has to be created to match the tool's representation of interfaces, and collections are a list of output ports which will be copied directly.
@@ -141,7 +141,7 @@ This will result in a JSON object which resembles the data representation discus
 
 \subsection{Generating the Prototype Data}
 The \javatoolname[] also creates data for making the prototype. This includes the content of the Docker-Compose YAML file and the information needed for creating the service folders and the resource folder.
-After the whole system has been parsed and a JolieSystem is created, the system will be given as a parameter to a \textit{build} object which will handle the logic for creating the JSON data.
+After the whole system has been parsed and a JolieSystem is created, the system will be given as a parameter to a \emph{build} object which will handle the logic for creating the JSON data.
 The builder will first create the service folders using the services in the networks from the JolieSystem object. Duplicate build folders will be checked for at this stage, which is done to make sure that duplicate images will not be generated when using Docker-Compose.
 However, as mentioned in a previous section, two identical services can be two different images if, for example, the runtime arguments are different. This is also handled here.
 The build folders contain a list of files which are needed for the service to run. This is essentially the file in which the target service resides and all dependency files.
@@ -150,7 +150,7 @@ When the inspector goes through embeddings, types, interfaces, etc, of a service
 
 After the build folders have been created as internal objects, they are parsed onto another object which builds the Docker-Compose YAML string. The JolieSystem is also used here to create the networks in the Docker-Compose file.
 The Docker-Compose builder also has some internal representation of what a service is, since two services in Docker-Compose can use the same image but have different deployment properties, which means that they should be created as separate services in Docker-Compose, but they will not have two different service folders.
-The Docker-Compose builder uses a string builder to create the YAML file content. It goes through all services and creates an internal \textit{compose service} and like with the service folders, composes duplicates and counts replicas.
+The Docker-Compose builder uses a string builder to create the YAML file content. It goes through all services and creates an internal \emph{compose service} and like with the service folders, composes duplicates and counts replicas.
 
 The networks are also created in the Docker-Compose YAML, which can have another semantic meaning from the networks defined in the architecture file.
 In Docker-Compose networks are used to restrict services connecting, which is not a problem with a system created in Jolie, so to have the Docker-Compose networks work similarly to how networks in the tool work, each service in Docker-Compose is set to be a part of
@@ -171,13 +171,13 @@ Some of the benefits of using TS include type checking, self-documenting code, i
 
 Writing standard CSS can also be a very tedious process, so to enhance the development experience TailwindCSS, or just Tailwind, is used.
 Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS properties are defined in the class attributes of the HTML components where readable class names have been defined meaning that any combination of these classes can be used to style components.
-Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \textit{postcss} and \textit{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
+Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \emph{postcss} and \emph{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
 
 \subsection{Rendering \& Layout}
 All services, ports and edges between ports are rendered using SVG components.
 Different SVG\footnote{SVG Elements - \url{https://developer.mozilla.org/en-US/docs/Web/SVG}} elements are used for different parts of the UI. Polygons are used to render service shapes, rectangles are used to render ports and paths are used to render edges between ports.
 SVG elements in HTML are easy to manipulate in TS, so when the JSON data is loaded in, the correct HTML components are created and then TS is used to create the SVG data for each component so they get the desired shape and size.
-To help with the manipulation of SVG elements in TS, a library is used called \textit{D3.js}.\footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
+To help with the manipulation of SVG elements in TS, a library is used called \emph{D3.js}.\footnote{D3.JS - \url{https://d3js.org/}} D3 has a long list of features to help visualize data using SVGs, however, the only functionality used for this tool is
 the ability to select SVG components and apply attributes, event handlers, and stylings.
 
 The problem with D3 is that it has no way of doing the layout of the services and ports.
@@ -185,7 +185,7 @@ To ensure that the architecture is always readable from the UI, and the connecti
 The framework needs to support the visualization of embeddings, networks and connections between ports.
 
 Different frameworks were tested to see which gave the best results while providing the capabilities needed for the tool.
-The first framework tested was MermaidJS\footnote{MermaidJS diagramming tool - \url{https://mermaid.js.org}} which is a diagramming and charting tool. Mermaid uses markdown to represent components in a diagram and does the rendering and layout of the components. Using this tool would mean that D3 was no longer necessary, however, MermaidJS uses D3 internally for the rendering along with Dagre-D3\footnote{Dagre-D3 - \url{https://github.com/dagrejs/dagre-d3}} for layout.
+The first framework tested was MermaidJS. Mermaid uses markdown to represent components in a diagram and does the rendering and layout of the components \cite{mermaid}. Using this tool would mean that D3 was no longer necessary, however, MermaidJS uses D3 internally for the rendering along with Dagre-D3\footnote{Dagre-D3 - \url{https://github.com/dagrejs/dagre-d3}} for layout.
 The problem with MermaidJS is that it is not generic enough, it supports rendering and layout for a long list of specific diagram types, but none of the types would fit the rendering of services in a microservice architecture.
 MermaidJS can draw simple graphs which could work as a foundation for the tool, but this is wasteful. The framework has a lot of capabilities which would go unused.
 
@@ -194,24 +194,17 @@ Dagre is a graph layout library which primarily focuses on the layout of directe
 Dagre and Dagre-D3 are both deprecated libraries, even though it is still used by many including MermaidJS.
 The problem with Dagre-D3 is that the scope of the library is directed graphs, and nothing more.
 Embeddings are not possible to represent.
-It is possible to have \textit{Clusters}\footnote{Dagre-D3 clusters - \url{https://dagrejs.github.io/project/dagre-d3/latest/demo/clusters.html}}
+It is possible to have \emph{Clusters}\footnote{Dagre-D3 clusters - \url{https://dagrejs.github.io/project/dagre-d3/latest/demo/clusters.html}}
 but the clusters work more like a grouping of vertices in a graph and not like a vertex having vertices inside it, which is essentially how the embeddings should be represented if a graph library is to be used.
 
 Another library that was also tried but has many of the same drawbacks as Dagre-D3 and MermaidJS is Cytoscape.\footnote{CytoscapeJS - \url{https://js.cytoscape.org}}
 This library is also a graph visualization and layout library. It comes with a lot of features out of the box like animations and dragging of the vertices. The main issue of this library is that embeddings are
 not possible, but also that many of the built-in features do not fit the visualization tool.
 
-The framework that was chosen for the tool is Eclipse Layout Kernel (ELK)\footnote{Eclipse Layout Kernel - \url{https://www.eclipse.org/elk/}}
-which is a layout framework with a collection of different layout algorithms. The tools currently use the layered layout algorithm which is based on \textit{Methods for Visual Understanding of Hierarchical System Structures} by Sugiyama, Tagawa and Toda.\cite{4308636} ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
+The framework that was chosen for the tool is Eclipse Layout Kernel (ELK) \cite{ELK}
+which is a layout framework with a collection of different layout algorithms. The tools currently use the layered layout algorithm which is based on \emph{Methods for Visual Understanding of Hierarchical System Structures} by Sugiyama, Tagawa and Toda \cite{4308636}. ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
 ELK only does layout, however, so the rendering needs to be done by a separate library, where D3 is chosen to render the components of the architecture when ELK has done the layout.
 \cref{figure:elk_example} shows a system being laid out using ELK.
-
-\begin{figure}[h!]
-    \center
-    \includegraphics[width=0.80\textwidth]{figures/elk.png}
-    \caption{A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are also calculated. The rendering of the system is not done using ELK. Source: \url{https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}}
-    \label{figure:elk_example}
-\end{figure}
 
 The drawback of using ELK is that in a highly reactive UI, the user might want to position the services themselves, which is not yet possible with ELK.
 So when the components of the architecture have been positioned in a network, for example, a service cannot be positioned inside the network. It can however be moved outside the network to move it to another network.
@@ -219,6 +212,13 @@ The drawbacks of using ELK do not outweigh the benefits. Having direct support f
 
 ELK has a TypeScript version, so it can easily be used with the rest of the user interface. To make ELK calculate the layout of the JSON data from \javatoolname[] it needs to be converted into a format which ELK understands.
 ELK has a textual graph DSL but also supports a specific JSON format, which is used by the tool because of simple conversion. This format can be seen in \cref{lst:elk_json}.
+
+\begin{figure}[t]
+    \center
+    \includegraphics[width=0.80\textwidth]{figures/elk.png}
+    \caption{A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are also calculated. The rendering of the system is not done using ELK. Source: \url{https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}}
+    \label{figure:elk_example}
+\end{figure}
 
 \begin{jsonlisting}[][caption={The ELK JSON format}, label={lst:elk_json}]
 {
@@ -258,9 +258,9 @@ The ELK JSON represents what is rendered in the UI, so embeddings of the top-lev
 everything gets recalculated and then they are re-rendered correctly in the UI. Generally, every time the user does something in the UI which requires the ELK graph to be modified, the layout algorithm is run.
 
 \subsection{UI Framework}
-To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \textit{Svelte}\footnote{Svelte - \url{https://svelte.dev/}} is used.
+To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \emph{Svelte}\footnote{Svelte - \url{https://svelte.dev/}} is used.
 Svelte is a framework used to create reactive web interfaces similar to React, Angular, and Vue. The benefit of using Svelte instead of any of the other frameworks mentioned is that Svelte compiles into highly efficient JavaScript,
-whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron\footnote{Electronjs - \url{https://www.electronjs.org/}}, and the speed is a factor in this case.
+whereas most of the other frameworks ship some sort of DOM manipulation engine alongside the code. Svelte is the chosen framework because it must run in VS Code which runs in Electron,\footnote{Electronjs - \url{https://www.electronjs.org/}} and the speed is a factor in this case.
 
 Svelte is component-based and works by combining stylings, markup and JavaScript/TypeScript into one file type. Svelte allows the injection of JS variables into the markup, and updating the variables will force a redrawing of the DOM, which makes the user interface reactive.
 The user interface is composed of a component tree where the "app" component is the root which holds information about the current ELK graph. \cref{figure:component_tree} shows the component tree of the user interface. The sidebar and popup window are child components of the root app component, meaning when they are updated, the DOM is re-rendered. 
@@ -271,21 +271,21 @@ The zoom component which handles the scaling and transposition of the SVG is als
 
 All components in Svelte have lifecycles which are utilized to render the components with D3.js.
 The lifecycle loop consists of four stages where all of which have event handlers directly accessible in the TypeScript code in Svelte files. This means that each component can run code at any stage of its lifecycle.
-The four events are: \textit{before update}, \textit{on mount}, \textit{after update}, and \textit{on destroy}.
-\textit{Before update} happens before anything else. It runs every time the component is updated and before the DOM is created.
-\textit{On mount} runs only once when the component is created and runs right after the DOM is created. 
-\textit{After update} runs after the DOM is created and runs every time the component is updated.
-Lastly, \textit{On Destroy} runs once when the component is destroyed.\footnote{Svelte lifecycle functions - \url{https://svelte.dev/docs\#run-time-svelte}}
+The four events are: \emph{before update}, \emph{on mount}, \emph{after update}, and \emph{on destroy}.
+\emph{Before update} happens before anything else. It runs every time the component is updated and before the DOM is created.
+\emph{On mount} runs only once when the component is created and runs right after the DOM is created. 
+\emph{After update} runs after the DOM is created and runs every time the component is updated.
+Lastly, \emph{On Destroy} runs once when the component is destroyed.\footnote{Svelte lifecycle functions - \url{https://svelte.dev/docs\#run-time-svelte}}
 All components of the graph will have position and size when they are created because ELK has done the layout at that point.
 So when creating the DOM elements for each component, the size and position are already known.
-Components which are rendered with D3 have an "after update" event handler which will run \textit{after} the DOM for the component is created. This code uses D3 to render the desired shapes.
+Components which are rendered with D3 have an "after update" event handler which will run \emph{after} the DOM for the component is created. This code uses D3 to render the desired shapes.
 
-The \textit{before update} event handler is used to map the ELK graph component to an object from the Jolie system JSON, because it runs before the DOM is created, it can be used to check if a service component is expanded or not, which allows the DOM of the service to change.
+The \emph{before update} event handler is used to map the ELK graph component to an object from the Jolie system JSON, because it runs before the DOM is created, it can be used to check if a service component is expanded or not, which allows the DOM of the service to change.
 
 The whole component tree does not re-render if a service is changed by the user. Only when the ELK graph in the root component is updated, will the whole component tree be re-rendered. To make sure that the ELK graph is updated when a service or port is changed, an event dispatcher is used to 
 send events up the component tree. Ports and services can send events which their parents listen for and will aggregate towards the root. When the root gets a specific event, it will trigger the ELK layout algorithm and re-render the whole component tree.
 
-The last Svelte-specific concept used is \textit{stores}.\footnote{Svelte stores - \url{https://svelte.dev/docs\#run-time-svelte-store}} Stores in Svelte are global states which can be used by all components of the program. Stores can be written to, which overwrites the object saved in the store, and they can be subscribed to by components which will run some code every time a store is changed.
+The last Svelte-specific concept used is \emph{stores}.\footnote{Svelte stores - \url{https://svelte.dev/docs\#run-time-svelte-store}} Stores in Svelte are global states which can be used by all components of the program. Stores can be written to, which overwrites the object saved in the store, and they can be subscribed to by components which will run some code every time a store is changed.
 In this UI, stores are used to keep a state of what is displayed in the sidebar and popup window. This allows all components of the application to write to the store and determine what is displayed in the sidebar or the popup window. 
 
 \begin{figure}[t]
@@ -320,7 +320,7 @@ namespace. This includes all operations and events regarding folders and files i
 Specific events and operations will be explained more in detail when discussing their applications in this extension.
 
 The built-in commands\footnote{VS Code Commands - \url{https://code.visualstudio.com/api/references/commands}} which VS Code provides can be programmatically executed.
-Many of the commands use \textit{providers} to define how they are implemented. This means that the commands essentially execute a provider which can be implemented by the language server protocol (LSP).\footnote{Language Server Protocol - \url{https://microsoft.github.io/language-server-protocol/}}
+Many of the commands use \emph{providers} to define how they are implemented. This means that the commands essentially execute a provider which can be implemented by the language server protocol (LSP).\footnote{Language Server Protocol - \url{https://microsoft.github.io/language-server-protocol/}}
 Providers can also be implemented in the extension or any other extension.
 This is useful because the extension can invoke LSP functions programmatically. How the LSP can be utilized for this tool will be discussed in a later section.
 
@@ -336,7 +336,7 @@ If a Jolie file has been changed the \nodetoolname[] is invoked and the JSON dat
 
 \subsection{Code Refactoring}
 To facilitate the refactoring of code from the UI, the JSON data also needs to contain information about where certain components are in the Jolie source code files.
-This is done using the \textit{parsing context} from the Jolie parser. When the Jolie parser creates the AST it keeps track of where tokens are in the file and what ranges a code block spans over.
+This is done using the \emph{parsing context} from the Jolie parser. When the Jolie parser creates the AST it keeps track of where tokens are in the file and what ranges a code block spans over.
 This information is saved in the JSON which \javatoolname[] creates as ranges with a name indicating what the range spans over.
 \cref{lst:code_ranges} shows how the code range is saved in the Jolie system JSON.
 
@@ -362,7 +362,7 @@ All refactorable components in the code must have a corresponding code range. Pr
 locations and port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
 
 When the user makes an edit in the UI, this can be either creation of ports or the renaming of properties, the UI sends a message to VS Code using the VS Code message API, with the necessary data for the refactor. This includes
-the code range, the new text and what file it happens in. VS Code has an API to create \textit{workspace edits}\footnote{VS Code workspace API - \url{https://code.visualstudio.com/api/references/vscode-api\#workspace}} which will add or replace text in code using internal position and range representations.
+the code range, the new text and what file it happens in. VS Code has an API to create \emph{workspace edits}\footnote{VS Code workspace API - \url{https://code.visualstudio.com/api/references/vscode-api\#workspace}} which will add or replace text in code using internal position and range representations.
 VS Code has an internal object which represents a code range, which is used by the VS Code API to make workspace edits. This is not identical to the code range representation created by the Jolie parser.
 This means that conversion needs to happen when the code range is used in the VS Code extension.
 
@@ -393,7 +393,7 @@ On the side of the VS Code extension, embeddings are a change to the architectur
 When a port is created the interfaces specified are not necessarily imported correctly into the service needing it.
 If the correct interface is not imported, either explicitly or via the \texttt{*} notation,
 the VS Code extension goes through all Jolie source code files in the workspace, using the workspace API, and tries to find the symbol needed. If it is interfaces that it is trying to find
-it will look for the interface name prefixed with \textit{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
+it will look for the interface name prefixed with \emph{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
 
 The path of the file containing the interface declaration and the path to the file to the newly created port will be used to remove the common path prefix. This will give a relative path.
 This path is then converted into the path notation which Jolie uses and is added to the top of the document with the newly created port, using the stack of edits as mentioned previously.
@@ -419,7 +419,7 @@ All symbols are imported if they are not already, and all input ports are create
 The service is created with one edit because no code ranges of the aggregator service exist at that point, so the components cannot be created separately.
 
 \section{Prototyping}
-When the user executes the \textit{Docker-Compose} command from the VS Code extension or the command line, the
+When the user executes the \emph{Docker-Compose} command from the VS Code extension or the command line, the
 \javatoolname[] is invoked via the adapter and fetches the JSON needed for creating the prototype.
 First, the docker-compose file is created by simply writing the generated content into the YAML file.
 \cref{appen:docker_yaml} shows an example of docker-compose YAML which can be generated.
@@ -428,7 +428,7 @@ The Jolie source code files must be placed with the correct relative path to eac
 The build folders are named using the service name and the service ID as a prefix. This is done to prevent any edge cases where two services are named the same thing.
 When creating the Docker-Compose YAML file content the build folders are referenced and the services follow the same pattern in the naming to prevent any cases of ambiguity.
 
-If \textit{JPM} is used in the project, the \texttt{package.json} file is also copied into the folders.
+If \emph{JPM} is used in the project, the \texttt{package.json} file is also copied into the folders.
 A custom Dockerfile is created in each build folder. The Dockerfile contains any runtime arguments defined in the architecture file, and if the service uses JPM the initialize command will be added to the Dockerfile to make sure that the container installs the external dependencies correctly.
 VS Code runs on Electron which uses NodeJS as runtime, meaning that a NodeJS filesystem library\footnote{File system API in NodeJS - \url{https://nodejs.org/api/fs.html}} is used to access the filesystem to make folders, copy files and write to the YAML file.
 
@@ -439,8 +439,7 @@ The file structure is also copied in the resource folder relative to the archite
 
 \begin{figure}[t]
     \center
-    \includegraphics[width=0.35\textwidth]{figures/bf_p1.png}
-    \includegraphics[width=0.35\textwidth]{figures/bf_p2.png}
+    \includegraphics[width=0.65\textwidth]{figures/bf.png}
     \caption{The structure of the build folders used in prototyping from the example in Chapter 3. It shows how the file structure is preserved for each service to maintain import paths. For binding volumes, the relative path to the architecture file is also maintained.}
     \label{figure:buildfolder_structure}
 \end{figure}

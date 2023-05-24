@@ -2,31 +2,42 @@
 % history
 Microservice architectures are the prominent paradigm for developing distributed applications which utilize scalability, maintainability and tight development and deployment cycles.
 Microservice architectures have become popular and are utilized by companies like Uber and Netflix
-to handle the amount of traffic from users each day.\footnote{The story of Netflix and Microservices - \url{https://www.geeksforgeeks.org/the-story-of-netflix-and-microservices/}}\footnote{Uber microservice architecture - \url{https://scaleyourapp.com/an-insight-into-how-uber-scaled-from-a-monolith-to-a-microservice-architecture/}}\todo{Turn these into references}
-
+to handle the amount of traffic from users each day \cite{netflix}, \cite{uber}.
 
 % the issue
 The challenges with microservice architectures are mainly the complexity. It can be very difficult for an inexperienced developer to start making an application using microservices and still have an overview of how the system works and what APIs the different services require and exposes.
 Managing a microservice architecture which in many cases can be complex and dynamic requires the developers and architects to utilize dedicated tools, technologies, and methodologies.
-Jolie \cite{jolie} is a service-oriented language which is one of the solutions to help developers create and manage microservice architectures, while microservice API patterns\cite*{PatternsForAPIDesign:2022} are a set of patterns the developer can utilize to create well-functioning architectures.
+Jolie \cite{jolie} is a service-oriented language which is one of the solutions to help developers create and manage microservice architectures, while microservice API patterns \cite{PatternsForAPIDesign:2022} are a set of patterns the developer can utilize to create well-functioning architectures.
 However, Jolie works at the service level and microservice API patterns work at the architectural level. It can be difficult to bridge this gap.
 
 % dissatisfaction
 Visualization is one solution to bridge the gap and aid the developer in understanding the architecture.
 Most current tools for visualization require the developer to have an understanding of the architecture to visualize it.
 These tools are the diagramming tools which aim to assist the developers in conveying the architecture to others but not so much to the developer.
-
-\section{Scope \& Aim}
+% \section{Scope \& Aim}
+\\
+\\
 The thesis aims to provide developers with a tool for visualizing and refactoring microservice architectures written in Jolie. The tool seeks to aid the developer with understanding the architecture while they are developing their applications and also 
 help them maintain complex projects, as well as, enhance the development experience.
+The tool should be integrated into the Jolie ecosystem and utilize the existing tools.
 The visualization capabilities entail the possibility for the user to see how the different services communicate and display key information about each component.
 The refactoring capabilities entail the possibility for the user to easily edit the key information of the components, as well as, apply microservice patterns to the current architecture or a set of services.
+
+Different solutions will be tested to see which gives the best experience from the user's perspective. This is the primary measure of how the tool performs. If the user does not find it intuitive or fast enough, they will not use it.
+For the visualization, this includes how the architecture is visualized. If the user cannot easily determine how the system works by looking at the visualization, it is not a good visualization.
+For refactoring, the main metric is speed, meaning how fast the reflected changes will be visualized to the user.
+
+Another aim is to test different solutions to make the tool function.
+The different solutions include the choice of technology, control flows of the operations, and the data representation of the architecture.
 
 The scope of the tool will be to have the visualization capabilities implemented.
 To make sure that time constraints are not violated, only some of the refactoring capabilities will be implemented but will be extendable if more time is put into the development.
 Lastly, a showcasing of how microservice patterns can be applied to the architecture using the tool will also be implemented, again with the possibility to extend the number of patterns that can be applied to the system.
-
-% \section{Structure of the Thesis}
-% Firstly, the necessary background information will be highlighted, then an extensive and illustrative example will be used to introduce the reader to the tool and its capabilities.
-% After the reader has been familiarized with the tool, the implementation and design decisions will be discussed and explained. The process of developing the tools will also be discussed in order to highlight some of the
-% tested methods in order to end up with the current version of the tool.
+% \section{Overview of the Thesis}
+\\
+\\
+This thesis consists of four further chapters. The next chapter will highlight the necessary background information needed for the thesis. This includes an introduction to microservice API patterns and the Jolie programming language.
+Following that will be an illustrative and comprehensive example of the tool being used to develop an application with a microservice architecture.
+Chapter four will go into the implementation details of how the tool is currently working, as well as explain the technologies used for each component of the tool.
+The final chapter contains the discussions and conclusions. The chapter will explain what other approaches were tried in order to get to the current solution, as well as, what key findings were found for each aspect.
+The chapter will end with a reflective part where the tool is compared to similar tools and suggestions for further improvements to the tool.

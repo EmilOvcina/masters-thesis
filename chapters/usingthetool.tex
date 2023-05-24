@@ -31,7 +31,7 @@ These will, however, be introduced later.
 In order to use the tool, Jolie must be set up correctly with version \texttt{1.11.0-git}. This section will not specify how this is done, but the Jolie website goes more in detail on how
 the correct git version is installed.\footnote{Downloading the newest version of Jolie - \url{https://www.jolie-lang.org/downloads.html}} From this point onwards it is assumed that the environment variables are set correctly to point to the git version of Jolie.
 
-The tool is developed to be used with Visual Studio Code\footnote{Visual Studio Code - Code Editing. Redefined. - \url{https://code.visualstudio.com/}}, aka VS Code, which is a code editor developed by Microsoft.
+The tool is developed to be used with Visual Studio Code,\footnote{Visual Studio Code - Code Editing. Redefined. - \url{https://code.visualstudio.com/}} aka VS Code, which is a code editor developed by Microsoft.
 VS Code has a large ecosystem of plugins which are used to enhance the developing experience.
 To start using the tool, it must be downloaded and installed either from the VS Code marketplace under the name: \texttt{\toolname}, or compile the source code and extract a \texttt{.VSIX} file to install manually.
 
@@ -79,13 +79,13 @@ interface UserIFace {
 }
 \end{jolisting}
 
-The service is created in the main file and the execution is set to \textit{concurrent}.
+The service is created in the main file and the execution is set to \emph{concurrent}.
 The service can now be added to the architecture file. Since only one service is present in the main OL file, only the file name needs to be specified in the service JSON.
-Now the visualization tool can be run using the command \textit{Jolie: Visualize} in VS Code, and a single service called \textit{User} can be seen.
+Now the visualization tool can be run using the command \emph{Jolie: Visualize} in VS Code, and a single service called \emph{User} can be seen.
 
 To use the tool to add the ports, double-click on the service to open the service in the sidebar. Next to the empty lists of ports, a \texttt{"+"} button can be clicked to add either an input port or an output port.
 This will bring up a pop-up window, shown in \cref{figure:popup_create_inputport}, where the user can specify the details of the port such as name, location, protocol and a list of interfaces.
-\begin{figure}[h!]
+\begin{figure}[t]
     \center
     \includegraphics[width=0.35\textwidth]{figures/popup_create_inputport.png}
     \caption{Pop up in the visualization tool where a user can specify details about a port, and by clicking 'confirm' will add that port in code.}
@@ -121,7 +121,7 @@ service User {
 }
 \end{jolisting}
 
-The implementation details of the types are omitted for all services, but the source code for the application example can be found in the GitHub repository\footnote{Source code: \url{https://github.com/EmilOvcina/jolievisualize/tree/main/microservice_example}}.
+The implementation details of the types are omitted for all services, but the source code for the application example can be found in the GitHub repository.\footnote{Source code: \url{https://github.com/EmilOvcina/jolievisualize/tree/main/microservice_example}}
 
 \subsection{The Product Service}
 The product service handles all operations of the products. This is a basic CRUD service, which also will send analytics to the analytics service, which can be used to monitor popular products etc.
@@ -129,7 +129,7 @@ The create and update operation's request types require a product, which is a ty
 The read operation request type is only an integer corresponding to the product ID. The delete operation request type is a type containing the user ID and product ID to, once again, check if the user is allowed to delete the product and the ID of the product.
 
 When the types and interface (\texttt{ProductIFace}) have been created,
-a service named \textit{Product} is created in the main \texttt{.ol} file and once again the execution context is set to \textit{concurrent}.
+a service named \emph{Product} is created in the main \texttt{.ol} file and once again the execution context is set to \emph{concurrent}.
 The service is added to the architecture file in the same network as the user service, and can now be seen in the visualization user interface.
 
 By opening the product service in the sidebar the input and output port can be created similarly to the user service previously. The input port will use the \texttt{ProductIFace} interface and the output port will use the \texttt{AnalyticsIFace} interface.
@@ -144,7 +144,7 @@ The two services displayed in the visualization UI can be seen in \cref{figure:j
 \subsection{The Analytics Service}
 This service supports one operation for now. This is \texttt{addToLogs(AnalyticsRequest)}, which is a one-way operation. The interface for the service is already defined, so the operation is added there with the request type being \texttt{AnalyticsRequest}. This type holds information about what content will be logged and from which service.
 
-This service is created in the main file, and the execution is also \textit{concurrent}. The analytics service is added to the architecture file and is displayed in the visualization UI.
+This service is created in the main file, and the execution is also \emph{concurrent}. The analytics service is added to the architecture file and is displayed in the visualization UI.
 The input port can be created using the tool just like the last two services, and the interface for the
 port is \texttt{AnalyticsIFace}.
 
@@ -253,13 +253,6 @@ For this example, the aggregator will just connect using the existing ports requ
 After clicking "confirm", the aggregator service will be created in the file of the first service selected. The new architecture can be seen in \cref{figure:full_example_lc} and shows that the aggregator service called \texttt{Aggregator} is connected to the services and is displayed in a slightly more orange colour 
 to illustrate that the aggregator is a generated service and is only a scaffolding service which the developer needs to implement the functionality for.
 
-\begin{figure}[h!]
-    \center
-    \includegraphics[width=0.32\textwidth]{figures/jv_aggregator.png}
-    \caption{The e-commerce application with an aggregator service that serves as a reverse proxy for the services that are invoked by clients.}
-    \label{figure:jv_aggregate}
-\end{figure}
-
 \subsection{Networks}
 The final part of the application is determining which networks each top-level service belongs to. This is relevant when the application is deployed.
 The services can be dragged out of their dashed box to create a new network and place the service in the network.
@@ -268,8 +261,15 @@ Other services can then be dragged into the new network to add the service to th
 Creating new networks and moving services around to different networks does nothing in the Jolie code. It changes the structure of the architecture file, but that is only for visualization purposes. 
 For this example, the networks can be arbitrary so the services will all reside in the same network for now.
 
+\begin{figure}[t]
+    \center
+    \includegraphics[width=0.32\textwidth]{figures/jv_aggregator.png}
+    \caption{The e-commerce application with an aggregator service that serves as a reverse proxy for the services that are invoked by clients.}
+    \label{figure:jv_aggregate}
+\end{figure}
+
 \section{Prototyping}
-The tool facilitates testing in a local deployment. Using the command \textit{Jolie: Docker-Compose} will generate a build folder where all top-level services reside in their respective subfolder containing all dependencies, a package.json file if the project is using JPM, and a Dockerfile to create an image when running the deployment.
+The tool facilitates testing in a local deployment. Using the command \emph{Jolie: Docker-Compose} will generate a build folder where all top-level services reside in their respective subfolder containing all dependencies, a package.json file if the project is using JPM, and a Dockerfile to create an image when running the deployment.
 A \texttt{docker-compose.yml} file will also be generated specifying each service and the deployment configurations.
 In the generated deployment file the networks are also specified and added to each service depending on what network the developer added the service to in the architecture file and what networks the service is connected to via ports.
 This is just a generic deployment file and should not be used for anything other than testing the application locally.

@@ -10,9 +10,10 @@ or solve more problems for the user. This will also serve as a discussion of the
 
 All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter.
 
-\section{The First Version}
+\section{Reconnaissance}
 The tool has been through one major revision before reaching the state that it is in now. This section
-will explain the \textit{first version} of the tool, briefly how it was implemented, and why the revision was needed.
+will explain the \emph{first version} of the tool, briefly how it was implemented, and why the revision was needed.
+The first version served as a way to get familiar with visualization and D3.js. It was also a tool where different approaches were tested to see what works and what does not.
 
 The general structure of the tool was very different. The first version tried to be more decoupled from VS Code than what the tool currently is.
 The first version was a Java program which had an open server socket. From this server socket, a lot of endpoints were exposed which would serve the whole user interface as well as provide the Jolie system JSON data.
@@ -43,10 +44,10 @@ The problem with this approach is that in some architectures, the visualization 
 It gives the sense that there exists some sort of direction or flow between services which is not necessarily the case.
 Embeddings are not represented intuitively. If a service is embedded by another service it is simply placed to the left of the embedder service and a dashed square is drawn around the two services indicating that an embedding is happening, but it 
 is not clear to an inexperienced Jolie developer what is the embedder service and what is the embedded service.
-This is why the current version of the tool has chosen a more \textit{traditional} approach to the service shapes. It does not imply a flow and it can be easier to visualize more complicated architectures.
+This is why the current version of the tool has chosen a more \emph{traditional} approach to the service shapes. It does not imply a flow and it can be easier to visualize more complicated architectures.
 
 The UI for the first version is grid-based where all services can be moved around and will snap to the grid.
-The reason a grid is used is that the edges that represent the connection between ports are calculated using the \textit{A*} pathfinding algorithm\footnote{A* pathfinding algorithm - \url{https://en.wikipedia.org/wiki/A*_search_algorithm}}, so each point in the grid is essentially used as a point in a graph that the pathfinding algorithm can use.
+The reason a grid is used is that the edges that represent the connection between ports are calculated using the \emph{A*} pathfinding algorithm\footnote{A* pathfinding algorithm - \url{https://en.wikipedia.org/wiki/A*_search_algorithm}}, so each point in the grid is essentially used as a point in a graph that the pathfinding algorithm can use.
 This also means that invisible walls are created around the services and ports to ensure that paths do not go through other services or ports.
 The current version of the tool has hexagons as service shapes, so to facilitate the possibility of having ports on all sides of the shape, the pathfinding from the output port to the input port must be handled differently.
 One idea which was tried is connecting services instead of ports, and then drawing the port shapes at the edge of the service shape where the connection intersects the service shape.
@@ -63,7 +64,7 @@ A grid is not used in the current version of the tool because ELK is used to mak
 The first version of the tool uses a simple custom layered layout algorithm. This is possible because the services have a direction.
 The algorithm works by placing each service in a horizontal layer based on how many of each port it has. The starting number of layers is determined by the width of the screen and each layer has a set height limit so when services exceed the limit an adjacent layer is created.
 Services with only one input port are placed in the left-most layer, and services with only one output layer are placed in the right-most layer.
-The services in between will be ordered so the service with most \textit{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
+The services in between will be ordered so the service with most \emph{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
 
 This algorithm is very simple. It worked on the handful of tested examples from the Jolie GitHub repository.\footnote{Jolie Examples on GitHub - \url{https://github.com/jolie/examples/tree/master}}
 But when the system becomes more complex connection-wise, it can quickly break or incomprehensible. One advantage of using this algorithm is that the user can drag around the services if the initial layout is bad.
@@ -86,6 +87,16 @@ Some UI frameworks have a steep learning curve, especially for newer web develop
 The performance is not necessarily a problem for Svelte since the overhead is minimal, but for larger UI frameworks like React and Angular, performance can become an issue since they ship a virtual DOM\footnote{React virtual DOM - \url{https://legacy.reactjs.org/docs/faq-internals.html}} which in VS Code can be a bottleneck.
 For this specific tool, there are no apparent framework-specific limitations with Svelte, which is one of the reasons it was chosen.
 
+\section{Control Flow} % subsection?
+Having a simple control flow is key to preventing bugs and keeping the tool fast.
+Different flows were tested to see which gave the best results in terms of speed but also the experience from the perspective of the user.
+The first version did not have many flows. The initialization was simple but this version of the tool did not have refactoring capabilities, so comparing it with the current solution is unnecessary.
+
+The current flow has split up the different operations so they happen both in the user interface and the code simultaneously, without interfering with each other. Another approach which was tried is to have the user interface update from the newly refactored code. This means that when the UI sends a refactoring request to VS Code, the UI does not update, but waits for VS Code to send the updated JSON back to the UI.
+This approach is simpler than the one used currently but with a significant performance decrease compared to the current solution.
+
+The current solution is chosen because it is faster. The updates happen in parallel which is faster from the perspective of the user because the UI shows the changes immediately instead of waiting for the VS Code extension to update. The control flow might not be as simple as the first proposed solution, but it is still easy to understand.
+
 \section{Data Representation}
 Different representations of the Jolie system JSON were tested. There are some tradeoffs to consider when structuring the JSON which can affect size and computation in the user interface.
 The interface list in the JSON does not have to be a global array. Interfaces are only used by ports which reside in the services, structurally, and at the moment the interfaces in a port simply contain the name and file path pair of the interfaces used. This could be switched out with the whole interface object.
@@ -104,7 +115,6 @@ The components in the tool communicate via messages and parse the whole Jolie sy
 This section will go into different aspects where Jolie is lacking either features or concepts.
 This is in the context of the tool only, meaning that these aspects would benefit the tool in some way.
 
-% todo: more here
 Jolie is a language in development which means that some useful conventions still need to be defined.
 The prototyping feature tries to be as general as possible which in some way prevents the feature to be fully fletched
 and being a tool for creating deployment instead of just a prototyping tool.
@@ -132,7 +142,7 @@ Ultimately the tool is keeping the JSON configuration as of now. JSON is easy to
 \subsection{Language Server Protocol}
 The language server protocol implementation has some missing language features which the tool would like to utilize.
 The renaming capabilities are very useful when renaming interfaces, types, and services if they are imported elsewhere. This feature of the LSP is not working at the time of writing this thesis.
-The tool is simply using the LSP for renaming \textit{as if} the renaming feature is implemented correctly, so if the feature will be added to the LSP the tool does not need any further update.
+The tool is simply using the LSP for renaming \emph{as if} the renaming feature is implemented correctly, so if the feature will be added to the LSP the tool does not need any further update.
 No alternative implementation of this language feature has been developed for the tool. If the LSP does not implement the renaming feature, the VS Code extension should have a custom renaming provider.
 This can be implemented in various ways, but one idea is to have a big symbol table where all symbols are added with references to everywhere it is used. This way the VS Code extension can go through all locations and create the corresponding workspace edits.
 
@@ -151,17 +161,18 @@ This tool aims to help the developer get an understanding of the architecture wh
 
 This tool analyzes the code in order to visualize the architecture, which a handful of other tools also do. 
 The level of abstraction varies a lot from tool to tool. Some tools analyse the flow of a codebase, which means how the different classes or files in 
-a codebase are connected. This is similar to how a UML diagram will visualize a system. \textit{Code2Flow}\footnote{Code2Flow Github - \url{https://github.com/scottrogowski/code2flow}} is a tool which visualizes the control flow of the source code of a handful of dynamic languages. Other tools like \textit{CodeSee}\footnote{CodeSee - \url{https://www.codesee.io}} visualize different levels of abstraction allowing the user to see the architecture of the application.
+a codebase are connected. This is similar to how a UML diagram will visualize a system. \emph{Code2Flow}\footnote{Code2Flow Github - \url{https://github.com/scottrogowski/code2flow}} is a tool which visualizes the control flow of the source code of a handful of dynamic languages. Other tools like \emph{CodeSee}\footnote{CodeSee - \url{https://www.codesee.io}} visualize different levels of abstraction allowing the user to see the architecture of the application.
 CodeSee is a proprietary product with a free tier, however, the free tier does not offer many capabilities.
 The only plan which automatically visualizes the services in an architecture is the enterprise plan with an undisclosed price point. 
 CodeSee also has a VS Code extension which allows the users to visualize directly in the editor. Another tool which focuses on visualizing software architecture 
-is \textit{docker-compose-viz}\footnote{docker-compose-viz - \url{https://github.com/pmsipilot/docker-compose-viz}} which creates a simple graph visualization based on a Docker-Compose YAML file.
+is \emph{docker-compose-viz}\footnote{docker-compose-viz - \url{https://github.com/pmsipilot/docker-compose-viz}} which creates a simple graph visualization based on a Docker-Compose YAML file.
 CodeSee and docker-compose-viz do not offer any form of refactoring capabilities of the architecture or the code.
 
 Most IDEs provide refactor capabilities using the language server protocol, which often happens directly in the code.
 However, several tools exist for code analysis and code generation but are not tied to any visualization.
 This tool is trying to do what most of these tools do but with a focus on visualization and refactoring, whereas many of the tools mentioned focus on one of these aspects.
 This tool is also only for Jolie and is meant to be a part of the Jolie ecosystem. The other tools mentioned are more general solutions and support a variety of programming languages.
+This tool enhances the development experience of Jolie developers, which was the aim of this thesis. It also provides visualization and refactoring capabilities in one solution.
 
 \section{Future Development}
 In this section, some potential future improvements will be discussed.
@@ -210,5 +221,3 @@ Then each Dockerfile should be smarter in the way it copies resources into the i
 The prototyping tool fits well with the tool because the architecture is already defined for visualization.
 The prototyping is an extension of the visualization but if Jolie develops a universal way of representing the architecture, the prototyping tool should move out of the visualization tool and be separate.
 This will also allow for more general functionality which, together with support for multiple deployment technologies, can move the tool from a prototyping tool to a build tool where the user can get a production-ready deployment of the architecture.
-
-\section{Final Conclusions}
