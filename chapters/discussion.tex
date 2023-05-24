@@ -88,7 +88,7 @@ The performance is not necessarily a problem for Svelte since the overhead is mi
 For this specific tool, there are no apparent framework-specific limitations with Svelte, which is one of the reasons it was chosen.
 
 \section{Control Flow} % subsection?
-Having a simple control flow is key to preventing bugs and keeping the tool fast.
+Having a simple control flow is key to preventing bugs, keeping the tool fast, and making the tool easier to extend and maintain.
 Different flows were tested to see which gave the best results in terms of speed but also the experience from the perspective of the user.
 The first version did not have many flows. The initialization was simple but this version of the tool did not have refactoring capabilities, so comparing it with the current solution is unnecessary.
 
@@ -205,6 +205,9 @@ The tool utilizes the VS Code API in order to edit the code. However, since VS C
 a simplified version of the VS Code API separately, at least the part of the API which the tool uses, to be more inclusive to other editors.
 The API can be contained within the NPM package and will then run anywhere where NodeJS can run, and the visualization can be in the browser, which is much more versatile than locking into VS Code.
 implementing this separate API would be time-consuming and utilizing the VS Code API is more robust.
+
+Introducing a new protocol for communication between the UI and VS Code could also be an improvement. Switching to Web Sockets\footnote{Web Socket protocol - \url{https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API}} to facilitate two-way communication would remove the need for the VS Code messaging API.
+This would theoretically make communication between the VS Code extension and the UI faster, but this was not tested. The other benefit of introducing web sockets is that it is more universal. Migrating from VS Code requires a new protocol for communication between the editor and the user interface.
 
 The separate API is something that should be introduced at a later point to be more inclusive to developers who prefer other code editors.
 
