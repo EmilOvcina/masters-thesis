@@ -8,7 +8,9 @@ some of the bigger design decisions were made.
 The chapter will also discuss what similar tools exist and how the tool compares to these tools. Lastly, how the tool can be developed further to enhance user experience, and what features and changes could be made to the tool to either make it more useable
 or solve more problems for the user. This will also serve as a discussion of the shortcomings of the tool.
 
-All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter.
+All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter. 
+% todo summary or conclusion?
+The chapter and thesis will end with a small summary of the thesis which also serves as a response to the introductory chapter.
 
 \section{Reconnaissance}
 The tool has been through one major revision before reaching the state that it is in now. This section
@@ -218,9 +220,25 @@ configuration in the extension specifying which technology the prototyping shoul
 The tool is however locked into Docker as the containerization tool. This is justifiable by the fact that Docker is considered to be the de facto standard in containerization technology.
 
 The way the Docker image/build folders are created is not very efficient in terms of space. If two services share a file as a dependency the file will be duplicated.
-This is done for simplicity's sake. A more complex solution where file duplication is avoided would be to copy all Jolie files once and mimic the file structure of the project. 
+This is done for simplicity's sake. A more complex solution where file duplication is avoided would be to copy all Jolie files once and mimic the file structure of the project.
 Then each Dockerfile should be smarter in the way it copies resources into the image. In this simpler version, it copies all files in the build folder into the image, but all files are needed for the image so the size of the image is not bloated using this approach, only the destination folder of the prototype creation is bloated with duplicate files.
 
 The prototyping tool fits well with the tool because the architecture is already defined for visualization.
 The prototyping is an extension of the visualization but if Jolie develops a universal way of representing the architecture, the prototyping tool should move out of the visualization tool and be separate.
 This will also allow for more general functionality which, together with support for multiple deployment technologies, can move the tool from a prototyping tool to a build tool where the user can get a production-ready deployment of the architecture.
+
+\section{Summary or Conclusion?}
+A tool has been developed and published. The tool complies with the scope and aim described in the introductory chapter.
+The tool is currently a VS Code extension that uses a NodeJS module which visualizes an architecture of a system developed in Jolie, and the user of the tool can refactor the Jolie services directly in the tool. The tool will change the code
+to reflect the changes done in the user interface.
+The current refactoring capabilities entail changing port protocol, port location, port name, and service name.
+The renaming of ports and services needs the LSP to be functioning correctly.
+The architectural aspects of the Jolie services can also be changed in the tool. The user of the tool can drag services around to embed and disembed the services and place them in different networks.
+The user can further enhance the architecture of their application by applying architectural patterns, which currently entail aggregators, directly from the tool by selecting a set of services.
+
+When the user is satisfied with the architecture and the services. The user can create a prototype of the deployment. This will utilize Docker and create the necessary images while Docker-Compose will handle the networks and creation of the containers, as well as, the orchestration of the containers.
+
+Different approaches for each aspect of the tool have been tested in order to get the current result.
+The benefits and consequences of each design decision have been discussed, and future development has been planned to further enhance the functionality of the tool. The future enhancements include making the tool more universal and adding more refactoring capabilities, as well as, enhancing the user experience.
+
+Links to the Github repositories containing the full source code of the VS Code extension and the JolieVisualize NodeJS module can be found in \cref{appen:source_code}.
