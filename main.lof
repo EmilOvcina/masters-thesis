@@ -1,0 +1,48 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\babel@toc {british}{}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {2.1}{\ignorespaces A group of microservices handling different payment methods. The payment service acts as an aggregator obscuring the underlying services. The orange hexagons depict services, the yellow boxes depict input ports and the red boxes depict output ports. Sending a request to the payment service will aggregate the message to the correct payment service depending on the user's chosen API operation. This is done without the client needing to know the aggregated service's location and protocol.\relax }}{8}{figure.caption.6}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {2.2}{\ignorespaces A group of microservices which can be accessed through an API gateway. The client can specify a resource name to specify which service to send the request to. The product service fetches information about a product. The recommendation service fetches the recommended products based on the user and the shipping service fetches shipping information given the user's location.\relax }}{9}{figure.caption.7}%
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.1}{\ignorespaces A diagram of the example architecture of the e-commerce application. The output ports (red) represent internal communication between the services via their input ports (yellow).\relax }}{13}{figure.caption.8}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Pop up in the visualization tool where a user can specify details about a port, and by clicking 'confirm' will add that port in code.\relax }}{15}{figure.caption.9}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.3}{\ignorespaces The product and user services displayed in the visualization tool's UI. They have an input port (yellow) and an output port (red) each and they both are considered to be in the same network.\relax }}{17}{figure.caption.10}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.4}{\ignorespaces The product, user, and analytics services displayed in the visualization tool's UI. The user and product services have an output port (red) each of which is connected to the input port (yellow) of the analytics service.\relax }}{18}{figure.caption.11}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.5}{\ignorespaces The entire e-commerce application is displayed in the visualization tool's UI. All services exist in the same network and all are top-level.\relax }}{20}{figure.caption.12}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.6}{\ignorespaces The e-commerce application after the payment, notification, and analytics services have been embedded.\relax }}{21}{figure.caption.13}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {3.7}{\ignorespaces The e-commerce application with an aggregator service that serves as a reverse proxy for the services that are invoked by clients.\relax }}{23}{figure.caption.14}%
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.1}{\ignorespaces A diagram of the different components of the tools. The JolieVisualize tool contains the user interface and the Jolie2JSON subsystem which includes the adapter for the VS Code to communicate with the parsing program.\relax }}{25}{figure.caption.15}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.2}{\ignorespaces A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are also calculated. The rendering of the system is not done using ELK. Source: \url {https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}\relax }}{33}{figure.caption.16}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.3}{\ignorespaces The component tree of the user interface created in Svelte. When the root component is updated an update is cascaded down the component tree.\relax }}{36}{figure.caption.17}%
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.4}{\ignorespaces The structure of the build folders used in prototyping from the example in Chapter 3. It shows how the file structure is preserved for each service to maintain import paths. For binding volumes, the relative path to the architecture file is also maintained.\relax }}{41}{figure.caption.18}%
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {5.1}{\ignorespaces A very early version of how the first version of the tool displayed service shapes and the sidebar. No layout algorithm is used to place the services correctly on the grid in this version.\relax }}{44}{figure.caption.19}%
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }

@@ -6,14 +6,14 @@ Everything in Jolie is contained within services, and the developer defines the 
 Microservice API patterns are architectural patterns which can be used to enhance a microservice system.
 These patterns can be used to create specific behaviour on the architectural level.
 
-Jolie services alone cannot determine the behaviour of the architecture, so the developer of the system needs to have a good understanding of the topology of the system and how the different microservices communicate.
+% Jolie services alone cannot determine the behaviour of the architecture, 
+The Jolie services are self-contained. They do not know about the architecture of the system, only the location of other ports and the APIs.
+The developer of the system needs to have a good understanding of the topology of the system and how the different microservices communicate.
 Several visualization tools exist which allow the developer to
  model and diagram the architecture to convey key information to others, which requires the developer to have a good understanding of the system being developed.
 
 A tool has been developed to aid Jolie developers understand the architecture they are developing. The tool visualizes the topology of the system and allows the developer to 
 get an overview of key information about each component. The tool's functionality is further extended to allow the developer to refactor the code directly in the tool's user interface, as well as, "apply" a microservice API pattern to a selected set of services.
-\\
-\\
 \\
 \\
 \section*{\centering Resumé}
@@ -24,7 +24,9 @@ Alt i Jolie er indeholdt i tjenester, og udvikleren definerer en \emph{applicati
 Microservice-API-mønstre er arkitekturmønstre, der bruges til at forbedre et microservicesystem.
 Disse mønstre kan bruges til a lave specifik adfærd på et arkitekturniveau.
 
-Jolie-tjenester kan ikke bestemme adfærden af arkitekturen alene, så udvikleren af systemet skal have en god forståelse for systemets topologi og hvordan de forskellige microservices kommunikerer.
+% Jolie-tjenester kan ikke bestemme adfærden af arkitekturen alene
+Jolie-services er selvstændige. De ved intet om arkitekturen af systemet, kun lokationen af andre porte og API'erne.
+Udvikleren af systemet skal have en god forståelse for systemets topologi og hvordan de forskellige microservices kommunikerer.
 Der findes flere visualiseringsværktøjer, der giver udvikleren mulighed for at modellere og lave diagrammer for at formidle arkitekturen og vigtig information til andre,
 som kræver at udvikleren har en god forståelse af det system, der bliver udviklet.
 

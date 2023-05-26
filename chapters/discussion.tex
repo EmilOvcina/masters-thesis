@@ -8,10 +8,7 @@ some of the bigger design decisions were made.
 The chapter will also discuss what similar tools exist and how the tool compares to these tools. Lastly, how the tool can be developed further to enhance user experience, and what features and changes could be made to the tool to either make it more useable
 or solve more problems for the user. This will also serve as a discussion of the shortcomings of the tool.
 
-All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter. 
-% todo summary or conclusion?
-The chapter and thesis will end with a small summary of the thesis which also serves as a response to the introductory chapter.
-
+All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter. However, this chapter will end with a short conclusion of the thesis.
 \section{Reconnaissance}
 The tool has been through one major revision before reaching the state that it is in now. This section
 will explain the \emph{first version} of the tool, briefly how it was implemented, and why the revision was needed.
@@ -89,8 +86,8 @@ Some UI frameworks have a steep learning curve, especially for newer web develop
 The performance is not necessarily a problem for Svelte since the overhead is minimal, but for larger UI frameworks like React and Angular, performance can become an issue since they ship a virtual DOM\footnote{React virtual DOM - \url{https://legacy.reactjs.org/docs/faq-internals.html}} which in VS Code can be a bottleneck.
 For this specific tool, there are no apparent framework-specific limitations with Svelte, which is one of the reasons it was chosen.
 
-\section{Control Flow} % subsection?
-Having a simple control flow is key to preventing bugs, keeping the tool fast, and making the tool easier to extend and maintain.
+\section{Control Flow}
+Having a simple control flow between the components of the tool is key to preventing bugs, keeping the tool fast, and making the tool easier to extend and maintain.
 Different flows were tested to see which gave the best results in terms of speed but also the experience from the perspective of the user.
 The first version did not have many flows. The initialization was simple but this version of the tool did not have refactoring capabilities, so comparing it with the current solution is unnecessary.
 
@@ -129,7 +126,6 @@ Jolie currently has no way of representing the architecture in code which is why
 A JSON configuration file is a common practice but can be unnecessary overhead if it is not intuitive to the user of the tool.
 Another idea is to use Docker-Compose to represent networks and top-level services. The point is to have the user define the architecture while they are creating the deployment.
 This is however not the chosen solution because the tool should not lock the user to a specific deployment tool or software.
-% There is also more customizability in using JSON because Docker-Compose does not allow for custom fields to be set. So if the tool needs any information not Docker-Compose specific about the services or networks it would likely not be possible to parse the information to the tool in an intuitive way.
 Custom fields are possible in Docker-Compose but it is far from as intuitive as JSON is, and it will lock the tool into only using Docker-Compose so a whole new 
 parser for the architecture file would need to be created for all deployment tools.
 
@@ -195,7 +191,8 @@ more patterns. Another pattern to implement is the redirector pattern for creati
 This is very identical to the aggregator but the resources need to be specified in the user interface along with everything else which is also needed for the aggregator pattern.
 
 The refactoring and application of microservice API patterns are limited by the missing architecture representation in Jolie.
-Many of the patterns described in the preliminary chapter can be developed using architectural programming in Jolie but the behaviour of the architecture cannot be created in Jolie.
+Many of the patterns described in the preliminary chapter can be developed using architectural programming in Jolie
+but the Jolie services are self-contained and know nothing about the architecture.
 This means that the number of patterns which can be applied on a service level is significantly smaller.
 Either the tool should create specific implementations of the different patterns and let the user edit it themselves or the architecture should be 
 defined in a separate language/technology which the tool could support, like LEMMA.
@@ -241,4 +238,4 @@ When the user is satisfied with the architecture and the services. The user can 
 Different approaches for each aspect of the tool have been tested in order to get the current result.
 The benefits and consequences of each design decision have been discussed, and future development has been planned to further enhance the functionality of the tool. The future enhancements include making the tool more universal and adding more refactoring capabilities, as well as, enhancing the user experience.
 
-Links to the Github repositories containing the full source code of the VS Code extension and the JolieVisualize NodeJS module can be found in \cref{appen:source_code}.
+Links to the Github repositories containing the full source code of the VS Code extension and the JolieVisualize NodeJS module can be found in \cite{jv} and \cite{vscode-jv}.
