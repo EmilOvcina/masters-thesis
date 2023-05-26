@@ -1,7 +1,7 @@
 \begin{table}[h]
-    \advance
-    \leftskip-1.2cm
-    \begin{tabular}{p{0.12\linewidth} | p{0.48\linewidth} | p{0.1\linewidth} | p{0.30\linewidth}}
+%    \advance
+%    \leftskip-1.2cm
+    \begin{tabular}{l | p{0.4\linewidth} | p{7ex} | p{0.30\linewidth}}
     \toprule
     \textbf{Field}           & \textbf{Desrciption} & \textbf{Type} & \textbf{Example} \\ \midrule
     file                 & The location of a Jolie file relative to the architecture file & String & \texttt{main.ol} \\\midrule
@@ -14,6 +14,7 @@
     env& Deployment environment variables. Gets added in the deployment yaml file & JSON & \texttt{\{username: "test", password: "123"\}} \\\midrule
     image           & Specifies a remote image which gets added in the deployment yaml file & String & \texttt{emilovcina/somejolieimage}\\\midrule
     ports             & List of strings defining Docker port mappings & String[] & \texttt{["4000:4000", "3444:9000"]}\\\midrule 
-    volumes              & List of file locations which will get bound as volumes when running the deployment & String[] & \texttt{["/config.ini", "assets/test.txt"]}\\\midrule
+    volumes              & List of file locations which will get bound as volumes when running the deployment & String[] & \texttt{["/config.ini", "assets/test.txt"]}
+    \\\bottomrule
     \end{tabular}
     \end{table}

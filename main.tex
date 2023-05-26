@@ -22,8 +22,8 @@
 \usepackage{titlepic}
 \linespread{1.15}
 \newcommand{\subsubsubsection}[1]{\paragraph{#1}\mbox{}\\}
-\setcounter{secnumdepth}{4}
-\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
 
 % GRAPHICS ---------------------------------------------------------------------
 \usepackage[x11names,rgb,html]{xcolor}
@@ -104,6 +104,10 @@
 \newcommand{\change}[2][]{\todo[linecolor=blue,backgroundcolor=blue!25,bordercolor=blue,#1]{#2}}
 \newcommand{\info}[2][]{\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan,#1]{#2}}
 \newcommand{\improvement}[2][]{\todo[linecolor=green,backgroundcolor=green!25,bordercolor=green,#1]{#2}}
+
+% TODO: remove this
+\usepackage{showframe}
+
 % LISTINGS ---------------------------------------------------------------------
 
 % Typesetting folder and file trees
