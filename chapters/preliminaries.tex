@@ -3,8 +3,7 @@
 % Revision:          X
 % Final Revision:    X
 \chapter{Preliminaries}
-This chapter aims to provide the reader with the necessary background knowledge 
-in order
+This chapter aims to provide the reader with the necessary background knowledge
 to understand the purpose of the thesis and why it can be useful for developing Jolie applications and utilizing
 microservice API patterns. This is necessary for understanding the context described in the previous chapter.
 % This essentially builds on the motivation
@@ -40,18 +39,18 @@ The last category, which will be quickly explained in this part of the section, 
 
 \subsection{Quality Patterns}
 This category of patterns is highlighted in a subsection because they are more relevant in the context of the thesis. 
-Quality patterns focus on cost-effectively providing high-quality services. These patterns can be partitioned into \emph{Refecence Management}, \emph{Data Transfer Parsimony}, and \emph{Quality Management and Governance}.
+Quality patterns focus on cost-effectively providing high-quality services. These patterns can be partitioned into \emph{Reference Management}, \emph{Data Transfer Parsimony}, and \emph{Quality Management and Governance}.
 
 Relevant patterns in this category include the \emph{Conditional Request} pattern which aims to eliminate unnecessary server-side 
 processing, the \emph{Rate Limit} pattern that prevents excessive usage of an endpoint and the \emph{Pricing Plan} pattern that allows the provider to monetize the API,
 
-Many of the patterns can be used in conjunction to enhance the effect of the desired functionality. For example: \emph{Pricing Plan} can use \emph{Rate Limit} to allow the provider to have different levels of pricing plans.
+Many of the patterns can be used in conjunction to enhance the effect of the desired functionality. For example, \emph{Pricing Plan} can use \emph{Rate Limit} to allow the provider to have different levels of pricing plans.
 To further enhance the functionality of the pricing plan pattern, \emph{API Keys}\footnote{A structure API pattern which allows the API provider
 to assign a unique token/key to each client which can be used for authorization purposes.} can be used together to allow the API provider to safely and reliably monetize the API using different billing plans. 
 Adding this to an API Gateway\footnote{API Gateway - \url{https://microservices.io/patterns/apigateway.html}} is good to ensure that all clients are monetized accordingly.
 
 Generally, most of the API patterns described in the book are best utilized in conjunction,
-and when looking at Jolie in a moment, it is crucial to understand that these patterns, both API and non-API patterns,
+and when looking at Jolie in a moment, it is crucial to understand that these patterns, both API and non-API patterns
 should be seen as building blocks which are used together to implement the desired architecture.
 It is also worth mentioning that the patterns discussed in this section will not be implemented in this thesis.
 
@@ -69,9 +68,9 @@ This subsection will quickly describe some of the relevant building blocks which
 in this block where a developer will create business logic and provide information about the API. Services usually consist of some main business logic block and any number of ports.
 
 \textbf{Ports}: ports are the means of communication between services. Not just between Jolie services but also external communication.
-Jolie-services differentiate between in-going and out-going communication. So building blocks for both exists, namely \texttt{inputPort} and \texttt{outputPort}.
-Ports have their properties which a developer needs to specify. The three main properties of any port are: \emph{location}, \emph{protocol}, and \emph{interfaces}.
-Where location specifies where the port will be listening for messages and where the port will send messages.
+The Jolie services differentiate between in-going and out-going communication. So building blocks for both exists, namely \texttt{inputPort} and \texttt{outputPort}.
+Ports have properties which a developer needs to specify. The three main properties of any port are: \emph{location}, \emph{protocol}, and \emph{interfaces}.
+Where location specifies where the input port will be listening for messages and where the output port will be sending messages.
 The protocol specifies how the port sends and receives messages. Lastly, for input ports, interfaces specify which
 operations the service is capable of performing, and for output ports, the interfaces specify which
 operations the service is capable of invoking internally. 
@@ -90,17 +89,17 @@ inputPort IP {
 
 The location of the port can utilize different media for communication, but the two most common are TCP/IP sockets and Jolie in-memory communication.
 Specifying the location of ports with \texttt{socket://} followed by an IP address means that the ports are communicating via TCP/IP.
-Specifying the location with \texttt{local} means that the ports will use an in-memory channel to communicate, this also means that services on different networks cannot communicate.
+Specifying the location with \texttt{local} specifies that the ports will use an in-memory channel to communicate, this also means that services on different networks cannot communicate.
 A port using the local communication medium will be referred to as a "local port".
 
-\textbf{Interfaces}: interfaces define a list of operations, which a service needs to implement in order to use. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
+\textbf{Interfaces}: interfaces define a list of operations, which a service needs to implement to use. These operations can be of type \texttt{RequestResponse}, where the operation takes in some request type and return some response type, 
 and \texttt{OneWay} where the operation takes in a request type but returns nothing. The syntax of a RequestResponse operation is: \jo{opName(RequestType)(ResponseType)}, and for OneWay operations it is: \jo{opName(RequestType)}
 
 \textbf{Type}: interfaces use types to define what is expected to be given to an operation, and in some cases what the operation will return. In Jolie, there are basic
-data types, also called primitives, which include: \texttt{void}, \texttt{int}, \texttt{string}, \texttt{bool}, etc. However, it is also to define custom types which can contain subtypes.
+data types, also called primitives, which include: \texttt{void}, \texttt{int}, \texttt{string}, \texttt{bool}, etc. However, it can also define custom types which can contain subtypes.
 This could be used when an operation needs more data types.
 
-This Listing is an example of a custom type used in an interface in Jolie:
+The following Listing is an example of a custom type used in an interface in Jolie:
 \begin{jolisting}[][caption={
     % Custom type used in an interface in Jolie
     },label=lst:type-with-interf]
@@ -127,7 +126,7 @@ The service can simply embed another service to ensure that when the embedder is
 Another benefit of embedding is that the language can take care of the connection, meaning that the developer does not necessarily need to worry about how a service is connected to the embedded services.
 This also potentially hides the connection from the outside world.
 
-The in-memory communication channel can be utilized here. The developer can specify if the embedder should create a new local port and connect automatically via that. This requires that the embedded service contains an input port which shares protocol and location.
+The in-memory communication channel can be utilized here. The developer can specify if the embedder should create a new local port and connect automatically via that. This requires the embedded service to contain an input port which shares protocol and location.
 The following Listing showcases this functionality:
 
 \begin{jolisting}[][caption={
@@ -137,15 +136,15 @@ embed svc as OP
 \end{jolisting}
 
 It is not required that the embedder specifies some local output port for communication. In some cases, where the two services already have ports which use TCP/IP sockets,
-it can be the intention to just keep using those ports for communication. If this
-is the intention, the developer can simply remove the \texttt{as OP} part of the embed line, and this will still ensure that the embedded service is running when the embedder is executing.
+it can be the intention to keep using those ports for communication. If this
+is the intention, the developer can simply remove the "\texttt{as OP}" part of the embed line, and this will still ensure that the embedded service is running when the embedder is executing.
 
 \subsection{Programming the Communication Topology}
 Jolie also facilitates the programming of the communication topology. This includes aggregation, redirection, couriers, and collections, which is useful when 
 implementing some of the microservice API patterns mentioned before.
 \newdif{Aggregation} is an architectural pattern where a service has an input port which exposes all operations of a specified set of output ports. This essentially works like a reverse proxy, where the aggregated service distributes requests to aggregated services without
 requiring the aggregated services to be publically exposed or known. \cref{lst:aggregator-inputport} displays how an input port can expose the API of two other output ports.
-The API of the output ports being aggregated can be extended by the aggregator service. This is done by using \emph{interface extenders} which does as the name implies and allows any client to access more operations than the output port's interfaces specify.
+The API of the output ports being aggregated can be extended by the aggregator service. This is done by using \emph{interface extenders} which allow any client to access more operations than the output port's interfaces specify.
 This is a simple architectural pattern but can be used to implement some widely used architectural strategies. This includes load balancing, caching, encryption and cyber attack prevention.
 
 \begin{jolisting}[][caption={Input port which aggregates requests to some output ports, OP1 and OP2.}, label=lst:aggregator-inputport]
@@ -166,11 +165,11 @@ client and the services, and depending on the payment method, the aggregator can
     Sending a request to the payment service will aggregate the message to the correct payment service depending on the user's chosen API operation. This is done without the client needing to know the aggregated service's location and protocol.}
     \label{figure:aggregator_example}
 \end{figure}
-\newdif{Redirection} is a pattern which works similarly to the aggregator, but architecturally is very different.
+\newdif{Redirection} is a pattern which works similarly to the aggregator but architecturally is very different.
 A service with an input port can specify that a resource name gets redirected to a specific service via an output port.
 \cref{lst:redirector-inputport} displays how an input port can specify resources and map them to an output port.
 This means that a client sending a request to the redirector can specify a resource name in the communication media, and the redirector will forward the message to the correct service based on that resource name.
-To specify a resource name the client simply needs to specify it in the location, e.g \texttt{socket://localhost:9000/!/rss} where the \texttt{/!/rss} part is what specifies the resource name.
+To specify a resource name the client simply needs to specify it in the location, e.g. \texttt{socket://localhost:9000/!/rss} where the \texttt{/!/rss} part is what specifies the resource name.
 
 Redirection can be used to implement several different microservice API patterns since it essentially is a proxy.
 Generally, a lot of API structures can be implemented using redirectors, because of how a client can specify a specific resource.
@@ -186,35 +185,36 @@ inputPort RedirectorPort {
 }
 \end{jolisting}
 
-A simple example of what the redirector could be used for is: imagine that an e-commerce application wants to have a single point-of-entry for the system. The application could set up an \emph{API Gateway} which will act as that point of entry. 
+A simple example of what the redirector could be used for is: imagine an e-commerce application wants to have a single point of entry for the system. The application could set up an \emph{API Gateway} which will act as that point of entry. 
 When a client wants to get information for a product page, it can specify what it needs in the resource names. This also handles protocol transformation so the client does not need to know the internal service's required protocols.
 The example is showcased in \cref{figure:redirector_example}. The client makes requests to the redirector specifying the resource name to fetch the relevant data.
 \begin{figure}[h!]
     \center
     \includegraphics[width=0.5\textwidth]{figures/redirector_example.png}
     \caption{A group of microservices which can be accessed through an API gateway. 
-    The client can specify a resource name to specify which service to send the request to.
+    The client can specify a resource name to specify which service (orange hexagons) to send the request to.
     The product service fetches information about a product. The recommendation service fetches
-    the recommended products based on the user and the shipping service fetches shipping information given the user's location.}
+    the recommended products based on the user and the shipping service fetches shipping information given the user's location.
+    Red squares depict output ports and yellow squares depict input ports.}
     \label{figure:redirector_example}
 \end{figure}
-\newdif{Couriers}  allow the developer to append functionality to a set of operations. They work well in extension with other communication topologies like aggregators.
+\newdif{Couriers} allow the developer to append functionality to a set of operations. They work well in extension with other communication topologies like aggregators.
 The developer defines a courier process by specifying an input port and a set of operations. When that input port receives a request using any of the operations, the courier process executes some code before forwarding
 the request along to the main operation implementation.
 
 Couriers can be used to implement any type of middleware functionality. From the book by Olaf Zimmermann et al., many of the quality patterns can be implemented using couriers. This includes
 \emph{conditional requests}, \emph{rate limit}, \emph{pricing plan} etc. Besides the quality microservice API patterns, other microservice patterns can be implemented using couriers, namely, \emph{API key} security and authorization.
-\newdif{Collections} is another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
+\newdif{Collections} are another extension of aggregators. Collections are useful when an aggregator input port aggregates services which share the same interface.
 They are specified by grouping output ports when defining aggregates.
 This together with courier processes can fully, and easily, implement a load balancer for groups of services sharing interfaces because the courier can forward the requests to any of the aggregated services based on some condition.
 Since collections are an extension of aggregates, they can have the same use cases, but the collections can group services that share the same interfaces but can have much different underlying business logic.
 
 \section{Docker \& Docker-Compose}
-Docker\footnote{Docker - \url{https://www.docker.com}} is a containerization tool used for deploying applications. It builds an \emph{image} which specifies how the container should build and start when it is created.
-Docker handles a single container, and \emph{Docker-Compose}\footnote{Docker-Compose - \url{https://docs.docker.com/compose/}} is used to handle multi-container applications. Docker-Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
-
-Docker-Compose is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas
+\emph{Docker}\footnote{Docker - \url{https://www.docker.com}} is a containerization tool used for deploying applications. It builds an \emph{image} which specifies how the container should build and start when it is created.
+\emph{Docker-Compose}\footnote{Docker-Compose - \url{https://docs.docker.com/compose/}} is a container orchestration tool, essentially configuring multiple containers and allowing the developer to ensure that the correct files are mounted, the correct ports are exposed and the containers are bound to their specified networks. It also handles multiple instances/replicas
 of containers if needed.
+
+Docker handles a single container, and Docker-Compose is used to handle multi-container applications. Docker-Compose will handle the networking between containers, so it is a great tool for testing and deploying applications using a microservice architecture.
 
 \subsection{Jolie in Docker}
 \label{label:jolie_in_docker}
@@ -222,13 +222,13 @@ To utilize Docker and Docker Compose when developing a microservice architecture
 Using this image when making a Dockerfile will set up Jolie when building the image, so only the exposed ports, source files and possible runtime arguments should be handled by the developer.
 
 When running a container, the developer needs to specify what container ports to expose, what parameters should be parsed into the Jolie program, and if it needs to connect to other services the developer needs to first create the network and then assign each container to that network.
-This is where Docker Compose, or \emph{Kubernetes}\footnote{Kubernetes - \url{https://kubernetes.io}} which is another container orchestration tool, can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
+This is where Docker Compose, or \emph{Kubernetes}\footnote{Kubernetes - \url{https://kubernetes.io}} which is another container orchestration tool can become helpful because it will take care of all this if the developer specifies it in the deployment configuration file.
 
 Connecting ports over a Docker network needs some extra work from the developer. Ports which use TCP/IP sockets for communication cannot use "localhost" as seen in the previous examples, they need to use the container name as the host address so Docker can figure out where to send messages inside the network.
-This can look something like: \texttt{socket://auth:9999}, where \texttt{auth} is the name of the container.
+This can look something like \texttt{socket://auth:9999}, where \texttt{auth} is the name of the container.
 
 \section{Current Tools}
-Jolie, and other programming languages, do have some tools in order to enhance the developer experience. This section will go through some of the tools
+Jolie, and other programming languages, do have some tools to enhance the developer experience. This section will go through some of the tools
 which have been developed for Jolie and then look at some of the counterparts in other languages.
 %
 \newdif{Joliedoc}\footnote{Joliedoc - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/documenting-api/index.html}} generates a documentation page for a single Jolie service. This gives an overview of the API a Jolie service exposes. It shows the input ports and output ports of the service as well as their location and protocol.
@@ -236,7 +236,7 @@ This tool is useful when the developer wants a simple and easy-to-follow represe
 For other programming languages, there are tools like \emph{JSDoc}\footnote{JSDoc - \url{https://jsdoc.app}} which look at the comments in JavaScript code to generate the API documentation. This requires the developer to write more lines for the same result.
 Tools like \emph{Stoplight}\footnote{Stoplight - \url{https://stoplight.io}} and \emph{Swagger}\footnote{Swagger - \url{https://swagger.io}} can do the same for all languages, but this requires the developer to set up a markdown or YAML file and specify the whole API in that.
 Because of Jolie's way of writing the API as a part of the language, Joliedoc can infer the API from the code without the developer needing to write more lines or comments to achieve this goal.
-Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is more to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
+Jolie does have another tool which generates OpenAPI specifications, which Swagger uses, but this is meant to be used in conjunction with these other tools, and is not a standalone tool like Joliedoc is.
 %
 \newdif{JPM}\footnote{Jolie Package Manager - \url{https://docs.jolie-lang.org/v1.10.x/language-tools-and-standard-library/basics/package-manager/index.html}} is a package management tool for Jolie which, similarly to NPM, keeps track of dependencies of a Jolie program.
 This program is useful for creating the project structure for the application. JPM can be used in Docker to ensure that the correct dependencies are installed alongside the Jolie services when the image is building.
@@ -246,7 +246,7 @@ There are a lot of different visualization tools for software architecture which
 The subset of tools which fall under the category of \emph{modelling tools} aims to document a system on different levels of abstraction. This can be on the level of individual components to large-scale businesses with interconnecting components and sectors.
 Tools like \emph{IcePanel}\footnote{IcePanel - \url{https://icepanel.io/}} and \emph{Aplas}\footnote{Aplas - \url{https://aplas.com/}} allow the developer of a system to use C4 modelling to create a model of their system, on any level of abstraction.
 
-Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \emph{mermaid} \cite{mermaid}, \emph{ELK} \cite{ELK} and \emph{graphviz}\footnote{Graphviz - \url{https://graphviz.org/}} belong.
+Another subset of tools is the code-based tools which allow the developer to programmatically or textually create models. This is where tools like \emph{mermaidJS} \cite{mermaid}, \emph{ELK} \cite{ELK} and \emph{graphviz}\footnote{Graphviz - \url{https://graphviz.org/}} belong.
 These tools allow the developer to write structured text or code and then they will render the diagram.
 
 The last relevant category of tools is the diagramming tools. Tools like \emph{draw.io}\footnote{Draw.io - \url{https://drawio-app.com/}} and \emph{lucidchart}\footnote{Lucidchart - \url{https://www.lucidchart.com/pages/product}} allows the user to diagram everything from E/R, UML and FlowCharts to complex systems.

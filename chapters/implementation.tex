@@ -8,10 +8,10 @@ is available in \cite{jv} and \cite{vscode-jv}.
 
 \section{Overview of the Components}
 The tool essentially consists of four components: The VS Code extension, the user interface written in Svelte, the \javatoolname[] program written in Java and an adapter program for \javatoolname[] which uses NodeJS called \nodetoolname[].
-The \javatoolname[] program is used to run the Jolie parser, which is also written in Java, and that will gather all information from the Jolie code needed by the visualization tool.
+The \javatoolname[] program is used to run the Jolie parser, which is also written in Java, and the program will gather all information from the Jolie code needed by the visualization tool.
 
 The Svelte user interface is the component which takes in the user input and renders the services, ports and connections.
-In order for the UI to get the relevant data from the Jolie code, the VS Code extension invokes the \nodetoolname[], with the correct parameters, which invokes the \javatoolname[] program.
+For the UI to get the relevant data from the Jolie code, the VS Code extension invokes the \nodetoolname[], with the correct parameters, which invokes the \javatoolname[] program.
 \nodetoolname[] listens for the output of the \javatoolname[] program,
 meaning that the \nodetoolname[] functions as a wrapper for the \javatoolname[] program so the VS Code extension does not have to invoke \javatoolname[] directly,
 and sends the data to the VS Code extension, which sends the data to the user interface.
@@ -33,13 +33,16 @@ The data needed for the tool is a list of interfaces, a list of types and the li
 \subsection{Interfaces \& Types}
 Each interface in the list of interfaces has a name, identifier, file path, and two lists of operations.
 One of the lists contains all one-way operations, and the other contains all request-response operations.
-The request-response operations consist of the operation name, the request type name and file path pair and the response type name and file path pair, and for one-way operations it is similar but with the response type omitted.
+% The request-response operations consist of the operation name, the request type name and file path pair and the response type name and file path pair. For one-way operations it is similar but with the response type omitted.
+The request-response operations consist of the operation name along with two pair objects. The pair objects contain a type name and file path.
+The request-response operations have a pair object for the request type and a pair object for the response type.
+One-way operations contain the same information but not a pair object for the response type.
 
-Having the type name and file path pair as a separate type object list instead of the type object directly in the specific interface object is a design decision made at the very start of the development process.
-Each interface could have a list of types which will save computation when the user clicks on the type in the sidebar and the type is displayed because only the interface's list of types needs to be searched for the correct type.
+Having the type name and file path pair as a separate type object list instead of the type object directly in the specific interface object is a design decision made at the very beginning of the development process.
+Each interface could have a list of types which will save computation when the user clicks on the type in the sidebar and the type is displayed because only the interface's list of types needs to be searched to receive the correct type.
 This, however, has the drawback of a lot of duplication, only if all interfaces in the system use a unique set of types can this issue be avoided.
-This is why a global list of types is used. The interfaces then reference what types are used for operation and the global list of types can be used when using the sidebar to view interfaces and types, and by
-using the Jolie language constraint of no duplicate type names in the same OL file, the file path and type name are enough to find the correct type when searching for it.
+This is why a global list of types is used. The interfaces reference what types are used for the operations and the global list of types can be used when the sidebar displays the information about interfaces and types.
+By using the Jolie language constraint of no duplicate type names in the same \texttt{.ol} file, the file path and type name pair is sufficient to find the correct type.
 
 The list of types, as mentioned, contains all types used by all interfaces in the architecture.
 Each type object in the list represents the information about a type in the code, this includes the name of the type, the file in which the type is defined, the root type, subtypes which is a list of types as well, and cardinality of the type in case of this being defined.
@@ -54,7 +57,7 @@ This approach draws inspiration from how bigraphs are used to model software arc
 The nodes in the system of the bigraph can be directly mapped to Jolie services. Bigraphs also model ports which are a component of Jolie services as well.
 The data representation used for the tool draws the most inspiration from the place graph since the link graph is inferred by the locations and protocols of the ports in Jolie.
 A place graph models the topology and the networks, which are called \emph{roots} in bigraph terminology, and also embeddings, which are called \emph{nestings}.
-The bigraph inspiration is taken from \emph{The Space and Motion of Communicating Agents} by Robin Milner \cite{BigraphBook}, where bigraphs are formally introduced and explained but are not necessary for this use-case.
+The bigraph inspiration is taken from \emph{The Space and Motion of Communicating Agents} by Robin Milner \cite{BigraphBook}, where bigraphs are formally introduced and explained but are not necessary for this use case.
 
 The place graph component can be seen as a list of trees where the root is the network and contains all top-level services as immediate children and embeddings of the top-level services are the children of those services.
 This fits well with how a Jolie system can be modelled, so the list of services in the global JSON is essentially a place graph or a list of trees where each node is a service in the system.
@@ -69,7 +72,7 @@ An example of the JSON data used to represent services and ports from Jolie can 
 The architectural programming features in Jolie also need to be represented in the data to visualize it in the tool's UI.
 This includes couriers, collections, aggregations, and redirections. The information is represented in the ports of the JSON since the features are port specific and are either created in ports or reference ports in the code.
 
-Aggregations in the JSON are represented by the name of the output port to aggregate to, optionally the aggregate can have an interface extender which is defined here.
+Aggregations in the JSON are represented by the name of the output port to aggregate requests to, optionally the aggregate can have an interface extender which is defined here.
 Collections are essentially a list of aggregations, so collections are also represented in the aggregates as a list of names of the output ports, and because multiple output ports of one service cannot have identical names, this will not create ambiguity.
 
 Couriers are defined in Jolie based on an input port with aggregation, so the port also represents the couriers of that port.
@@ -97,9 +100,14 @@ The JSON data generated to create the prototype can be seen in \cref{appen:jolie
 The \nodetoolname[] functions as a wrapper for the \javatoolname[] program. It is created so the VS Code application does not have to execute the \javatoolname[] program directly and also if the tool should be extended to other code editors or run in the browser, this functionality should not be implemented in the VS Code extension.
 The \nodetoolname[] also makes sure to return errors if a parsing error occurs or if Jolie is not installed correctly.
 
-This part of the tool consists of three parts, the data fetching part which executes the \javatoolname[] program and checks for errors, the server part which allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality, and
-prototyping which is identical to the functionality in the VS Code extension, but this can be used if the user of the tool installs only this part of the tool without the VS Code extension.
-The server uses the express framework\footnote{Express Framework - \url{https://expressjs.com/}} to open an endpoint to get the JSON data and also serve the webpage as static assets on localhost.
+% This part of the tool consists of three sub-parts, the data fetching part which executes the \javatoolname[] program and checks for errors, the server part which allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality, and
+% prototyping which is identical to the functionality in the VS Code extension, but this can be used if the user of the tool installs only this part of the tool without the VS Code extension.
+This part of the tool consists of three sub-parts.
+The first sub-part is the data fetching part. It executes the \javatoolname[] program and checks for errors. The second sub-part is the server part. It allows the developer to visualize their program's architecture directly in the browser but without the code refactoring functionality. 
+Lastly, there is the prototyping sub-part. It is identical to the functionality in the VS Code extension. However, it can be used separately if the user installs only this part of the tool without the VS Code extension.
+
+The server part uses the express framework\footnote{Express Framework - \url{https://expressjs.com/}} to open an endpoint to get the JSON data and also serve the webpage as static assets on localhost.
+
 
 \section{The \javatoolname[] Program}
 % how the data is fetched in the Java tool
@@ -129,11 +137,11 @@ The operations are also parsed using type comparison, since two types of operati
 The interfaces are added to a global object \emph{JolieSystem} which has information about all parsed services, interfaces and types.
 
 For input ports specifically, information about aggregates, collections, couriers and redirects is also stored. Redirects can be seen as a mapping where a resource is mapped to a port name. This is how the Jolie parser represents redirects as well, so this is simply copied over to the tool's representation.
-Aggregates are simply a name of an output port but can contain collections and interface extenders, however, Jolie's internal representation of aggregates contains this information so the interface extender just has to be created to match the tool's representation of interfaces, and collections are a list of output ports which will be copied directly.
+Aggregates are simply a name of an output port but can contain collections and interface extenders, however, Jolie's internal representation of aggregates contains this information so the interface extender just has to be created to match the tool's representation of interfaces, and collections are a list of output ports which are copied directly.
 
 When the interfaces are created the types used in the operations are also parsed and created in an internal representation.
 This representation stores information about the root type, cardinality, subtypes, etc.
-The types in Jolie can also be three different AST node types, namely definition links, inline definitions and choice definitions. Type comparison is also used here to parse the type correctly depending on the AST node type.
+The types in Jolie can be three different AST node types, namely, definition links, inline definitions and choice definitions. Type comparison is also used here to parse the type correctly depending on the AST node type.
 Types are, similarly to interfaces, added to the system's global list of types.
 
 Each building block of a Jolie service has an internal representation in the \javatoolname[] program and all of them have a \texttt{toJSON} method which takes all information stored in the objects and creates a JSON object.
@@ -141,16 +149,16 @@ When the tool invokes the \javatoolname[] program to get the JSON data, the \tex
 This will result in a JSON object which resembles the data representation discussed in the previous section, and this JSON can be used by the other components of the tool.
 
 \subsection{Generating the Prototype Data}
-The \javatoolname[] also creates data for making the prototype. This includes the content of the Docker-Compose YAML file and the information needed for creating the service folders and the resource folder.
+The \javatoolname[] program also creates data for making the prototype of the application. This includes the content of the Docker-Compose YAML file, as well as, the information needed for creating the service folders and the resource folder.
 After the whole system has been parsed and a JolieSystem is created, the system will be given as a parameter to a \emph{build} object which will handle the logic for creating the JSON data.
 The builder will first create the service folders using the services in the networks from the JolieSystem object. Duplicate build folders will be checked for at this stage, which is done to make sure that duplicate images will not be generated when using Docker-Compose.
-However, as mentioned in a previous section, two identical services can be two different images if, for example, the runtime arguments are different. This is also handled here.
+However, as mentioned in a previous section, two identical services can be two different images if, for example, the runtime arguments are different. This check is also handled here.
 The build folders contain a list of files which are needed for the service to run. This is essentially the file in which the target service resides and all dependency files.
 To get all the dependencies of a service, the service representation in the system inspector has a set of strings corresponding to the file URIs of the imported symbols.
 When the inspector goes through embeddings, types, interfaces, etc, of a service it adds all file URIs to the set which can be used to make the list of dependencies when creating the build folder.
 
-After the build folders have been created as internal objects, they are parsed onto another object which builds the Docker-Compose YAML string. The JolieSystem is also used here to create the networks in the Docker-Compose file.
-The Docker-Compose builder also has some internal representation of what a service is, since two services in Docker-Compose can use the same image but have different deployment properties, which means that they should be created as separate services in Docker-Compose, but they will not have two different service folders.
+After the build folders have been created as internal objects, they are parsed onto another object which builds the Docker-Compose YAML string. The JolieSystem is used here to create the networks in the Docker-Compose file.
+The Docker-Compose builder has some internal representation of what a service is, since two services in Docker-Compose can use the same image but have different deployment properties, which means that they should be created as separate services in Docker-Compose, but they will not have two different service folders.
 The Docker-Compose builder uses a string builder to create the YAML file content. It goes through all services and creates an internal \emph{compose service} and like with the service folders, composes duplicates and counts replicas.
 
 The networks are also created in the Docker-Compose YAML, which can have another semantic meaning from the networks defined in the architecture file.
@@ -166,11 +174,11 @@ The tool's user interface is essentially a static webpage where the JSON data is
 The UI uses CSS for styling and JavaScript for the logic, like most standard websites.
 
 However, creating a very feature-heavy reactive user interface in standard CSS and JavaScript is almost impossible in a reasonable amount of time.
-The first improvement to the development of the UI was to replace JavaScript with TypeScript (TS).
+The first improvement to the development of the UI was to replace JavaScript with \emph{TypeScript} (TS).
 TS is a transpiled and typed programming language, created by Microsoft, which is a superset of JavaScript. It compiles directly to JavaScript which makes it usable by the UI webpage.
 Some of the benefits of using TS include type checking, self-documenting code, interfaces, and generally enhanced productivity.\footnote{TypeScript - \url{https://www.typescriptlang.org/}}
 
-Writing standard CSS can also be a very tedious process, so to enhance the development experience TailwindCSS, or just Tailwind, is used.
+Writing standard CSS can also be a very tedious process, so to enhance the development experience \emph{TailwindCSS}, or simply Tailwind, is used.
 Tailwind is a CSS framework which aims to move CSS to the HTML components. CSS properties are defined in the class attributes of the HTML components where readable class names have been defined meaning that any combination of these classes can be used to style components.
 Tailwind also defines a design system which a developer can use to enforce a standard when it comes to the design of the UI, and with tools like \emph{postcss} and \emph{autoprefixer} the build size of the utility CSS components will be kept at a minimum.\footnote{TailwindCSS - \url{https://tailwindcss.com/}}
 
@@ -203,7 +211,7 @@ This library is also a graph visualization and layout library. It comes with a l
 not possible, but also that many of the built-in features do not fit the visualization tool.
 
 The framework that was chosen for the tool is Eclipse Layout Kernel (ELK) \cite{ELK}
-which is a layout framework with a collection of different layout algorithms. The tools currently use the layered layout algorithm which is based on \emph{Methods for Visual Understanding of Hierarchical System Structures} by Sugiyama, Tagawa and Toda \cite{4308636}. ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
+which is a layout framework with a collection of different layout algorithms. The tool currently uses the layered layout algorithm which is based on \emph{Methods for Visual Understanding of Hierarchical System Structures} by Sugiyama, Tagawa and Toda \cite{4308636}. ELK supports embeddings, ports and edges. This is essentially everything the tool needs for the layout capabilities.
 ELK only does layout, however, so the rendering needs to be done by a separate library, where D3 is chosen to render the components of the architecture when ELK has done the layout.
 \cref{figure:elk_example} shows a system being laid out using ELK.
 
@@ -214,49 +222,49 @@ The drawbacks of using ELK do not outweigh the benefits. Having direct support f
 ELK has a TypeScript version, so it can easily be used with the rest of the user interface. To make ELK calculate the layout of the JSON data from \javatoolname[] it needs to be converted into a format which ELK understands.
 ELK has a textual graph DSL but also supports a specific JSON format, which is used by the tool because of simple conversion. This format can be seen in \cref{lst:elk_json}.
 
-\begin{figure}[t]
-    \center
-    \includegraphics[width=0.80\textwidth]{figures/elk.png}
-    \caption{A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are also calculated. The rendering of the system is not done using ELK. Source: \url{https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}}
-    \label{figure:elk_example}
-\end{figure}
-
-\begin{jsonlisting}[][caption={The ELK JSON format}, label={lst:elk_json}]
-{
-    "id": "root",
-    "layoutOptions": { "algorithm": "layered" },
-    "children": [
-        { "id": "n1", "width": 30, "height": 30 },
-        { "id": "n2", "width": 30, "height": 30 },
-        {
-            "id": "n3",
-            "width": 30,
-            "height": 30,
-            "ports": [
-                { "id": "p1", "width": 5, "height": 5 },
-                { "id": "p1", "width": 5, "height": 5 }
-            ]
-        }
-    ],
-    "edges": [
-        { "id": "e1", "sources": [ "n1" ], "targets": [ "n2" ] },
-        { "id": "e2", "sources": [ "n1" ], "targets": [ "n3" ] }
-    ]
-}
-\end{jsonlisting}
-
 When the UI receives the JSON data containing the networks with services, the ELK graph is created based on the JSON data.
 The networks are the children of the root node of the ELK graph. This is specified in the \texttt{"children"} field of the ELK JSON.
 ELK nodes in the graph have a field for ports, which are positioned around the node when the layout algorithm is invoked.
+
+\begin{figure}[t]
+    \center
+    \includegraphics[width=0.80\textwidth]{figures/elk.png}
+    \caption{A system using ELK to layout each component of the system including ports and embeddings. Connections between ports are calculated as well. The rendering of the system is not done using ELK. Source: \url{https://www.eclipse.org/elk/img/example_layout_complexRouter.svg}}
+    \label{figure:elk_example}
+\end{figure}
 
 To connect the ports with edges, edge objects can be added to the ELK nodes. Embedded connections will be placed in the parent's edge list in the ELK graph, and inter-service connections will have edges in the network containing the services.
 Multiple local output ports are handled so the UI can differentiate between local output ports when embedding and disembedding services to avoid removing unwanted ports or rendering connections between ports which should not be there.
 This is done in a preprocessing step when the UI gets the Jolie system JSON, where local input ports will be matched to the corresponding output port of the embedder and the location will be unique between the two ports to remove ambiguity.
 Connections that are happening between networks are placed at the root of the ELK graph. To determine what edges should be added to the graph, all output ports will be checked to see if a matching input port exists anywhere.
 
+\begin{jsonlisting}[][caption={The ELK JSON format}, label={lst:elk_json}]
+    {
+        "id": "root",
+        "layoutOptions": { "algorithm": "layered" },
+        "children": [
+            { "id": "n1", "width": 30, "height": 30 },
+            { "id": "n2", "width": 30, "height": 30 },
+            {
+                "id": "n3",
+                "width": 30,
+                "height": 30,
+                "ports": [
+                    { "id": "p1", "width": 5, "height": 5 },
+                    { "id": "p1", "width": 5, "height": 5 }
+                ]
+            }
+        ],
+        "edges": [
+            { "id": "e1", "sources": [ "n1" ], "targets": [ "n2" ] },
+            { "id": "e2", "sources": [ "n1" ], "targets": [ "n3" ] }
+        ]
+    }
+\end{jsonlisting}
+
 When the ELK graph has been populated with the necessary nodes and edges, the layout is calculated. All the components of the graph get a position and size, and all edges get a list of points. D3 can then render the graph components.
 The ELK JSON represents what is rendered in the UI, so embeddings of the top-level services are not added to the ELK graph. When the user of the tool expands a service the embedded services will be added to the ELK graph and
-everything gets recalculated and then they are re-rendered correctly in the UI. Generally, every time the user does something in the UI which requires the ELK graph to be modified, the layout algorithm is run.
+everything gets recalculated and then they are re-rendered correctly in the UI. Generally, every time the user does something in the UI which requires the ELK graph to be modified, the layout algorithm is invoked.
 
 \subsection{UI Framework}
 To facilitate the reactivity needed for the UI when the user starts manipulating the architecture, a UI framework called \emph{Svelte}\footnote{Svelte - \url{https://svelte.dev/}} is used.
@@ -271,7 +279,7 @@ The service components also have edge components which represent the internal ed
 The zoom component which handles the scaling and transposition of the SVG is also added to the root component to enhance user experience.
 
 All components in Svelte have lifecycles which are utilized to render the components with D3.js.
-The lifecycle loop consists of four stages where all of which have event handlers directly accessible in the TypeScript code in Svelte files. This means that each component can run code at any stage of its lifecycle.
+The lifecycle loop consists of four stages where all have event handlers directly accessible in the TypeScript code in Svelte files. This means that each component can run code at any stage of its lifecycle.
 The four events are: \emph{before update}, \emph{on mount}, \emph{after update}, and \emph{on destroy}.
 \emph{Before update} happens before anything else. It runs every time the component is updated and before the DOM is created.
 \emph{On mount} runs only once when the component is created and runs right after the DOM is created. 
@@ -298,7 +306,7 @@ In this UI, stores are used to keep a state of what is displayed in the sidebar 
 
 \section{Visual Studio Code Extension}
 The VS Code extension generally consists of the activation events, contribution points and a web view.
-The activation events determine what will activate the extension. An example could be that would be when a certain file type is opened, the plugin is activated.
+The activation events determine what will activate the extension. An example could be when a certain file type is opened, the plugin is activated.
 For this extension, the activation events happen by commands which the user can type into VS Code. The commands are displayed in \cref{appen:vscode_commands}.
 
 The contribution points\footnote{Contribution Points in VS Code - \url{https://code.visualstudio.com/api/references/contribution-points}} are declarations of enhancement that the extension does. There is a long list of different functionalities which can be extended.
@@ -327,7 +335,8 @@ This is useful because the extension can invoke LSP functions programmatically. 
 
 \subsection{Live Updates}
 When the user of the tool changes something in the code while the tool is running, the visualization UI automatically reflects the changes done in the code.
-Two event listeners are used to keep the UI up-to-date with the code when a change happens in the code. \texttt{OnWillSave} and \texttt{OnSave}.
+Two event listeners, \texttt{OnWillSave} and \texttt{OnSave}, are used to keep the UI up-to-date with the code when a change happens.
+
 \texttt{OnWillSave} is an event which fires when the user saves a document but before the \texttt{OnSave} event is fired. The purpose of this event listener is
 to check if a service name of a service which is declared in the architecture file has been changed. If the name of a service was changed, the event listener updates the architecture file content to reflect the change before moving on to the \texttt{OnSave} event listener.
 
@@ -340,7 +349,7 @@ To facilitate the refactoring of code from the UI, the JSON data also needs to c
 This is done using the \emph{parsing context} from the Jolie parser. When the Jolie parser creates the AST it keeps track of where tokens are in the file and what ranges a code block spans over.
 This information is saved in the JSON which \javatoolname[] creates as ranges with a name indicating what the range spans over.
 \cref{lst:code_ranges} shows how the code range is saved in the Jolie system JSON.
-
+\clearpage
 \begin{jsonlisting}[][caption={JSON representing a code range created by the Jolie parser}, label={lst:code_ranges}]
 {
     "ranges": [
@@ -359,8 +368,8 @@ This information is saved in the JSON which \javatoolname[] creates as ranges wi
 }
 \end{jsonlisting}
 
-All refactorable components in the code must have a corresponding code range. Protocols,
-locations and port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
+All refactorable components in the code must have a corresponding code range. 
+Protocols, locations, and the port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
 
 When the user makes an edit in the UI, this can be either creation of ports or the renaming of properties, the UI sends a message to VS Code using the VS Code message API, with the necessary data for the refactor. This includes
 the code range, the new text and what file it happens in. VS Code has an API to create \emph{workspace edits}\footnote{VS Code workspace API - \url{https://code.visualstudio.com/api/references/vscode-api\#workspace}} which will add or replace text in code using internal position and range representations.
@@ -368,7 +377,7 @@ VS Code has an internal object which represents a code range, which is used by t
 This means that conversion needs to happen when the code range is used in the VS Code extension.
 
 When the edit has been created internally it is not yet applied to the document, because it is often the case that multiple edits should happen when a change happens in the UI.
-All edits are saved to a list, and when the last edit request comes from the UI, the whole list of edits is sorted according to position in the file, so the edits which are applied further down the document gets applied first to keep the positions and ranges intact for the other edits not yet applied.
+All edits are saved to a list, and when the last edit request comes from the UI, the whole list of edits is sorted according to position in the file, so the edits which are applied further down the document get applied first to keep the positions and ranges intact for the other edits not yet applied.
 After the edits have been applied, the reflected changes can be seen in the source code as well as the UI.
 
 This functionality is used for all types of edits done in the UI, including embedding and applying architectural patterns, to make all edits atomic without having to make specific interfaces for all types of edits possible. 
@@ -377,7 +386,6 @@ This allows reusability of the refactor requests, and also the possibility to se
 Another type of edit can be used when renaming symbols, like service names, interface names, type names, or port names. This must be done carefully because these names can be imported by other files which means that the names must be updated everywhere.
 The LSP specification provides functionality for renaming a symbol which must be implemented by the language server protocol implementation for Jolie.
 VS Code can execute this function using the built-in command highlighted earlier. This needs a position of the symbol and what the new name is. The LSP then returns a list of workspace edits which can be applied directly in VS Code.
-
 
 \subsection{Embedding \& Disembedding}
 The user of the tool can drag around the services in the UI, and by dropping them on top of another service or outside the parent service, it will embed or disembed respectively.
@@ -388,11 +396,11 @@ Case two is when the embedded service already has a local port which is not conn
 The final case is when no free ports exist in the services, and new ports should be created to accommodate the embedding. A pop-up window will appear requiring the user to 
 type in the necessary information to create a new local input port for the embedded service. This is a shortcut to first creating a local port using the sidebar and then embedding using case two.
 
-On the side of the VS Code extension, embeddings are a change to the architecture file, a port creation in some cases, and an addition of an "embed" line.
+In the context of the VS Code extension, embeddings are a change to the architecture file, a port creation in some cases, and an addition of an "embed" line.
 
 \subsection{Auto Import}
 When a port is created the interfaces specified are not necessarily imported correctly into the service needing it.
-If the correct interface is not imported, either explicitly or via the \texttt{*} notation,
+If the correct interface is not imported, either explicitly or via the \texttt{*}-notation,
 the VS Code extension goes through all Jolie source code files in the workspace, using the workspace API, and tries to find the symbol needed. If it is interfaces that it is trying to find
 it will look for the interface name prefixed with \emph{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
 

@@ -1,16 +1,16 @@
 \chapter{Discussions \& Conclusions}
 The implementation details of the tool have been explained in depth. Some of the design decisions which has been made during the development of the tool have also been briefly discussed.
-This discussion chapter will dive more into the details of the development process, and elaborate more on what else was tried and tested to achieve the current result.
+This discussion chapter will go into the details of the development process, and elaborate more on what else was tried and tested to achieve the current result.
 
 This chapter will elaborate on the important discussion topics being made throughout the development process of the tool, and explain how
 some of the bigger design decisions were made.
 
-The chapter will also discuss what similar tools exist and how the tool compares to these tools. Lastly, how the tool can be developed further to enhance user experience, and what features and changes could be made to the tool to either make it more useable
+The chapter will also discuss what similar tools exist and how this tool compares to them. Lastly, how the tool can be developed further to enhance user experience, and what features and changes could be made to either make the tool more useable
 or solve more problems for the user. This will also serve as a discussion of the shortcomings of the tool.
 
 All sections of this chapter will also have a small conclusive part to each of the aspects. This means that no separate conclusion chapter will follow this chapter. However, this chapter will end with a short conclusion of the thesis.
 \section{Reconnaissance}
-The tool has been through one major revision before reaching the state that it is in now. This section
+The tool has been through one major revision before reaching the state it is in now. This section
 will explain the \emph{first version} of the tool, briefly how it was implemented, and why the revision was needed.
 The first version served as a way to get familiar with visualization and D3.js. It was also a tool where different approaches were tested to see what works and what does not.
 
@@ -19,7 +19,7 @@ The first version was a Java program which had an open server socket. From this 
 This approach requires that a port is open on the machine whenever the tool is running.
 
 It was never tested with VS Code so it is not certain how VS Code would incorporate a tool like this. One idea is
-that the tool must be running on the host machine, essentially as a server, and a client in VS Code would need to fetch the user interface from the specified endpoints.
+that the tool must be running on the host machine, essentially as a server, and a client in VS Code would need to fetch the user interface from the specific endpoints.
 The client in the VS Code extension would be a web view as it is at the moment.
 Whenever an update to the Jolie code is made the client in the VS Code web view will have to fetch data from all endpoints again.
 
@@ -46,7 +46,7 @@ is not clear to an inexperienced Jolie developer what is the embedder service an
 This is why the current version of the tool has chosen a more \emph{traditional} approach to the service shapes. It does not imply a flow and it can be easier to visualize more complicated architectures.
 
 The UI for the first version is grid-based where all services can be moved around and will snap to the grid.
-The reason a grid is used is that the edges that represent the connection between ports are calculated using the \emph{A*} pathfinding algorithm\footnote{A* pathfinding algorithm - \url{https://en.wikipedia.org/wiki/A*_search_algorithm}}, so each point in the grid is essentially used as a point in a graph that the pathfinding algorithm can use.
+The reason a grid is used is that the edges that represent the connection between ports are calculated using the \emph{A*} pathfinding algorithm,\footnote{A* pathfinding algorithm - \url{https://en.wikipedia.org/wiki/A*_search_algorithm}} so each point in the grid is essentially used as a point in a graph that the pathfinding algorithm can use.
 This also means that invisible walls are created around the services and ports to ensure that paths do not go through other services or ports.
 The current version of the tool has hexagons as service shapes, so to facilitate the possibility of having ports on all sides of the shape, the pathfinding from the output port to the input port must be handled differently.
 One idea which was tried is connecting services instead of ports, and then drawing the port shapes at the edge of the service shape where the connection intersects the service shape.
@@ -55,7 +55,7 @@ A grid is not used in the current version of the tool because ELK is used to mak
 \begin{figure}[t]
 \center
 \includegraphics[width=0.8\textwidth]{figures/old_ui.png}
-\caption{A very early version of how the first version of the tool displayed service shapes and the sidebar. No layout algorithm is used to place the services correctly on the grid in this version.}
+\caption{A very early version of how the first version of the tool displayed service shapes (orange) and the sidebar (blue). No layout algorithm is used to place the services correctly on the grid in this version.}
 \label{figure:old_ui}
 \end{figure}
 
@@ -63,7 +63,7 @@ A grid is not used in the current version of the tool because ELK is used to mak
 The first version of the tool uses a simple custom layered layout algorithm. This is possible because the services have a direction.
 The algorithm works by placing each service in a horizontal layer based on how many of each port it has. The starting number of layers is determined by the width of the screen and each layer has a set height limit so when services exceed the limit an adjacent layer is created.
 Services with only one input port are placed in the left-most layer, and services with only one output layer are placed in the right-most layer.
-The services in between will be ordered so the service with most \emph{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
+The services in between will be ordered so the service with the most \emph{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
 
 This algorithm is very simple. It worked on the handful of tested examples from the Jolie GitHub repository.\footnote{Jolie Examples on GitHub - \url{https://github.com/jolie/examples/tree/master}}
 But when the system becomes more complex connection-wise, it can quickly break or incomprehensible. One advantage of using this algorithm is that the user can drag around the services if the initial layout is bad.
@@ -73,9 +73,9 @@ ELK uses a variety of researched layout algorithms which are more robust than th
 
 \subsection{UI Framework}
 The introduction of a UI framework was made because of the component tree, lifecycle events, and reactivity. Before Svelte was used to create the user interface, it was created in pure TypeScript.
-The UI in the first version has no lifecycle events, all JavaScript is loaded after the DOM is created.
-The control flow of the user interface is that after the DOM has loaded all the Jolie system JSON data is loaded and preprocessed very similarly to the current version, but here, the custom layout algorithm is used.
-Then all components are added to the DOM, under one parent container, using jQuery\footnote{jQuery - \url{https://jquery.com}} and rendered using D3.js. Lastly, the event listeners are added to the system components. The event listeners include the mouse listener for moving the service shapes around and opening the sidebar to display information about the components.
+The UI in the first version has no lifecycle events. All JavaScript code is loaded after the DOM is created.
+The flow of the user interface is that after the DOM has loaded all the Jolie system JSON data is loaded and preprocessed very similarly to the current version, but here, the custom layout algorithm is used.
+Then all components are added to the DOM, under one parent container, using \emph{jQuery}\footnote{jQuery - \url{https://jquery.com}} and rendered using D3.js. Lastly, the event listeners are added to the system components. The event listeners include the mouse listener for moving the service shapes around and opening the sidebar to display information about the components.
 When the user interface is updated by the user, a re-rendering happens. Since all system DOM elements are added under one parent container element, that specific element is simply cleared and the rendering is invoked to populate it with the updated elements.
 
 This approach of using pure TypeScript/JavaScript is not inherently wrong. After all, Svelte compiles down to optimized JavaScript.
@@ -101,9 +101,9 @@ Different representations of the Jolie system JSON were tested. There are some t
 The interface list in the JSON does not have to be a global array. Interfaces are only used by ports which reside in the services, structurally, and at the moment the interfaces in a port simply contain the name and file path pair of the interfaces used. This could be switched out with the whole interface object.
 This would, however, result in at least twice the size of all interfaces, because each time an interface is used the whole interface JSON object is created. Input and output ports share interfaces which means that for every connection between ports, an interface is duplicated.
 
-The global list of types has a similar problem but can be avoided a bit easier. Types can be created under the interfaces which use them, which would remove the need for a global list, but again if the interfaces are created under ports, each type will be duplicated in the JSON. 
-If the global list of interfaces is kept, but the types are created under the individual interface that uses them, much of the duplication can be avoided if the user never reuses any types. Doing this duplication of the interfaces and types can save computation when the user interface needs to determine which interface and type is used by a port. 
-When the types and interfaces are displayed in the sidebar, the correct type or interface in the global lists must be found in order to display the correct information. This search time can be reduced if the ports simply have a copy of the interfaces it uses, and the interfaces have copies of the types.
+The global list of types has a similar problem but can be avoided a bit easier. Types can be created under the interfaces that use them, which would remove the need for a global list, but again if the interfaces are created under ports, each type will be duplicated in the JSON. 
+If the global list of interfaces is kept, but the types are created under the individual interface that uses them, much of the duplication can be avoided if the user never reuses any types. Doing this duplication of the interfaces and types can save computation when the user interface needs to determine which interfaces and types are used by a port. 
+When the types and interfaces are displayed in the sidebar, the correct type or interface in the global lists must be found to display the correct information. This search time can be reduced if the ports simply have a copy of the interfaces it uses, and the interfaces have copies of the types.
 
 However, this duplication approach was not chosen as the final solution for the tool.
 The amount of duplicate data does not weigh up for the amount of computation needed if no duplicated data is present.
@@ -114,9 +114,9 @@ The components in the tool communicate via messages and parse the whole Jolie sy
 This section will go into different aspects where Jolie is lacking either features or concepts.
 This is in the context of the tool only, meaning that these aspects would benefit the tool in some way.
 
-Jolie is a language in development which means that some useful conventions still need to be defined.
-The prototyping feature tries to be as general as possible which in some way prevents the feature to be fully fletched
-and being a tool for creating deployment instead of just a prototyping tool.
+Jolie is a language in development which means some useful conventions still need to be defined.
+The prototyping feature tries to be as general as possible which in some way prevents the feature to be more complete,
+and be a tool for creating deployment instead of just a prototyping tool.
 The tool will benefit a lot from having more language-specific conventions like project file structures.
 This will make the tool more robust when creating the prototyping. The Jolie package manager can be a solution
 to the problem with the file structure. JPM is still in development which means that the specification can change, so the tool does not utilize any set file structure by JPM.
@@ -125,7 +125,7 @@ to the problem with the file structure. JPM is still in development which means 
 Jolie currently has no way of representing the architecture in code which is why the architecture JSON file is needed.
 A JSON configuration file is a common practice but can be unnecessary overhead if it is not intuitive to the user of the tool.
 Another idea is to use Docker-Compose to represent networks and top-level services. The point is to have the user define the architecture while they are creating the deployment.
-This is however not the chosen solution because the tool should not lock the user to a specific deployment tool or software.
+This is, however, not the chosen solution because the tool should not lock the user to a specific deployment tool or software.
 Custom fields are possible in Docker-Compose but it is far from as intuitive as JSON is, and it will lock the tool into only using Docker-Compose so a whole new 
 parser for the architecture file would need to be created for all deployment tools.
 
@@ -140,7 +140,7 @@ Ultimately the tool is keeping the JSON configuration as of now. JSON is easy to
 \subsection{Language Server Protocol}
 The language server protocol implementation has some missing language features which the tool would like to utilize.
 The renaming capabilities are very useful when renaming interfaces, types, and services if they are imported elsewhere. This feature of the LSP is not working at the time of writing this thesis.
-The tool is simply using the LSP for renaming \emph{as if} the renaming feature is implemented correctly, so if the feature will be added to the LSP the tool does not need any further update.
+The tool is simply using the LSP for renaming \emph{as if} the renaming feature is implemented correctly. If the feature will be added to the LSP the tool does not need any further update.
 No alternative implementation of this language feature has been developed for the tool. If the LSP does not implement the renaming feature, the VS Code extension should have a custom renaming provider.
 This can be implemented in various ways, but one idea is to have a big symbol table where all symbols are added with references to everywhere it is used. This way the VS Code extension can go through all locations and create the corresponding workspace edits.
 
@@ -157,7 +157,7 @@ There are many tools which can be used to visualize the architecture of an appli
 The tools mentioned are not comparable with this tool since they all require the user to manually sketch out the architecture, which requires the user to have an understanding of the architecture before using the tool.
 This tool aims to help the developer get an understanding of the architecture while they are building it, and not only serve as a tool to convey the architecture to others.
 
-This tool analyzes the code in order to visualize the architecture, which a handful of other tools also do. 
+This tool analyzes the code to visualize the architecture, which a handful of other tools also do. 
 The level of abstraction varies a lot from tool to tool. Some tools analyse the flow of a codebase, which means how the different classes or files in 
 a codebase are connected. This is similar to how a UML diagram will visualize a system. \emph{Code2Flow}\footnote{Code2Flow Github - \url{https://github.com/scottrogowski/code2flow}} is a tool which visualizes the control flow of the source code of a handful of dynamic languages. Other tools like \emph{CodeSee}\footnote{CodeSee - \url{https://www.codesee.io}} visualize different levels of abstraction allowing the user to see the architecture of the application.
 CodeSee is a proprietary product with a free tier, however, the free tier does not offer many capabilities.
@@ -169,14 +169,14 @@ CodeSee and docker-compose-viz do not offer any form of refactoring capabilities
 Most IDEs provide refactor capabilities using the language server protocol, which often happens directly in the code.
 However, several tools exist for code analysis and code generation but are not tied to any visualization.
 This tool is trying to do what most of these tools do but with a focus on visualization and refactoring, whereas many of the tools mentioned focus on one of these aspects.
-This tool is also only for Jolie and is meant to be a part of the Jolie ecosystem. The other tools mentioned are more general solutions and support a variety of programming languages.
+This tool is only for Jolie and is meant to be a part of the Jolie ecosystem. The other tools mentioned are more general solutions and support a variety of programming languages.
 This tool enhances the development experience of Jolie developers, which was the aim of this thesis. It also provides visualization and refactoring capabilities in one solution.
 
 \section{Future Development}
 In this section, some potential future improvements will be discussed.
 This is only in the scope of the tool and is assuming that other shortcomings of Jolie are resolved, so things like the LSP and a definition of architecture in Jolie will not be discussed further.
 
-The UX of the tool is one aspect which has not been focused on. This is something that can be heavily improved.
+The user experience of the tool is one aspect which has not been focused on. This is something that can be heavily improved.
 The services are stationary within their network, which removes a lot of the freedom in visualizing the architecture of a program.
 In ELK it is possible to give nodes and ports a fixed position, so to have this improvement would require that when the user drags and drops a service inside the same network it will set a fixed position depending on the translation and scale of the whole graph and the mouse position in the web view.
 
@@ -200,9 +200,9 @@ defined in a separate language/technology which the tool could support, like LEM
 \subsection{Migrating From VS Code}
 Having the tool directly integrated into VS Code is very powerful, no switch of windows is needed to view the architecture. Jolie source code and visualization side by side.
 However, it is desirable to not be locked into a specific technology or editor, so creating more clients for the tool can be a useful future addition.
-The tool utilizes the VS Code API in order to edit the code. However, since VS Code uses NodeJS as runtime, it is possible to create
+The tool utilizes the VS Code API to edit the code. However, since VS Code uses NodeJS as runtime, it is possible to create
 a simplified version of the VS Code API separately, at least the part of the API which the tool uses, to be more inclusive to other editors.
-The API can be contained within the NPM package and will then run anywhere where NodeJS can run, and the visualization can be in the browser, which is much more versatile than locking into VS Code.
+The API can be contained within the NPM package and will then run anywhere NodeJS can run, and the visualization can be in the browser, which is much more versatile than locking into VS Code.
 implementing this separate API would be time-consuming and utilizing the VS Code API is more robust.
 
 Introducing a new protocol for communication between the UI and VS Code could also be an improvement. Switching to Web Sockets\footnote{Web Socket protocol - \url{https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API}} to facilitate two-way communication would remove the need for the VS Code messaging API.
@@ -235,7 +235,7 @@ The user can further enhance the architecture of their application by applying a
 
 When the user is satisfied with the architecture and the services. The user can create a prototype of the deployment. This will utilize Docker and create the necessary images while Docker-Compose will handle the networks and creation of the containers, as well as, the orchestration of the containers.
 
-Different approaches for each aspect of the tool have been tested in order to get the current result.
+Different approaches for each aspect of the tool have been tested to get the current result.
 The benefits and consequences of each design decision have been discussed, and future development has been planned to further enhance the functionality of the tool. The future enhancements include making the tool more universal and adding more refactoring capabilities, as well as, enhancing the user experience.
 
 Links to the Github repositories containing the full source code of the VS Code extension and the JolieVisualize NodeJS module can be found in \cite{jv} and \cite{vscode-jv}.
