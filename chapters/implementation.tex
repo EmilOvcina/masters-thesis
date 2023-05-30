@@ -238,7 +238,7 @@ Multiple local output ports are handled so the UI can differentiate between loca
 This is done in a preprocessing step when the UI gets the Jolie system JSON, where local input ports will be matched to the corresponding output port of the embedder and the location will be unique between the two ports to remove ambiguity.
 Connections that are happening between networks are placed at the root of the ELK graph. To determine what edges should be added to the graph, all output ports will be checked to see if a matching input port exists anywhere.
 
-\begin{jsonlisting}[][caption={The ELK JSON format}, label={lst:elk_json}]
+\begin{jsonlisting}[floatplacement=t, float][caption={The ELK JSON format}, label={lst:elk_json}]
     {
         "id": "root",
         "layoutOptions": { "algorithm": "layered" },
@@ -349,24 +349,6 @@ To facilitate the refactoring of code from the UI, the JSON data also needs to c
 This is done using the \emph{parsing context} from the Jolie parser. When the Jolie parser creates the AST it keeps track of where tokens are in the file and what ranges a code block spans over.
 This information is saved in the JSON which \javatoolname[] creates as ranges with a name indicating what the range spans over.
 \cref{lst:code_ranges} shows how the code range is saved in the Jolie system JSON.
-\clearpage
-\begin{jsonlisting}[][caption={JSON representing a code range created by the Jolie parser}, label={lst:code_ranges}]
-{
-    "ranges": [
-        {
-            "name": "svc_name"
-            "start": {
-                "line": 21,
-                "char": 10
-            },
-            "end": {
-                "line": 22,
-                "char": -1
-            }
-        }
-    ]
-}
-\end{jsonlisting}
 
 All refactorable components in the code must have a corresponding code range. 
 Protocols, locations, and the port ranges for input and output ports must be saved in ranges, as well as, embedding code and service names.
@@ -387,6 +369,24 @@ Another type of edit can be used when renaming symbols, like service names, inte
 The LSP specification provides functionality for renaming a symbol which must be implemented by the language server protocol implementation for Jolie.
 VS Code can execute this function using the built-in command highlighted earlier. This needs a position of the symbol and what the new name is. The LSP then returns a list of workspace edits which can be applied directly in VS Code.
 
+\begin{jsonlisting}[floatplacement=t, float][caption={JSON representing a code range created by the Jolie parser}, label={lst:code_ranges}]
+    {
+        "ranges": [
+            {
+                "name": "svc_name"
+                "start": {
+                    "line": 21,
+                    "char": 10
+                },
+                "end": {
+                    "line": 22,
+                    "char": -1
+                }
+            }
+        ]
+    }
+\end{jsonlisting}
+
 \subsection{Embedding \& Disembedding}
 The user of the tool can drag around the services in the UI, and by dropping them on top of another service or outside the parent service, it will embed or disembed respectively.
 Much like the code refactoring functionality, when the user changes the architecture of the system, the UI sends a group of requests which contains the necessary information to reflect the change in the code base.
@@ -402,7 +402,7 @@ In the context of the VS Code extension, embeddings are a change to the architec
 When a port is created the interfaces specified are not necessarily imported correctly into the service needing it.
 If the correct interface is not imported, either explicitly or via the \texttt{*}-notation,
 the VS Code extension goes through all Jolie source code files in the workspace, using the workspace API, and tries to find the symbol needed. If it is interfaces that it is trying to find
-it will look for the interface name prefixed with \emph{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
+it will look for the interface name prefixed with \jo{interface}. This will be the declaration of the interface and the file it was found in will be used to create the import statement.
 
 The path of the file containing the interface declaration and the path to the file to the newly created port will be used to remove the common path prefix. This will give a relative path.
 This path is then converted into the path notation which Jolie uses and is added to the top of the document with the newly created port, using the stack of edits as mentioned previously.
@@ -428,7 +428,7 @@ All symbols are imported if they are not already, and all input ports are create
 The service is created with one edit because no code ranges of the aggregator service exist at that point, so the components cannot be created separately.
 
 \section{Prototyping}
-When the user executes the \emph{Docker-Compose} command from the VS Code extension or the command line, the
+When the user executes the Docker-Compose command from the VS Code extension or the command line, the
 \javatoolname[] is invoked via the adapter and fetches the JSON needed for creating the prototype.
 First, the docker-compose file is created by simply writing the generated content into the YAML file.
 \cref{appen:docker_yaml} shows an example of docker-compose YAML which can be generated.
@@ -437,7 +437,7 @@ The Jolie source code files must be placed with the correct relative path to eac
 The build folders are named using the service name and the service ID as a prefix. This is done to prevent any edge cases where two services are named the same thing.
 When creating the Docker-Compose YAML file content the build folders are referenced and the services follow the same pattern in the naming to prevent any cases of ambiguity.
 
-If \emph{JPM} is used in the project, the \texttt{package.json} file is also copied into the folders.
+If JPM is used in the project, the \texttt{package.json} file is also copied into the folders.
 A custom Dockerfile is created in each build folder. The Dockerfile contains any runtime arguments defined in the architecture file, and if the service uses JPM the initialize command will be added to the Dockerfile to make sure that the container installs the external dependencies correctly.
 VS Code runs on Electron which uses NodeJS as runtime, meaning that a NodeJS filesystem library\footnote{File system API in NodeJS - \url{https://nodejs.org/api/fs.html}} is used to access the filesystem to make folders, copy files and write to the YAML file.
 

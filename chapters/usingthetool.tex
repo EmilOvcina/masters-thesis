@@ -75,15 +75,15 @@ interface UserIFace {
         register(RegisterRequest)(ErrorResponse),
         login(LoginRequest)(LoginResponse),
         updateUser(UpdateRequest)(ErrorResponse),
-        deleteUser(DeleteRequest)(ErrorResponse),
+        deleteUser(DeleteRequest)(ErrorResponse)
 }
 \end{jolisting}
 
-The service is created in the main file and the execution is set to \emph{concurrent}.
+The service is created in the main file and the execution is set to \jo{concurrent}.
 The service can now be added to the architecture file. Since only one service is present in the main \texttt{.ol} file, only the file name needs to be specified in the service JSON.
 Now the visualization tool can be run using the command \emph{Jolie: Visualize} in VS Code, and a single service called \emph{User} can be seen.
 
-To use the tool to add the ports, double-click on the service to open the service in the sidebar. Next to the empty lists of ports, a \texttt{"+"} button can be clicked to add either an input port or an output port.
+To use the tool to add the ports, double-click on the service to open the service in the sidebar. Next to the empty lists of ports, a "+" button can be clicked to add either an input port or an output port.
 This will bring up a pop-up window, shown in \cref{figure:popup_create_inputport}, where the user can specify the details of the port such as name, location, protocol and a list of interfaces.
 \begin{figure}[t]
     \center
@@ -129,7 +129,7 @@ The create and update operation's request types require a product, which is a ty
 The read operation request type is only an integer corresponding to the product ID. The delete operation request type is a type containing the user ID and product ID to, once again, check if the user is allowed to delete the product and the ID of the product.
 
 When the types and interface (\texttt{ProductIFace}) have been created,
-a service named \emph{Product} is created in the main \texttt{.ol} file and once again the execution context is set to \emph{concurrent}.
+a service named \emph{Product} is created in the main \texttt{.ol} file and once again the execution context is set to \jo{concurrent}.
 The service is added to the architecture file in the same network as the user service, and can now be seen in the visualization user interface.
 
 By opening the product service in the sidebar the input and output port can be created similarly to the user service previously. The input port will use the \texttt{ProductIFace} interface and the output port will use the \texttt{AnalyticsIFace} interface.
@@ -144,7 +144,7 @@ The two services displayed in the visualization UI can be seen in \cref{figure:j
 \subsection{The Analytics Service}
 This service supports one operation for now. This is \texttt{addToLogs(AnalyticsRequest)}, which is a one-way operation. The interface for the service is already defined, so the operation is added there with the request type being \texttt{AnalyticsRequest}. This type holds information about what content will be logged and from which service.
 
-This service is created in the main file, and the execution is also \emph{concurrent}. The analytics service is added to the architecture file and is displayed in the visualization UI.
+This service is created in the main file, and the execution is also \jo{concurrent}. The analytics service is added to the architecture file and is displayed in the visualization UI.
 The input port can be created using the tool just like the last two services, and the interface for the
 port is \texttt{AnalyticsIFace}.
 
@@ -227,7 +227,7 @@ Now that the application has all seven services implemented, the developer can a
 \end{figure}
 
 It is not necessarily the best approach to have all seven services as top-level services. The services not accessed by the client directly should be embedded in the services which need them.
-The analytics service is used by four services: Order, Payment, User, and Product. To embed the analytics service in these four services the input port's location can be changed to \texttt{local}. This is just one way of embedding using local in-memory communication and is not the only way of embedding services. Another method of embedding will be used for another service later.
+The analytics service is used by four following services: Order, Payment, User, and Product. To embed the analytics service in these four services the input port's location can be changed to \texttt{local}. This is just one way of embedding using local in-memory communication and is not the only way of embedding services. Another method of embedding will be used for another service later.
 Changing the port location to \texttt{local} can be done in the sidebar.
 The output ports in the mentioned services using the analytics interface must also be deleted which, at the moment only can be done in the code, but instead of looking for the main files which contain the ports,
 opening the port in the sidebar and clicking \texttt{\{\}} at the top of the sidebar opens the correct file in the editor.

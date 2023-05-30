@@ -63,7 +63,7 @@ A grid is not used in the current version of the tool because ELK is used to mak
 The first version of the tool uses a simple custom layered layout algorithm. This is possible because the services have a direction.
 The algorithm works by placing each service in a horizontal layer based on how many of each port it has. The starting number of layers is determined by the width of the screen and each layer has a set height limit so when services exceed the limit an adjacent layer is created.
 Services with only one input port are placed in the left-most layer, and services with only one output layer are placed in the right-most layer.
-The services in between will be ordered so the service with the most \emph{connected} ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
+The services in between will be ordered so the service with the most connected ports will be placed in the middle-most layer and services with an input port connected to an output port of the middle service will be placed to the left. Services having output ports connected to input ports of the middle service are placed to the right.
 
 This algorithm is very simple. It worked on the handful of tested examples from the Jolie GitHub repository.\footnote{Jolie Examples on GitHub - \url{https://github.com/jolie/examples/tree/master}}
 But when the system becomes more complex connection-wise, it can quickly break or incomprehensible. One advantage of using this algorithm is that the user can drag around the services if the initial layout is bad.
@@ -132,7 +132,7 @@ parser for the architecture file would need to be created for all deployment too
 If Jolie has a way of defining the networks and the top-level services it would remove the need for an architecture file.
 However, one of the principles of Jolie is that it does not care about deployment.
 So either a separate tool or this tool will need to keep track of the architecture and a common representation should be made so all tools for Jolie agree on how the architecture is represented.
-LEMMA\footnote{LEMMA - \url{https://github.com/SeelabFhdo/lemma}} is a language/tool which could be used to extend the possible refactorings. LEMMA is a language used to model architectures, and it has a tool for exporting the architecture to Jolie services.\footnote{LEMMA2Jolie - \url{https://www.sciencedirect.com/science/article/abs/pii/S0167642323000382}} The drawback
+LEMMA\footnote{LEMMA - \url{https://github.com/SeelabFhdo/lemma}} is a language/tool which could be used to extend the possible refactorings. LEMMA is used to model architectures, and it has a tool for exporting the architecture to Jolie services.\footnote{LEMMA2Jolie - \url{https://www.sciencedirect.com/science/article/abs/pii/S0167642323000382}} The drawback
 of introducing a separate language representing the architecture is a steeper learning curve for new Jolie developers.
 
 Ultimately the tool is keeping the JSON configuration as of now. JSON is easy to read and understand. The main reason to not use Docker-Compose YAML is that the tool should not be locked in to use one specific technology. JSON is universal.
