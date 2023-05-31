@@ -149,6 +149,8 @@ This is done through the Code Actions\footnote{LSP Code Actions - \url{https://m
 feature. Unlike the renaming capabilities, the auto import is implemented in the tool manually, but if the LSP implements code actions a provider is then present and the tool needs to be updated to utilize that provider for auto import.
 This would make the feature a lot more robust since the LSP has a way of collecting and resolving symbols, so it would be optimal if the tool could utilize that. The current solution simply looks for which file in the workspace the symbol is declared in.
 
+Lastly, the formatting feature of the LSP will also be a beneficial addition since this tool edits code. Formatting the code after every edit done in the UI will keep the code nice and readable, and the code formatter is usually invoked after every document save so the feature would automatically work with the tool when it has been implemented in the Jolie LSP.
+
 When the highlighted functionality of the LSP has been developed and is used by the VS Code extension for Jolie. The tool should utilize it as much as possible.
 The tool should also have the VS Code extension for Jolie as a direct dependency which ensures that the LSP is running when the tool is used.
 
